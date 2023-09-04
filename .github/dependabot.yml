@@ -9,4 +9,3 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
-      - "no_ci_cd_run"

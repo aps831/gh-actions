@@ -3,6 +3,9 @@ cli:
   version: 1.8.0
 plugins:
   sources:
+    - id: aps831
+      ref: v2.1.4
+      uri: https://github.com/aps831/trunk-io-plugins
     - id: trunk
       ref: v0.0.16
       uri: https://github.com/trunk-io/plugins
@@ -27,6 +30,12 @@ runtimes:
 actions:
   disabled:
   enabled:
+    - wip-check
+    - templated-output-check
+    - hardcoding-check
+    - commitizen-tools-check
+    - commitizen-prompt-conventional
+    - commit-branch
     - trunk-announce
     - trunk-check-pre-push
     - trunk-fmt-pre-commit
