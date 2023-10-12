@@ -1,6 +1,7 @@
 ---
 version: "3"
 tasks:
+  # Tool versions
   tool-versions:upgrade:repo:
     summary: Upgrade version in .tool-versions
     desc: Upgrade version in .tool-versions
@@ -33,6 +34,7 @@ tasks:
         vars:
           OWNER: go-task
           NAME: task
+  # Semgrep
   semgrep:auto:
     summary: Run semgrep static analysis with auto config
     desc: Run semgrep static analysis with auto config
@@ -51,6 +53,7 @@ tasks:
     silent: true
     cmds:
       - semgrep --config=p/secrets .
+  # Trivy
   trivy:fs:
     summary: Run trivy fs check
     desc: Run trivy fs check
@@ -63,3 +66,13 @@ tasks:
     silent: true
     cmds:
       - trivy config .
+  pin-github-actions:
+    summary: Pin Github actions
+    desc: Pin Github actions
+    silent: true
+    cmds:
+      - |
+        for file in */*.yaml
+        do
+          GH_ADMIN_TOKEN=$(gh auth token) npx --yes pin-github-action@latest $file
+        done

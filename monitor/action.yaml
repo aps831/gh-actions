@@ -1,0 +1,9 @@
+---
+name: "Monitor"
+description: "Monitor permissions of Github Workflows"
+runs:
+  using: "composite"
+  steps:
+    - uses: GitHubSecurityLab/actions-permissions/monitor@e83639073897b68de235d81a783b2221cc13def7 # pin@v1
+      with:
+        config: '{ "create_artifact": true, "enabled": true, "debug": false }'
