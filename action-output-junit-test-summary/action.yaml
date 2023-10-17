@@ -1,0 +1,26 @@
+---
+name: Action Output Junit Test Summary
+description: Output Junit test summary
+inputs:
+  test-result-files:
+    description: Test result files
+    required: true
+  component-name:
+    description: Component name
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Header
+      shell: bash
+      run: |
+        if [[ "${{ inputs.component-name }}" != "" ]]; then
+          echo "**Test Summary for ${{ inputs.component-name }} on $RUNNER_OS**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "**Test Summary on $RUNNER_OS**" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Test summary
+      uses: test-summary/action@fee35d7df20790255fe6aa92cf0f6d28092ecf2f # pin@v2
+      with:
+        paths: "${{ inputs.test-result-files }}"

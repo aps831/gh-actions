@@ -1,0 +1,43 @@
+---
+name: Action Update Templated Docs
+description: Update templated docs
+inputs:
+  tag:
+    description: Tag to use in templated files
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  templated-files:
+    description: Templated files newline separated list
+    required: true
+outputs:
+  files:
+    description: Updated files newline separated list
+    value: ${{ steps.files.outputs.files }}
+runs:
+  using: "composite"
+  steps:
+    - name: Update templated files
+      id: files
+      shell: bash
+      run: |
+        TAG=${{ inputs.tag }}
+        export TAG
+        paths="${{ inputs.templated-files }}"
+        updated=""
+        while IFS= read -r path || [ -n "$path" ]; do
+          fullpath="${{ github.workspace }}/${{ inputs.working-directory }}/$path"
+          if [[ -f "$fullpath" ]]; then
+            dirname=${fullpath%/*}
+            basename=${fullpath##*/}
+            noext=${basename%%.*};
+            ext=${basename##*.}
+            echo "Updating $noext.$ext with tag ${TAG}"
+            envsubst '$TAG' < "$fullpath" > "$dirname/$noext.$ext"
+            updated="$updated$dirname/$noext.$ext"$'\n'
+          fi
+        done <<< "$paths"
+        echo 'files<<EOF' >> $GITHUB_OUTPUT
+        echo "$updated" >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT

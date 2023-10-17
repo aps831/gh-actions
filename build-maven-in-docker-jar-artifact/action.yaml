@@ -1,0 +1,78 @@
+---
+name: Build Maven in Docker Jar Artifact
+description: Build Maven in Docker jar artifact
+inputs:
+  branch-build:
+    description: Branch used for build
+    required: true
+  maven-enforcer-fail:
+    description: Fail on Maven enforcer
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  dockerfile:
+    description: Dockerfile
+    required: true
+  stage-build:
+    description: Stage for building artifact
+    required: true
+  stage-output:
+    description: Stage for outputting artifact
+    required: true
+  stage-status:
+    description: Stage for returning status
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  build-artifacts-jar-upload-name:
+    description: Name of build artifacts upload
+    value: ${{ steps.upload.outputs.name }}
+runs:
+  using: "composite"
+  steps:
+    # git-checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-build }}
+
+    # docker-build-artifact
+    - uses: aps831/gh-actions/docker-build-artifact@master
+      with:
+        docker-context: ${{ inputs.working-directory }}
+        dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile }}
+        output-directory: ${{ inputs.working-directory }}/target
+        build-args: |
+          MAVEN_PHASE=clean install
+          ENFORCER_FAIL=${{ inputs.maven-enforcer-fail }}
+        secrets: |
+          GITHUB_USER_REF=${{ github.actor }}
+          GITHUB_TOKEN_REF=${{ inputs.ACCESS_TOKEN }}
+        stage-build: ${{ inputs.stage-build }}
+        stage-output: ${{ inputs.stage-output }}
+        stage-status: ${{ inputs.stage-status }}
+
+    # output-junit-test-summary
+    - uses: aps831/gh-actions/action-output-junit-test-summary@master
+      if: always()
+      with:
+        test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
+
+    # upload-test-results
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: always()
+      with:
+        type: unit
+        test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
+
+    # build-artifacts-upload
+    - uses: aps831/gh-actions/action-build-artifacts-upload@master
+      id: upload
+      with:
+        description: jar-cyclonedx
+        build-files: |
+          ${{ inputs.working-directory }}/target/*.jar
+          ${{ inputs.working-directory }}/target/*-cyclonedx.json
+          ${{ inputs.working-directory }}/target/*-cyclonedx.xml

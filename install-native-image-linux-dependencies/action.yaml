@@ -1,0 +1,30 @@
+---
+name: Install Native Image Linux Dependencies
+description: Install native image linux dependencies
+runs:
+  using: "composite"
+  steps:
+    # https://www.graalvm.org/22.0/reference-manual/native-image/
+    - name: install graalvm native-image dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install build-essential libz-dev zlib1g-dev
+
+    # https://github.com/gluonhq/substrate/blob/master/README.md
+    - name: install javafx native-image dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install libasound2-dev \
+          libavcodec-dev \
+          libavformat-dev \
+          libavutil-dev \
+          libfreetype6-dev \
+          libgl-dev \
+          libglib2.0-dev \
+          libgtk-3-dev \
+          libpango1.0-dev \
+          libx11-dev \
+          libxtst-dev \
+          zlib1g-dev

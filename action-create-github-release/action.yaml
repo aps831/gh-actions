@@ -1,0 +1,71 @@
+---
+name: Action Github Create Release
+description: Create Github release
+inputs:
+  tag:
+    description: Tag
+    required: true
+  prerelease:
+    description: Determine if prerelease
+    required: true
+  draft:
+    description: Determine if draft
+    required: true
+  release-notes-file:
+    description: Release note file
+    required: true
+  artifacts-folder:
+    description: Artifacts folder
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+
+          const body = fs.readFileSync('${{ inputs.release-notes-file }}').toString();
+
+          const { data: release } = await github.rest.repos.createRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            tag_name: "${{ inputs.tag }}",
+            draft: ${{ inputs.draft }},
+            prerelease: ${{ inputs.prerelease }},
+            make_latest: "${{ inputs.prerelease == 'true' && 'false' || 'true' }}",
+            body: body
+          });
+
+          if ("${{ inputs.artifacts-folder }}" != "") {
+
+            const files = fs.readdirSync("${{ inputs.artifacts-folder }}", { recursive: true });
+
+            for (const file of files) {
+
+              const filepath = path.join("${{ inputs.artifacts-folder }}", file);
+
+              if (fs.lstatSync(filepath).isFile()) {
+                try {
+                  const buf = fs.readFileSync(filepath);
+                  await github.rest.repos.uploadReleaseAsset({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    release_id: release.id,
+                    name: path.basename(file),
+                    data: buf,
+                  });
+                } catch (error) {
+                  console.log(error);
+                  console.log('skipping file: ' + filepath);
+                }
+              }
+            }
+          }
+
+        result-encoding: string
+        github-token: ${{ inputs.ACCESS_TOKEN }}

@@ -1,0 +1,23 @@
+---
+name: Action Calculate Maven Github Package Name
+description: Calculate Maven Github package name
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+outputs:
+  package-name:
+    description: Package name
+    value: ${{ steps.package-name.outputs.package-name }}
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/install-xmlstartlet@master
+
+    - id: package-name
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        groupId=$(xmlstarlet sel --text -N ns=http://maven.apache.org/POM/4.0.0 --template -v "/ns:project/ns:groupId" pom.xml)
+        artifactId=$(xmlstarlet sel --text -N ns=http://maven.apache.org/POM/4.0.0 --template -v "/ns:project/ns:artifactId" pom.xml)
+        echo "package-name=$groupId.$artifactId" >> $GITHUB_OUTPUT

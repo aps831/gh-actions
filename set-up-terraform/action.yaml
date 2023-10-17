@@ -1,0 +1,29 @@
+---
+name: Set Up Terraform
+description: Set up Terraform
+inputs:
+  terraform-version:
+    description: Terraform version
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Add plugin cache directory to environment
+      id: plugin
+      shell: bash
+      run: |
+        echo "plugin-cache-directory=${{ github.workspace }}/.terraform.d/plugin-cache" >> $GITHUB_OUTPUT
+
+    - uses: hashicorp/setup-terraform@bbe167fbdaa1a3bd046bdd70eba9dd3dddcca99c # pin@v2.0.2
+      with:
+        terraform_version: ${{ inputs.terraform-version }}
+        terraform_wrapper: false
+
+    - name: Create Terraform Plugin Cache Dir
+      shell: bash
+      run: mkdir --parents ${{ steps.plugin.outputs.plugin-cache-directory }}
+
+    - uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # pin@v3.0.11
+      with:
+        path: ${{ steps.plugin.outputs.plugin-cache-directory }}
+        key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}

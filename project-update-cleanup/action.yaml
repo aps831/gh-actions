@@ -1,0 +1,34 @@
+---
+name: Project Update Cleanup
+description: Cleanup basic project
+inputs:
+  tag:
+    description: Tag
+    required: true
+  branch-event:
+    description: Branch on which event occurred
+    required: true
+  branch-update:
+    description: Branch used for creating update
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # git checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-update }}
+
+    # git checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-event }}
+
+    # git-delete-branch
+    - uses: aps831/gh-actions/git-delete-branch@master
+      if: ${{ inputs.branch-event != inputs.branch-update }}
+      with:
+        branch: ${{ inputs.branch-update }}

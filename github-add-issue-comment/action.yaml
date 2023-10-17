@@ -1,0 +1,27 @@
+---
+name: Github Add Issue Comment
+description: Github add issue comment
+inputs:
+  comment:
+    description: Comment to add to issue
+    required: true
+  issue-number:
+    description: Number of issue
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      with:
+        script: |
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: "${{ inputs.issue-number }}",
+            body: "${{ inputs.comment }}",
+          });
+        result-encoding: string
+        github-token: ${{ inputs.ACCESS_TOKEN }}

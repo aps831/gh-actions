@@ -1,0 +1,13 @@
+---
+name: Git Add Tag
+description: Add Git tag
+inputs:
+  tag:
+    description: Tag
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: git add tag
+      shell: bash
+      run: git tag ${{ inputs.tag }}

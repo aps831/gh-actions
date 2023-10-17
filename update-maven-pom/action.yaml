@@ -1,0 +1,37 @@
+---
+name: Update Maven POM
+description: Update Maven POM
+inputs:
+  pom-version:
+    description: Version to use in pom.xml
+    required: true
+  pom-parent-version:
+    description: Parent version to use in pom.xml
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # install-xmlstartlet
+    - uses: aps831/gh-actions/install-xmlstartlet@master
+
+    # find-files
+    - uses: aps831/gh-actions/action-find-files@master
+      id: files
+      with:
+        filename: pom.xml
+        working-directory: ${{ inputs.working-directory }}
+
+    # update-maven-pom
+    - uses: aps831/gh-actions/action-update-maven-pom@master
+      with:
+        files: ${{ steps.files.outputs.files }}
+        pom-version: ${{ inputs.pom-version }}
+        pom-parent-version: ${{ inputs.pom-parent-version }}
+
+    # git-add-file
+    - uses: aps831/gh-actions/git-add-file@master
+      with:
+        files: ${{ steps.files.outputs.files }}

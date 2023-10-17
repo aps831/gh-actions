@@ -1,0 +1,9 @@
+---
+name: Git Push
+description: Git push
+runs:
+  using: "composite"
+  steps:
+    - name: git push
+      shell: bash
+      run: git push || true

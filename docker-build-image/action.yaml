@@ -1,0 +1,116 @@
+---
+#  TODO #1 Update provenance flag on docker/build-push-action
+#  TODO #2 Update sbom flag on docker/build-push-action
+name: Docker Build Image
+description: Docker build image
+inputs:
+  image-name:
+    description: Docker image name
+    required: true
+  upload-image:
+    description: Upload image as build artifact
+    required: true
+  docker-context:
+    description: Docker context
+    required: true
+  output-directory:
+    description: Output directory
+    required: true
+  dockerfile:
+    description: Dockerfile
+    required: true
+  build-args:
+    description: Build arguments
+    required: true
+  secrets:
+    description: Secret arguments
+    required: true
+  stage-build:
+    description: Stage for building artifact
+    required: true
+  stage-output:
+    description: Stage for outputting artifact
+    required: true
+  stage-status:
+    description: Stage for returning status
+    required: true
+outputs:
+  image-upload-name:
+    description: Name of build image upload
+    value: ${{ steps.upload.outputs.name }}
+runs:
+  using: "composite"
+  steps:
+    # set-up-docker
+    - uses: aps831/gh-actions/set-up-docker@master
+
+    # git-short-hash
+    - uses: aps831/gh-actions/git-short-hash@master
+      id: hash
+
+    # build
+    - uses: docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6 # pin@v3
+      with:
+        context: ${{ inputs.docker-context }}
+        file: ${{ inputs.dockerfile }}
+        pull: true
+        push: false
+        build-args: ${{ inputs.build-args }}
+        secrets: ${{ inputs.secrets }}
+        cache-from: type=gha,scope=build
+        cache-to: type=gha,scope=build,mode=max
+        target: ${{ inputs.stage-build }}
+
+    # output
+    - name: Ensure output directory is empty
+      shell: bash
+      run: rm -rf ${{ inputs.output-directory }}
+
+    - uses: docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6 # pin@v3
+      with:
+        context: ${{ inputs.docker-context }}
+        file: ${{ inputs.dockerfile }}
+        push: false
+        build-args: ${{ inputs.build-args }}
+        secrets: ${{ inputs.secrets }}
+        cache-from: type=gha,scope=build
+        outputs: type=local,dest=${{ inputs.output-directory }}
+        target: ${{ inputs.stage-output }}
+
+    # status
+    - uses: docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6 # pin@v3
+      with:
+        context: ${{ inputs.docker-context }}
+        file: ${{ inputs.dockerfile }}
+        push: false
+        build-args: ${{ inputs.build-args }}
+        secrets: ${{ inputs.secrets }}
+        cache-from: type=gha,scope=build
+        target: ${{ inputs.stage-status }}
+
+    # create temp file
+    - name: create temp file
+      run: echo "TEMP_FILE=$(mktemp)" >> $GITHUB_ENV
+      shell: bash
+
+    # image
+    - uses: docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6 # pin@v3
+      with:
+        context: ${{ inputs.docker-context }}
+        file: ${{ inputs.dockerfile }}
+        push: false
+        build-args: ${{ inputs.build-args }}
+        secrets: ${{ inputs.secrets }}
+        cache-from: type=gha,scope=build
+        tags:
+          ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}:${{
+          steps.hash.outputs.hash }}
+        outputs: type=docker,dest=${{ env.TEMP_FILE }}
+
+    # build-artifacts-upload
+    - uses: aps831/gh-actions/action-build-artifacts-upload@master
+      if: ${{ inputs.upload-image == 'true' }}
+      id: upload
+      with:
+        description: ${{ inputs.image-name }}-image
+        build-files: ${{ env.TEMP_FILE }}

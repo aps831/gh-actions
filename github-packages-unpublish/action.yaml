@@ -1,0 +1,55 @@
+---
+name: Github Unpublish Package
+description: Github unpublish package
+inputs:
+  package-type:
+    description: Type of package
+    required: true
+  package-name:
+    description: Name of package
+    required: true
+  version:
+    description: Version
+    required: true
+  tag:
+    description: Tag
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      id: result
+      with:
+        script: |
+          const { data: package_versions } = await github.rest.packages.getAllPackageVersionsForPackageOwnedByAuthenticatedUser({
+            package_type: "${{ inputs.package-type }}",
+            package_name: "${{ inputs.package-name }}"
+          });
+          if (package_versions.length == 1) {
+            await github.rest.packages.deletePackageForAuthenticatedUser({
+              package_type: "${{ inputs.package-type }}",
+              package_name: "${{ inputs.package-name }}"
+            });
+          } else if (package_versions.length > 1) {
+            var package_version_id = undefined;
+            if ("${{ inputs.package-type }}" == "maven") {
+              package_version_id = package_versions.filter(pv => pv.name == "${{ inputs.version }}").map(pv => pv.id)[0];
+            } else if ("${{ inputs.package-type }}" == "container") {
+              package_version_id = package_versions.filter(pv => pv.metadata.container.tags.includes("${{ inputs.tag }}")).map(pv => pv.id)[0];
+            } else {
+              core.warning("packge type '${{ inputs.package-type }}' not supported");
+            }
+            if (package_version_id != undefined) {
+              await github.rest.packages.deletePackageVersionForAuthenticatedUser({
+                package_type: "${{ inputs.package-type }}",
+                package_name: "${{ inputs.package-name }}",
+                package_version_id: package_version_id
+              });
+            }
+          }
+
+        result-encoding: string
+        github-token: ${{ inputs.ACCESS_TOKEN }}

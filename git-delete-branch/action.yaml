@@ -1,0 +1,15 @@
+---
+name: Git Delete Branch
+description: Git delete branch
+inputs:
+  branch:
+    description: Branch to delete
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: git delete branch
+      shell: bash
+      run: |
+        git branch -d ${{ inputs.branch }}
+        git push origin --delete ${{ inputs.branch }}

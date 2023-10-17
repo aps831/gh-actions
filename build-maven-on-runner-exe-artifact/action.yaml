@@ -1,0 +1,100 @@
+---
+name: Build Maven on Runner Exe Artifact
+description: Build Maven on runner exe artifact
+inputs:
+  java-version:
+    description: Java version
+    required: true
+  graalvm-version:
+    description: Graalvm version
+    required: true
+  branch-build:
+    description: Branch used for build
+    required: true
+  maven-enforcer-fail:
+    description: Fail on Maven enforcer
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  use-xvfb-run:
+    description: Use xvfb
+    required: true
+  skip-tests:
+    description: Skip tests
+    required: true
+  settings-file:
+    description: Maven settings file
+    required: true
+  virtual-machine:
+    description: Virtual machine to use
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  build-artifacts-exe-upload-name:
+    description: Name of build artifacts upload
+    value: ${{ steps.upload.outputs.name }}
+runs:
+  using: "composite"
+  steps:
+    # git-checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-build }}
+
+    # set-up-jdk
+    - uses: aps831/gh-actions/set-up-jdk@master
+      if: ${{ inputs.virtual-machine == 'jvm' }}
+      with:
+        java-version: ${{ inputs.java-version}}
+
+    # set-up-graalvm-native-image
+    - uses: aps831/gh-actions/set-up-graalvm-native-image@master
+      if: ${{ inputs.virtual-machine == 'graalvm' }}
+      with:
+        java-version: ${{ inputs.java-version }}
+        graalvm-version: ${{ inputs.graalvm-version }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # action-maven-clean-install
+    - uses: aps831/gh-actions/action-maven-clean-install@master
+      with:
+        maven-enforcer-fail: ${{ inputs.maven-enforcer-fail }}
+        working-directory: ${{ inputs.working-directory }}
+        use-xvfb-run: ${{ inputs.use-xvfb-run }}
+        skip-tests: ${{ inputs.skip-tests }}
+        settings-file: ${{ inputs.settings-file }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # output-junit-test-summary
+    - uses: aps831/gh-actions/action-output-junit-test-summary@master
+      if: always()
+      with:
+        test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
+
+    # upload-test-results
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: always()
+      with:
+        type: unit
+        os-name: "${{ runner.os }}"
+        test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
+
+    # build-artifacts-upload
+    - uses: aps831/gh-actions/action-build-artifacts-upload@master
+      id: upload
+      with:
+        description: exe-cyclonedx-${{ runner.os }}
+        build-files: |
+          ${{ inputs.working-directory }}/target/gluonfx/x86_64-linux/*
+          !${{ inputs.working-directory }}/target/gluonfx/x86_64-linux/gensrc
+          !${{ inputs.working-directory }}/target/gluonfx/x86_64-linux/gvm
+          ${{ inputs.working-directory }}/target/gluonfx/x86_64-windows/*
+          !${{ inputs.working-directory }}/target/gluonfx/x86_64-windows/gensrc
+          !${{ inputs.working-directory }}/target/gluonfx/x86_64-windows/gvm
+          ${{ inputs.working-directory }}/target/installer/*
+          !${{ inputs.working-directory }}/target/installer/input/
+          ${{ inputs.working-directory }}/target/*cyclonedx*.json
+          ${{ inputs.working-directory }}/target/*cyclonedx*.xml

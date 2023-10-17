@@ -1,0 +1,75 @@
+---
+name: Github Release Publish
+description: Github release publish
+inputs:
+  tag:
+    description: Tag
+    required: true
+  branch-update:
+    description: Branch used for creating update
+    required: true
+  prerelease:
+    description: Prerelease flag
+    required: true
+  draft:
+    description: Draft flag
+    required: true
+  build-artifacts-upload-name:
+    description: Name of build artifacts upload
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # git-checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-update }}
+
+    # git-add-tag
+    - uses: aps831/gh-actions/git-add-tag@master
+      with:
+        tag: ${{ inputs.tag }}
+
+    # git-push-tag
+    - uses: aps831/gh-actions/git-push-tag@master
+      with:
+        tag: ${{ inputs.tag }}
+
+    # build-artifacts-download
+    - uses: aps831/gh-actions/action-build-artifacts-download@master
+      id: artifacts-folder
+      with:
+        names: |
+          ${{ inputs.build-artifacts-upload-name }}
+
+    # latest release tag
+    - uses: aps831/gh-actions/github-latest-good-release-tag@master
+      id: latest-release-tag
+      with:
+        fallback: ""
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # action-create-release-notes
+    - uses: aps831/gh-actions/action-create-release-notes@master
+      id: release-notes-file
+      with:
+        current-tag: ${{ inputs.tag }}
+        previous-tag: ${{ steps.latest-release-tag.outputs.tag }}
+
+    # action-create-github-release
+    - uses: aps831/gh-actions/action-create-github-release@master
+      with:
+        tag: ${{ inputs.tag }}
+        prerelease: ${{ inputs.prerelease }}
+        draft: ${{ inputs.draft }}
+        release-notes-file: ${{ steps.release-notes-file.outputs.release-notes-file }}
+        artifacts-folder: ${{ steps.artifacts-folder.outputs.artifacts-folder }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # delete release notes
+    - name: delete release notes file
+      shell: bash
+      run: rm ${{ steps.release-notes-file.outputs.release-notes-file }}

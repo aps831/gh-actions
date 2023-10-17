@@ -1,0 +1,41 @@
+---
+name: Action Create Pull Request
+description: Create pull request
+inputs:
+  title:
+    description: Title of pull request
+    required: true
+  body:
+    description: Body of pull request
+    required: true
+  base-branch:
+    description: Base branch for pull request
+    required: true
+  update-branch:
+    description: Branch used for creating update
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  pull-request-number:
+    description: Number of pull request
+    value: ${{ steps.result.outputs.result }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      id: result
+      with:
+        script: |
+          const { data: pull } = await github.rest.pulls.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            head: "${{ inputs.update-branch }}",
+            base: "${{ inputs.base-branch }}",
+            title: "${{ inputs.title }}",
+            body: "${{ inputs.body }}",
+          });
+          return pull.number
+        result-encoding: string
+        github-token: ${{ inputs.ACCESS_TOKEN }}

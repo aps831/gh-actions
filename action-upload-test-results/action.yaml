@@ -1,0 +1,32 @@
+---
+name: Action Upload Test Results
+description: Upload test results
+inputs:
+  type:
+    description: Type of test results
+    required: true
+  test-result-files:
+    description: Test result files
+    required: true
+  os-name:
+    description: Operating system name
+    required: false
+  component-name:
+    description: Component name
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/action-sanitize-upload-name@master
+      id: component-name
+      with:
+        name: ${{ inputs.component-name }}
+
+    - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # pin@v3
+      with:
+        name: >
+          test-reports-type-${{ inputs.type }}${{ inputs.os-name != '' && '-on-' || '' }}${{
+          inputs.os-name }}${{ steps.component-name.outputs.name != '' && '-for-' || '' }}${{
+          steps.component-name.outputs.name }}
+        path: ${{ inputs.test-result-files }}
+        retention-days: 3

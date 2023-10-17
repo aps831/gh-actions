@@ -1,0 +1,52 @@
+---
+name: Github Publish Docker Image
+description: Github publish Docker image
+inputs:
+  image-name:
+    description: Docker image name
+    required: true
+  tag:
+    description: Tag
+    required: true
+  build-artifacts-upload-name:
+    description: Name of build artifacts upload
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # login-github-ghcr
+    - uses: aps831/gh-actions/login-github-ghcr@master
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # build-artifacts-download
+    - uses: aps831/gh-actions/action-build-artifacts-download@master
+      id: artifacts-folder
+      with:
+        names: ${{ inputs.build-artifacts-upload-name }}
+
+    # git-short-hash
+    - uses: aps831/gh-actions/git-short-hash@master
+      id: hash
+
+    # publish
+    - name: Publish image
+      working-directory:
+        ${{ steps.artifacts-folder.outputs.artifacts-folder }}/${{
+        inputs.build-artifacts-upload-name }}
+      shell: bash
+      run: |
+        for file in *; do
+          base="ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}"
+          hash="${base}:${{ steps.hash.outputs.hash }}"
+          version="${base}:${{ inputs.tag }}"
+          latest="${base}:latest"
+          docker load --input $file
+          docker tag "$hash" "$version"
+          docker tag "$hash" "$latest"
+          docker rmi "$hash"
+          docker push --all-tags "${base}"
+        done

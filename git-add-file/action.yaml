@@ -1,0 +1,19 @@
+---
+name: Git Add File
+description: Add file to Git
+inputs:
+  files:
+    description: Files to add newline separated list
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: git add
+      shell: bash
+      run: |
+        files="${{ inputs.files }}"
+        while IFS= read -r file || [ -n "$file" ]; do
+          if [[ -f "$file" ]]; then
+            git add "$file" || true
+          fi
+        done <<< "$files"

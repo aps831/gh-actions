@@ -1,0 +1,13 @@
+---
+name: Git Delete Tag
+description: Git delete tag
+inputs:
+  tag:
+    description: Tag
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: git delete tag
+      shell: bash
+      run: git tag -d ${{ inputs.tag }}

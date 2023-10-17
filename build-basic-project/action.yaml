@@ -1,0 +1,50 @@
+---
+name: Build Basic Project
+description: Build basic project
+inputs:
+  branch-build:
+    description: Branch used for build
+    required: true
+  build-script:
+    description: Build script
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  tap-test-results-directory:
+    description: Tap test results directory
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # git-checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-build }}
+
+    # create test results directory
+    - name: create test results directory
+      if: ${{ inputs.tap-test-results-directory != '' }}
+      shell: bash
+      run: mkdir -p ${{ inputs.working-directory }}/${{ inputs.tap-test-results-directory }}
+
+    # build
+    - name: build
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: ${{ inputs.build-script }}
+
+    # output-tap-test-summary
+    - uses: aps831/gh-actions/action-output-tap-test-summary@master
+      if: ${{ always() && inputs.tap-test-results-directory != '' }}
+      with:
+        tap-test-result-files:
+          ${{ inputs.working-directory }}/${{ inputs.tap-test-results-directory }}/*.tap
+
+    # upload-test-results
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.tap-test-results-directory != '' }}
+      with:
+        type: tap
+        test-result-files:
+          ${{ inputs.working-directory }}/${{ inputs.tap-test-results-directory }}/*.tap

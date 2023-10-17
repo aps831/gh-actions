@@ -1,0 +1,40 @@
+---
+name: Build Terraform Project
+description: Build Terraform project
+inputs:
+  branch-build:
+    description: Branch used for build
+    required: true
+  terraform-version:
+    description: Terraform version
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  paths:
+    description: Newline separated list of paths within working directory
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # git-checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-build }}
+
+    # set-up-terraform
+    - uses: aps831/gh-actions/set-up-terraform@master
+      with:
+        terraform-version: ${{ inputs.terraform-version }}
+
+    # terraform-format
+    - uses: aps831/gh-actions/action-terraform-format@master
+      with:
+        working-directory: ${{ inputs.working-directory }}
+        paths: ${{ inputs.paths }}
+
+    # terraform-validate
+    - uses: aps831/gh-actions/action-terraform-validate@master
+      with:
+        working-directory: ${{ inputs.working-directory }}
+        paths: ${{ inputs.paths }}

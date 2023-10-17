@@ -1,0 +1,35 @@
+---
+name: Set Up Graalvm Native Image
+description: Set up graalvm native image
+inputs:
+  java-version:
+    description: Java version
+    required: true
+  graalvm-version:
+    description: Graalvm version
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: graalvm/setup-graalvm@b8dc5fccfbc65b21dd26e8341e7b21c86547f61b # pin@v1
+      with:
+        version: "${{ inputs.graalvm-version }}"
+        java-version: "${{ inputs.java-version }}"
+        components: "native-image"
+        github-token: ${{ inputs.ACCESS_TOKEN }}
+
+    - uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # pin@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - if: ${{ runner.os == 'Linux' }}
+      uses: aps831/gh-actions/install-native-image-linux-dependencies@master
+
+    - if: ${{ runner.os == 'Windows' }}
+      uses: aps831/gh-actions/install-native-image-windows-dependencies@master

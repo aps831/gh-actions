@@ -1,0 +1,13 @@
+---
+name: Git commit
+description: Git commit
+inputs:
+  message:
+    description: commit message
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: git commit
+      shell: bash
+      run: git commit -m "${{ inputs.message }}" || true

@@ -1,0 +1,26 @@
+---
+name: Git Branch Not Behind
+description: Check for Git branch not behind
+inputs:
+  branch:
+    description: Branch to check
+    required: true
+  branch-check-against:
+    description: Branch to check against
+    required: true
+outputs:
+  not-behind:
+    description: Flag to indicate that branch is not behind
+    value: ${{ steps.not-behind.outputs.not-behind }}
+runs:
+  using: "composite"
+  steps:
+    - name: git add tag
+      id: not-behind
+      shell: bash
+      run: |
+        if [[ "$(git rev-list ${{ inputs.branch-check-against }} --not ${{ inputs.branch }} | wc -l)" == "0" ]]; then
+          echo "not-behind=true" >> $GITHUB_OUTPUT
+        else
+          echo "not-behind=false" >> $GITHUB_OUTPUT
+        fi

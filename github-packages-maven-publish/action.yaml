@@ -1,0 +1,57 @@
+---
+name: Github Publish Maven Package
+description: Github publish Maven package
+inputs:
+  settings-file:
+    description: Maven settings file
+    required: true
+  build-artifacts-upload-name:
+    description: Name of build artifacts upload
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # Set up JDK
+    - uses: aps831/gh-actions/set-up-jdk@master
+
+    # build-artifacts-download
+    - uses: aps831/gh-actions/action-build-artifacts-download@master
+      id: artifacts-folder
+      with:
+        names: ${{ inputs.build-artifacts-upload-name }}
+
+    # make target directory
+    - name: make target directory
+      working-directory: ${{ steps.artifacts-folder.outputs.artifacts-folder }}
+      shell: bash
+      run: mkdir target
+
+    # move artifacts into target
+    - name: make target directory
+      working-directory: ${{ steps.artifacts-folder.outputs.artifacts-folder }}
+      shell: bash
+      run: |
+        for file in *; do
+          if [ ! -d "$file" ]; then
+            mv "$file" target/
+          fi
+        done
+
+    # Publish
+    - name: Publish package
+      working-directory: ${{ steps.artifacts-folder.outputs.artifacts-folder }}
+      shell: bash
+      run: |
+        if [ "${{ inputs.settings-file }}" != "" ]; then
+          mvn --file ${{ github.workspace }}/pom.xml --batch-mode jar:jar deploy:deploy --settings ${{ github.workspace }}/${{ inputs.settings-file }}
+        elif [ -f "settings.xml" ]; then
+          mvn --file ${{ github.workspace }}/pom.xml --batch-mode jar:jar deploy:deploy --settings ${{ github.workspace }}/settings.xml
+        else
+          mvn --file ${{ github.workspace }}/pom.xml --batch-mode jar:jar deploy:deploy
+        fi
+      env:
+        GITHUB_USER_REF: ${{ github.actor }}
+        GITHUB_TOKEN_REF: ${{ inputs.ACCESS_TOKEN }}

@@ -1,0 +1,35 @@
+---
+name: Action Update Maven POM
+description: Update Maven POM
+inputs:
+  files:
+    description: Newline separated list of files
+    required: true
+  pom-version:
+    description: Version to use in pom.xml
+    required: true
+  pom-parent-version:
+    description: Parent version to use in pom.xml
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: update version
+      shell: bash
+      run: |
+        files="${{ inputs.files }}"
+        while IFS= read -r file || [ -n "$file" ]; do
+          if [[ -f "$file" ]]; then
+            xmlstarlet ed --inplace -N ns=http://maven.apache.org/POM/4.0.0 -u "/ns:project/ns:version" -v ${{ inputs.pom-version }} "$file" || true
+          fi
+        done <<< "$files"
+
+    - name: update parent version
+      shell: bash
+      run: |
+        files="${{ inputs.files }}"
+        while IFS= read -r file || [ -n "$file" ]; do
+          if [[ -f "$file" ]]; then
+            xmlstarlet ed --inplace -N ns=http://maven.apache.org/POM/4.0.0 -u "/ns:project/ns:parent/ns:version" -v ${{ inputs.pom-parent-version }} "$file" || true
+          fi
+        done <<< "$files"

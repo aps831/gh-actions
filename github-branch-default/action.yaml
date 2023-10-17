@@ -1,0 +1,25 @@
+---
+name: Github Branch Default
+description: Get Github branch default
+inputs:
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  branch-default:
+    description: Default branch
+    value: ${{ steps.default-branch.outputs.result }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      id: default-branch
+      with:
+        script: |
+          const { data: repo } = await github.rest.repos.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          });
+          return repo.default_branch
+        result-encoding: string
+        github-token: ${{ inputs.ACCESS_TOKEN }}

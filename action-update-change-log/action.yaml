@@ -1,0 +1,23 @@
+---
+name: Action Update Change Log
+description: Update change log
+inputs:
+  current-tag:
+    description: Current tag
+    required: true
+  start-tag:
+    description: Start tag
+    required: true
+outputs:
+  changelog:
+    description: Change log file name
+    value: CHANGELOG.md
+runs:
+  using: "composite"
+  steps:
+    - uses: orhun/git-cliff-action@b7913b664658dd091d9971658cb02a19047baa79 # pin@v2
+      id: git-cliff
+      with:
+        args: ${{ inputs.start-tag }}..${{ inputs.current-tag }}
+      env:
+        OUTPUT: CHANGELOG.md

@@ -1,0 +1,23 @@
+---
+name: Update Nodejs package json
+description: Update Nodejs package json
+inputs:
+  version:
+    description: Version to use in package.json
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # update-nodejs-package-json
+    - uses: aps831/gh-actions/action-update-nodejs-package-json@master
+      with:
+        files: ${{ inputs.working-directory}}/package.json
+        version: ${{ inputs.version }}
+
+    # git-add-file
+    - uses: aps831/gh-actions/git-add-file@master
+      with:
+        files: ${{ inputs.working-directory}}/package.json

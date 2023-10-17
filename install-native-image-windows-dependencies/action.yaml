@@ -1,0 +1,11 @@
+---
+name: Install Native Image Windows Dependencies
+description: Install native image Windows dependencies
+runs:
+  using: "composite"
+  steps:
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@c26a08ba26249b81327e26f6ef381897b6a8754d # pin@v1.0.2
+
+    - name: Visual Studio shell
+      uses: egor-tensin/vs-shell@6d88c01ad4b6b33190d261b45e241e462545652b # pin@v1

@@ -1,0 +1,35 @@
+---
+name: Action Find Files
+description: Find files
+inputs:
+  filename:
+    description: Filename to search
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+outputs:
+  files:
+    description: Newline separated list of files
+    value: ${{ steps.files.outputs.files }}
+runs:
+  using: "composite"
+  steps:
+    - name: create temp file
+      run: echo "TEMP_FILE=$(mktemp)" >> $GITHUB_ENV
+      shell: bash
+
+    - name: find files
+      working-directory: ${{ inputs.working-directory }}
+      run:
+        find -name ${{ inputs.filename }} -printf "${{ inputs.working-directory }}/%p\n" > ${{
+        env.TEMP_FILE }}
+      shell: bash
+
+    - name: output files
+      id: files
+      shell: bash
+      run: |
+        echo 'files<<EOF' >> $GITHUB_OUTPUT
+        cat ${{ env.TEMP_FILE }} >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT

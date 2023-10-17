@@ -1,0 +1,21 @@
+---
+name: Update Terraform Docs
+description: Update Terraform docs
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Render terraform docs
+      id: render
+      uses: terraform-docs/gh-actions@f6d59f89a280fa0a3febf55ef68f146784b20ba0 # pin@v1.0.0
+      with:
+        find-dir: ${{ inputs.working-directory }}
+        output-file: TERRAFORM.md
+        output-method: replace
+
+    - name: Fix .git owner
+      shell: bash
+      run: sudo chown runner:docker -R .git

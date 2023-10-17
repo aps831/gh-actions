@@ -1,0 +1,30 @@
+---
+name: Github Latest Release Is Draft
+description: Check if Github latest release is draft
+inputs:
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  is-draft:
+    description: Draft flag
+    value: ${{ steps.result.outputs.result }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      id: result
+      with:
+        script: |
+          var release = undefined;
+          const { data: releases } = await github.rest.repos.listReleases({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          });
+          if (releases[0] == undefined) {
+            return false;
+          } else {
+            return releases[0].draft;
+          }
+        result-encoding: string
+        github-token: ${{ inputs.ACCESS_TOKEN }}

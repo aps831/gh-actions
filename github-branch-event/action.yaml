@@ -1,0 +1,37 @@
+---
+name: Github Branch Event
+description: Get Github branch event
+inputs:
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  branch-event:
+    description: Branch on which event occurred
+    value: ${{ steps.event-branch.outputs.event-branch }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      if: github.event.issue.pull_request
+      id: pull-request
+      with:
+        script: |
+          const { data: pull } = await github.rest.pulls.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number
+          })
+          return pull.head.ref
+        result-encoding: string
+        github-token: ${{ inputs.ACCESS_TOKEN }}
+
+    - name: Get Github event branch
+      shell: bash
+      id: event-branch
+      run: |
+        if [[ "${{ steps.pull-request.outputs.result }}" != "" ]]; then
+          echo "event-branch=${{ steps.pull-request.outputs.result }}" >> $GITHUB_OUTPUT
+        else
+          echo "event-branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        fi

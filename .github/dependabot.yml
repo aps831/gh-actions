@@ -9,3 +9,291 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-build-artifacts-download/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-build-artifacts-upload/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-create-github-release/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-create-pull-request/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-create-release-notes/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-find-files/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-output-junit-test-summary/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-output-tap-test-summary/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-output-update-change-log/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-upload-test-results/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "docker-build-artifact/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "build-basic-project/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "build-nodejs-in-docker-directory-artifact/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "docker-build-image/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "git-checkout/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "github-add-issue-comment/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "github-branch-default/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "github-branch-event/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "github-latest-good-release-tag/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "github-latest-release-is-draft/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "github-no-draft-releases/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "github-nth-release-tag/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "github-packages-docker-publish/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "github-packages-unpublish/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "github-release-finalize/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "github-release-unpublish/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "install-native-image-windows-dependencies/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "install-rust-tool/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "login-github-ghcr/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "monitor/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "set-up-docker/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "set-up-graalvm-native-image/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "set-up-jdk/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "set-up-nodejs/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "set-up-terraform/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "update-terraform-docs/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"

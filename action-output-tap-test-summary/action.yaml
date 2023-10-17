@@ -1,0 +1,19 @@
+---
+name: Action Output Tap Test Summary
+description: Output tap test summary
+inputs:
+  tap-test-result-files:
+    description: Tap test result files
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Header
+      shell: bash
+      run: |
+        echo "**Test Summary $RUNNER_OS**" >> $GITHUB_STEP_SUMMARY
+
+    - name: Test summary
+      uses: test-summary/action@fee35d7df20790255fe6aa92cf0f6d28092ecf2f # pin@v2
+      with:
+        paths: "${{ inputs.tap-test-result-files }}"

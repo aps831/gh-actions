@@ -1,0 +1,16 @@
+---
+name: Git Short Hash
+description: Calculate git short hash
+outputs:
+  hash:
+    description: Git short hash
+    value: ${{ steps.hash.outputs.hash }}
+runs:
+  using: "composite"
+  steps:
+    - name: calculate git short hash
+      id: hash
+      shell: bash
+      run: |
+        hash=$(git rev-parse --short HEAD)
+        echo "hash=$hash" >> $GITHUB_OUTPUT

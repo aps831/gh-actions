@@ -1,0 +1,13 @@
+---
+name: Git Push Tag
+description: Git push tag
+inputs:
+  tag:
+    description: Tag
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: git push tag
+      shell: bash
+      run: git push origin ${{ inputs.tag }}

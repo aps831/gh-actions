@@ -1,0 +1,13 @@
+---
+name: Git Merge
+description: Git merge
+inputs:
+  branch:
+    description: Branch to merge
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: git merge
+      shell: bash
+      run: git merge --ff-only ${{ inputs.branch }}

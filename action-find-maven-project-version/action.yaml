@@ -1,0 +1,22 @@
+---
+name: Action Find Maven Project Version
+description: Find Maven project version
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+outputs:
+  project-version:
+    description: Project version
+    value: ${{ steps.project-version.outputs.project-version }}
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/install-xmlstartlet@master
+
+    - id: project-version
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        version=$(xmlstarlet sel --text -N ns=http://maven.apache.org/POM/4.0.0 --template -v "/ns:project/ns:version" pom.xml)
+        echo "project-version=$version" >> $GITHUB_OUTPUT

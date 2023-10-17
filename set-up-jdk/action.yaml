@@ -1,0 +1,19 @@
+---
+name: Set Up JDK
+description: Set up jdk
+inputs:
+  java-version:
+    description: Java version
+    required: false
+    default: "17"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # pin@v3
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: "adopt"
+        cache: "maven"
+        server-id: github
+        server-username: GITHUB_USER_REF
+        server-password: GITHUB_TOKEN_REF

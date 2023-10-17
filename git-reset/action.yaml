@@ -1,0 +1,9 @@
+---
+name: Git Reset
+description: Git reset
+runs:
+  using: "composite"
+  steps:
+    - name: git reset
+      shell: bash
+      run: git reset --hard HEAD^

@@ -1,0 +1,89 @@
+---
+name: Project Update Terraform Maven
+description: Update Terraform Maven project
+inputs:
+  pom-version:
+    description: Version to use in pom.xml
+    required: true
+  pom-parent-version:
+    description: Parent version to use in pom.xml
+    required: true
+  snapshot:
+    description: Snapshot release flag
+    required: true
+  tag:
+    description: Tag
+    required: true
+  working-directory-maven:
+    description: Maven working directory
+    required: true
+  working-directory-terraform:
+    description: Terraform working directory
+    required: true
+  templated-files:
+    description: Templated files to update with new tag
+    required: true
+  branch-event:
+    description: Branch on which event occurred
+    required: true
+  branch-update:
+    description: Branch to use for creating update
+    required: true
+  persist-updates:
+    description: Persist updates
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # git checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-event }}
+
+    # git-create-and-switch-branch
+    - uses: aps831/gh-actions/git-create-and-switch-branch@master
+      if: ${{ inputs.branch-event != inputs.branch-update }}
+      with:
+        branch: ${{ inputs.branch-update }}
+
+    # git-configure
+    - uses: aps831/gh-actions/git-configure@master
+
+    # update-templated-docs
+    - uses: aps831/gh-actions/update-templated-docs@master
+      with:
+        tag: ${{ inputs.tag }}
+        working-directory: "."
+        templated-files: ${{ inputs.templated-files }}
+
+    # update-change-log
+    - uses: aps831/gh-actions/update-change-log@master
+      with:
+        tag: ${{ inputs.tag }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # update-terraform-docs
+    - uses: aps831/gh-actions/update-terraform-docs@master
+      with:
+        working-directory: ${{ inputs.working-directory-terraform }}
+
+    # update-maven-pom
+    - uses: aps831/gh-actions/update-maven-pom@master
+      with:
+        pom-version: ${{ inputs.pom-version }}${{ inputs.snapshot == 'true' && '-SNAPSHOT' || '' }}
+        pom-parent-version:
+          ${{ inputs.pom-parent-version }}${{ inputs.snapshot == 'true' && '-SNAPSHOT' || '' }}
+        working-directory: ${{ inputs.working-directory-maven }}
+
+    # git-commit
+    - uses: aps831/gh-actions/git-commit@master
+      if: ${{ inputs.persist-updates == 'true' }}
+      with:
+        message: "chore: update for ${{ inputs.tag }} release [skip ci]"
+
+    # git-push
+    - uses: aps831/gh-actions/git-push@master
+      if: ${{ inputs.persist-updates == 'true' }}

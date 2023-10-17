@@ -1,0 +1,34 @@
+---
+name: Git Checkout
+description: Git checkout
+inputs:
+  branch:
+    description: Branch to checkout
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: test if git repo already checked out
+      id: check
+      shell: bash
+      run: |
+        if [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]; then
+          echo "isrepo=true" >> $GITHUB_OUTPUT
+        else
+          echo "isrepo=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: git checkout branch existing repo
+      if: ${{ steps.check.outputs.isrepo == 'true' }}
+      shell: bash
+      run: |
+        git checkout ${{ inputs.branch }}
+        git pull --ff-only
+
+    - if: ${{ steps.check.outputs.isrepo == 'false' }}
+      uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # pin@v3.1.0
+      with:
+        ref: ${{ inputs.branch }}
+        fetch-depth: 0
+        clean: false
+        submodules: true

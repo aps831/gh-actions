@@ -1,0 +1,39 @@
+---
+name: Action Maven Clean Install
+description: Maven clean install
+inputs:
+  maven-enforcer-fail:
+    description: Fail on Maven enforcer
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  use-xvfb-run:
+    description: Use xvfb
+    required: true
+  skip-tests:
+    description: Skip tests
+    required: true
+  settings-file:
+    description: Maven settings file
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Run maven clean install
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        if [ "${{ inputs.settings-file }}" != "" ]; then
+          ${{ inputs.use-xvfb-run == 'true' && 'xvfb-run' || '' }} mvn --batch-mode clean install -Denforcer.fail=${{ inputs.maven-enforcer-fail }} ${{ inputs.skip-tests == 'true' && '-DskipTests' || '' }} --settings ${{ inputs.settings-file }}
+        elif [ -f "settings.xml" ]; then
+          ${{ inputs.use-xvfb-run == 'true' && 'xvfb-run' || '' }} mvn --batch-mode clean install -Denforcer.fail=${{ inputs.maven-enforcer-fail }} ${{ inputs.skip-tests == 'true' && '-DskipTests' || '' }} --settings settings.xml
+        else
+          ${{ inputs.use-xvfb-run == 'true' && 'xvfb-run' || '' }} mvn --batch-mode clean install -Denforcer.fail=${{ inputs.maven-enforcer-fail }} ${{ inputs.skip-tests == 'true' && '-DskipTests' || '' }}
+        fi
+      env:
+        GITHUB_USER_REF: ${{ github.actor }}
+        GITHUB_TOKEN_REF: ${{ inputs.ACCESS_TOKEN }}

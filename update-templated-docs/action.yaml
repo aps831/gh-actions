@@ -1,0 +1,26 @@
+---
+name: Update Templated Docs
+description: Update templated docs
+inputs:
+  tag:
+    description: Tag to use in templated files
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  templated-files:
+    description: Templated files newline separated list
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/action-update-templated-docs@master
+      id: update
+      with:
+        tag: ${{ inputs.tag }}
+        working-directory: ${{ inputs.working-directory }}
+        templated-files: ${{ inputs.templated-files }}
+
+    - uses: aps831/gh-actions/git-add-file@master
+      with:
+        files: ${{ steps.update.outputs.files }}

@@ -1,0 +1,33 @@
+---
+name: Project Merge Publish Branch
+description: Merge publish branch of project
+inputs:
+  target-branch:
+    description: Branch to update
+    required: true
+  source-branch:
+    description: Branch update from
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # git checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.source-branch }}
+
+    # git checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.target-branch }}
+
+    # git-merge
+    - uses: aps831/gh-actions/git-merge@master
+      with:
+        branch: ${{ inputs.source-branch }}
+
+    # git-push
+    - uses: aps831/gh-actions/git-push@master

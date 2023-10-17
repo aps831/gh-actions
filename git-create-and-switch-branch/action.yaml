@@ -1,0 +1,17 @@
+---
+name: Git Create and Switch Branch
+description: Create Git create and switch branch
+inputs:
+  branch:
+    description: Branch to create and switch to
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: checkout and switch branch
+      shell: bash
+      run: git checkout -b ${{ inputs.branch }}
+
+    - name: push branch to remote
+      shell: bash
+      run: git push --set-upstream origin ${{ inputs.branch }}

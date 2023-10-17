@@ -1,0 +1,47 @@
+---
+name: Action Terraform Format
+description: Action Terraform format
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+  paths:
+    description: Newline separated list of paths within working directory
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Install ansi2txt
+      shell: bash
+      run: sudo apt install colorized-logs
+
+    - name: Output Terraform format step summary
+      shell: bash
+      run: echo "**Terraform Format Check Summary**" >> $GITHUB_STEP_SUMMARY
+
+    - name: Terraform format check
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        paths="${{ inputs.paths }}"
+        while IFS= read -r path || [ -n "$path" ]; do
+          if [[ -n "$path" && -d "$path" ]]; then
+
+            pushd "$path" > /dev/null 2>&1
+
+            terraform fmt -check -recursive > format.log
+            ansi2txt < format.log > format.txt
+
+            echo "### $path" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            cat format.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+            rm format.log
+            rm format.txt
+
+            popd > /dev/null 2>&1
+
+          fi
+        done <<< "$paths"

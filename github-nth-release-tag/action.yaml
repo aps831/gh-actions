@@ -1,0 +1,33 @@
+---
+name: Github nth Release Tag
+description: Get Github nth release tag
+inputs:
+  index:
+    description: Zero-based index of required tag
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  nth-tag:
+    description: "nth tag"
+    value: ${{ steps.result.outputs.result }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      id: result
+      with:
+        script: |
+          const { data: releases } = await github.rest.repos.listReleases({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          });
+          const release = releases.filter(r => r.draft == false && r.prerelease == false).map(r => r.tag_name)
+          if (${{ inputs.index }} >= release.length) {
+            return release[release.length - 1];
+          } else {
+            return release[${{ inputs.index }}];
+          }
+        result-encoding: string
+        github-token: ${{ inputs.ACCESS_TOKEN }}

@@ -1,0 +1,605 @@
+---
+name: Publish Workflow Control
+description: Publish workflow control
+inputs:
+  tag-prefix:
+    description: Prefix used version number when creating tag
+    required: false
+    default: v
+  branch-prerelease:
+    description: Branch used for prereleases
+    required: true
+  branch-update-base:
+    description: Base name of temporary branch to use for creating update
+    required: true
+  release-on-default-branch:
+    description: Create releases on default branch
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  version-next:
+    description: Next release version
+    value: ${{ steps.version-next.outputs.version-next }}
+  tag-version-next:
+    description: Tag for identifying release
+    value: ${{ steps.tag-version-next.outputs.tag-version-next }}
+  branch-default:
+    description: Default branch
+    value: ${{ steps.branch-default.outputs.branch-default }}
+  branch-event:
+    description: Branch on which event occurred
+    value: ${{ steps.branch-event.outputs.branch-event }}
+  branch-publish:
+    description: Branch used for publishing
+    value: ${{ steps.branch-publish.outputs.branch-publish }}
+  branch-update:
+    description: Branch name for update to be performed on
+    value: ${{ steps.branch-update.outputs.branch-update }}
+  branch-build:
+    description: Branch name for build to be performed on
+    value: ${{ steps.branch-build.outputs.branch-build }}
+  release:
+    description: Release flag
+    value: ${{ steps.release.outputs.release }}
+  prerelease:
+    description: Prerelease flag
+    value: ${{ steps.prerelease.outputs.prerelease }}
+  draft:
+    description: Draft flag
+    value: ${{ steps.draft.outputs.draft }}
+  update:
+    description: Run update flag
+    value: ${{ steps.update.outputs.update }}
+  build:
+    description: Run build flag
+    value: ${{ steps.build.outputs.build }}
+  publish:
+    description: Run publish flag
+    value: ${{ steps.publish.outputs.publish }}
+  finalize:
+    description: Run finalize flag
+    value: ${{ steps.finalize.outputs.finalize }}
+  unpublish:
+    description: Run unpublish flag
+    value: ${{ steps.unpublish.outputs.unpublish }}
+runs:
+  using: "composite"
+  steps:
+    # install-rust-tool
+    - uses: aps831/gh-actions/install-rust-tool@master
+      with:
+        tool: conventional_commits_next_version@6.0.0 # HARDCODED
+
+    #
+    # Fixed Branches
+    #
+    # github-branch-event
+    - uses: aps831/gh-actions/github-branch-event@master
+      id: branch-event
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # github-branch-default
+    - uses: aps831/gh-actions/github-branch-default@master
+      id: branch-default
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # git checkout default branch
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ steps.branch-default.outputs.branch-default }}
+
+    # git checkout event branch
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ steps.branch-event.outputs.branch-event }}
+
+    #
+    # Versions
+    #
+    # tag-version-current
+    - uses: aps831/gh-actions/github-latest-good-release-tag@master
+      id: tag-version-current
+      with:
+        fallback: ${{ inputs.tag-prefix }}0.0.0
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # version-current
+    - name: Remove tag prefix
+      id: version-current
+      shell: bash
+      run: |
+        version=${{ steps.tag-version-current.outputs.tag }}
+        prefix=${{ inputs.tag-prefix }}
+        echo "version-current=${version//$prefix}" >> $GITHUB_OUTPUT
+
+    # version-next-conventional
+    - name: Get next conventional version
+      id: version-next-conventional
+      shell: bash
+      run: |
+        version_current=${{ steps.version-current.outputs.version-current }}
+        if [[ "$version_current" == "0.0.0"  ]]; then
+          echo "version-next-conventional=0.1.0" >> $GITHUB_OUTPUT
+        else
+          echo "version-next-conventional=$(conventional_commits_next_version --calculation-mode "Batch" --from-version $version_current --from-reference ${{ inputs.tag-prefix }}$version_current)" >> $GITHUB_OUTPUT
+        fi
+
+    # tag-version-next-conventional
+    - name: Get tag next conventional version
+      id: tag-version-next-conventional
+      shell: bash
+      run: |
+        echo "tag-version-next-conventional=${{ inputs.tag-prefix }}${{ steps.version-next-conventional.outputs.version-next-conventional }}" >> $GITHUB_OUTPUT
+
+    # version-next-patch
+    - name: Get next patch version
+      id: version-next-patch
+      shell: bash
+      run: |
+        version_current=${{ steps.version-current.outputs.version-current }}
+        if [[ "$version_current" == "0.0.0"  ]]; then
+          echo "version-next-patch=0.0.1" >> $GITHUB_OUTPUT
+        else
+          updated="$(echo ${version_current} | awk -F. -v OFS=. '{$NF += 1 ; print}')"
+          echo "version-next-patch=${updated}" >> $GITHUB_OUTPUT
+        fi
+
+    # timestamp
+    - name: Calculate timestamp
+      id: timestamp
+      shell: bash
+      run: |
+        echo "timestamp=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_OUTPUT
+
+    # tag-version-next-patch
+    - name: Get tag next patch version
+      id: tag-version-next-patch
+      shell: bash
+      run: |
+        echo "tag-version-next-patch=${{ inputs.tag-prefix }}${{ steps.version-next-patch.outputs.version-next-patch }}-${{ steps.timestamp.outputs.timestamp }}" >> $GITHUB_OUTPUT
+
+    #
+    # Publish
+    #
+    - name: Test for manual publish
+      id: publish-manual
+      shell: bash
+      run: |
+        if [[ "${{ github.event_name }}" == "issue_comment" && "${{ github.event.action }}" == "created" && "${{ github.event.comment.body }}" == ".publish" && "${{ inputs.release-on-default-branch }}" != "true" ]]; then
+          echo "publish-manual=true" >> $GITHUB_OUTPUT
+        else
+          echo "publish-manual=false" >> $GITHUB_OUTPUT
+        fi
+
+    #
+    # Release
+    #
+    - name: Test for auto release
+      id: release-auto
+      shell: bash
+      run: |
+        version_current=${{ steps.version-current.outputs.version-current }}
+        version_next=${{ steps.version-next-conventional.outputs.version-next-conventional }}
+        if [[ "$version_current" != "$version_next" && "${{ inputs.release-on-default-branch }}" == "true" ]]; then
+          echo "release-auto=true" >> $GITHUB_OUTPUT
+        else
+          echo "release-auto=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Test for on release branch
+      id: release-branch
+      shell: bash
+      run: |
+        branch_default=${{ steps.branch-default.outputs.branch-default }}
+        branch_event=${{ steps.branch-event.outputs.branch-event }}
+        branch_prerelease=${{ inputs.branch-prerelease }}
+        if [[ "${{ inputs.release-on-default-branch }}" == "true" && "$branch_event" == "$branch_default" ]]; then
+          echo "release-branch=true" >> $GITHUB_OUTPUT
+        elif [[ "${{ inputs.release-on-default-branch }}" != "true" && "$branch_event" != "$branch_prerelease" ]]; then
+          echo "release-branch=true" >> $GITHUB_OUTPUT
+        else
+          echo "release-branch=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Test for event branch not behind default branch
+      id: release-not-behind
+      uses: aps831/gh-actions/git-branch-not-behind@master
+      with:
+        branch: ${{ steps.branch-event.outputs.branch-event }}
+        branch-check-against: ${{ steps.branch-default.outputs.branch-default }}
+
+    - name: Test for no draft releases
+      uses: aps831/gh-actions/github-no-draft-releases@master
+      id: release-no-drafts
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    - name: Test tag-next-version-conventional does not exist
+      id: release-tag-next
+      shell: bash
+      run: |
+        if [ $(git tag -l "${{ steps.tag-version-next-conventional.outputs.tag-version-next-conventional }}") ]; then
+          echo "release-tag-next=false" >> $GITHUB_OUTPUT
+        else
+          echo "release-tag-next=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Test for release
+      id: release
+      shell: bash
+      run: |
+        publish_manual=${{ steps.publish-manual.outputs.publish-manual }}
+        release_auto=${{ steps.release-auto.outputs.release-auto }}
+        release_branch=${{ steps.release-branch.outputs.release-branch }}
+        release_not_behind=${{ steps.release-not-behind.outputs.not-behind }}
+        release_no_drafts=${{ steps.release-no-drafts.outputs.no-drafts }}
+        release_tag_next=${{ steps.release-tag-next.outputs.release-tag-next }}
+        if [[ ("$publish_manual" == "true" || "$release_auto" == "true") && "$release_branch" == "true" && "$release_not_behind" == "true" && "$release_no_drafts" == "true" && "$release_tag_next" == "true" ]]; then
+          echo "release=true" >> $GITHUB_OUTPUT
+        else
+          echo "release=false" >> $GITHUB_OUTPUT
+        fi
+
+    #
+    # Prerelease
+    #
+    - name: Test for auto prerelease
+      id: prerelease-auto
+      shell: bash
+      run: |
+        version_current=${{ steps.version-current.outputs.version-current }}
+        version_next=${{ steps.version-next-patch.outputs.version-next-patch }}
+        if [[ "$version_current" != "$version_next" && "${{ inputs.release-on-default-branch }}" == "true" ]]; then
+          echo "prerelease-auto=true" >> $GITHUB_OUTPUT
+        else
+          echo "prerelease-auto=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Test on prerelease branch
+      id: prerelease-branch
+      shell: bash
+      run: |
+        branch_event=${{ steps.branch-event.outputs.branch-event }}
+        branch_prerelease=${{ inputs.branch-prerelease }}
+        if [[ "$branch_event" == "$branch_prerelease" ]]; then
+          echo "prerelease-branch=true" >> $GITHUB_OUTPUT
+        else
+          echo "prerelease-branch=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Test for prerelease branch not behind default branch
+      id: prerelease-not-behind
+      uses: aps831/gh-actions/git-branch-not-behind@master
+      with:
+        branch: ${{ steps.branch-event.outputs.branch-event }}
+        branch-check-against: ${{ steps.branch-default.outputs.branch-default }}
+
+    - name: Test for prerelease
+      id: prerelease
+      shell: bash
+      run: |
+        publish_manual=${{ steps.publish-manual.outputs.publish-manual }}
+        prerelease_auto=${{ steps.prerelease-auto.outputs.prerelease-auto }}
+        prerelease_branch=${{ steps.prerelease-branch.outputs.prerelease-branch }}
+        prerelease_not_behind=${{ steps.prerelease-not-behind.outputs.not-behind }}
+        if [[ ("$publish_manual" == "true" || "$prerelease_auto" == "true") && "$prerelease_branch" == "true"  && "$prerelease_not_behind" == "true" ]]; then
+          echo "prerelease=true" >> $GITHUB_OUTPUT
+        else
+          echo "prerelease=false" >> $GITHUB_OUTPUT
+        fi
+
+    #
+    # Unpublish
+    #
+    - name: Test for manual unpublish
+      id: unpublish-manual
+      shell: bash
+      run: |
+        if [[ "${{ github.event_name }}" == "issue_comment" && "${{ github.event.action }}" == "created" && "${{ github.event.comment.body }}" == ".unpublish" && "${{ inputs.release-on-default-branch }}" != "true" ]]; then
+          echo "unpublish-manual=true" >> $GITHUB_OUTPUT
+        else
+          echo "unpublish-manual=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Test for unpublish branch
+      id: unpublish-branch
+      shell: bash
+      run: |
+        branch_default=${{ steps.branch-default.outputs.branch-default }}
+        branch_event=${{ steps.branch-event.outputs.branch-event }}
+        branch_prerelease=${{ inputs.branch-prerelease }}
+        if [[ "${{ inputs.release-on-default-branch }}" == "true" || "$branch_event" == "$branch_default" || "$branch_event" == "$branch_prerelease" ]]; then
+          echo "unpublish-branch=false" >> $GITHUB_OUTPUT
+        else
+          echo "unpublish-branch=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Test latest release is draft
+      uses: aps831/gh-actions/github-latest-release-is-draft@master
+      id: unpublish-draft
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    - name: Test that branch is at current release
+      id: unpublish-release
+      shell: bash
+      run: |
+        tag=${{ steps.tag-version-next-conventional.outputs.tag-version-next-conventional }}
+        branch_publish=${{ steps.branch-publish.outputs.branch-publish }}
+        if [[ $(git branch --contains "$tag" 2>/dev/null | grep "$branch_publish" ) ]]; then
+          echo "unpublish-release=true" >> $GITHUB_OUTPUT
+        else
+          echo "unpublish-release=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Test for unpublish
+      id: unpublish
+      shell: bash
+      run: |
+        unpublish_manual=${{ steps.unpublish-manual.outputs.unpublish-manual }}
+        unpublish_branch=${{ steps.unpublish-branch.outputs.unpublish-branch }}
+        unpublish_draft=${{ steps.unpublish-draft.outputs.is-draft }}
+        unpublish_release=${{ steps.unpublish-release.outputs.unpublish-release }}
+        if [[ "$unpublish_manual" == "true" && "$unpublish_branch" == "true"  && "$unpublish_draft" == "true" && "$unpublish_release" == "true" ]]; then
+          echo "unpublish=true" >> $GITHUB_OUTPUT
+        else
+          echo "unpublish=false" >> $GITHUB_OUTPUT
+        fi
+
+    #
+    # Finalize
+    #
+    - name: Test for manual finalize
+      id: finalize-manual
+      shell: bash
+      run: |
+        if [[ "${{ github.event_name }}" == "issue_comment" && "${{ github.event.action }}" == "created" && "${{ github.event.comment.body }}" == ".finalize" && "${{ inputs.release-on-default-branch }}" != "true" ]]; then
+          echo "finalize-manual=true" >> $GITHUB_OUTPUT
+        else
+          echo "finalize-manual=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Test for finalize branch
+      id: finalize-branch
+      shell: bash
+      run: |
+        branch_default=${{ steps.branch-default.outputs.branch-default }}
+        branch_event=${{ steps.branch-event.outputs.branch-event }}
+        branch_prerelease=${{ inputs.branch-prerelease }}
+        if [[ "${{ inputs.release-on-default-branch }}" == "true" || "$branch_event" == "$branch_default" || "$branch_event" == "$branch_prerelease" ]]; then
+          echo "finalize-branch=false" >> $GITHUB_OUTPUT
+        else
+          echo "finalize-branch=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Test latest release is draft
+      uses: aps831/gh-actions/github-latest-release-is-draft@master
+      id: finalize-draft
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    - name: Test that publish branch contains latest release
+      id: finalize-release
+      shell: bash
+      run: |
+        tag=${{ steps.tag-version-next-conventional.outputs.tag-version-next-conventional }}
+        branch_publish=${{ steps.branch-publish.outputs.branch-publish }}
+        if [[ $(git branch --contains "$tag" 2>/dev/null | grep "$branch_publish" ) ]]; then
+          echo "finalize-release=true" >> $GITHUB_OUTPUT
+        else
+          echo "finalize-release=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Test for finalize
+      id: finalize
+      shell: bash
+      run: |
+        finalize_manual=${{ steps.finalize-manual.outputs.finalize-manual }}
+        finalize_branch=${{ steps.finalize-branch.outputs.finalize-branch }}
+        finalize_draft=${{ steps.finalize-draft.outputs.is-draft }}
+        finalize_release=${{ steps.finalize-release.outputs.finalize-release }}
+        if [[ "$finalize_manual" == "true" && "$finalize_branch" == "true"  && "$finalize_draft" == "true" && "$finalize_release" == "true" ]]; then
+          echo "finalize=true" >> $GITHUB_OUTPUT
+        else
+          echo "finalize=false" >> $GITHUB_OUTPUT
+        fi
+
+    #
+    # Version
+    #
+    # version-next
+    - name: Calculate next version
+      id: version-next
+      shell: bash
+      run: |
+        if [[ "${{ steps.prerelease-branch.outputs.prerelease-branch }}" == "true" ]]; then
+          echo "version-next=${{ steps.version-next-patch.outputs.version-next-patch }}" >> $GITHUB_OUTPUT
+        else
+          echo "version-next=${{ steps.version-next-conventional.outputs.version-next-conventional }}" >> $GITHUB_OUTPUT
+        fi
+
+    # tag-version-next
+    - name: Calculate tag-version-next
+      id: tag-version-next
+      shell: bash
+      run: |
+        if [[ "${{ steps.prerelease-branch.outputs.prerelease-branch }}" == "true" ]]; then
+          echo "tag-version-next=${{ steps.tag-version-next-patch.outputs.tag-version-next-patch }}" >> $GITHUB_OUTPUT
+        else
+          echo "tag-version-next=${{ steps.tag-version-next-conventional.outputs.tag-version-next-conventional }}" >> $GITHUB_OUTPUT
+        fi
+
+    #
+    # Branch names
+    #
+    # Publish branch name
+    - name: Publish branch name
+      id: branch-publish
+      shell: bash
+      run: |
+        branch_event=${{ steps.branch-event.outputs.branch-event }}
+        if [[ "${{ inputs.release-on-default-branch }}" == "true" && "${{ steps.release.outputs.release }}" == "true" ]]; then
+          branch_publish=${{ steps.branch-default.outputs.branch-default }}
+        else
+          branch_publish="$branch_event"
+        fi
+        echo "branch-publish=$branch_publish" >> $GITHUB_OUTPUT
+
+    # Update branch name
+    - name: Update branch name
+      id: branch-update
+      shell: bash
+      run: |
+        echo "branch-update=${{ inputs.branch-update-base }}-${{ steps.tag-version-next.outputs.tag-version-next }}" >> $GITHUB_OUTPUT
+
+    # Build branch name
+    - name: Build branch name
+      id: branch-build
+      shell: bash
+      run: |
+        if [[ "${{ steps.release.outputs.release }}" == "true" || "${{ steps.prerelease.outputs.prerelease }}" == "true" ]]; then
+          echo "branch-build=${{ steps.branch-update.outputs.branch-update }}" >> $GITHUB_OUTPUT
+        else
+          echo "branch-build=${{ steps.branch-event.outputs.branch-event }}" >> $GITHUB_OUTPUT
+        fi
+
+    #
+    # Control
+    #
+    - name: Update flag
+      id: update
+      shell: bash
+      run: |
+        if [[ "${{ steps.release.outputs.release }}" == "true" || "${{ steps.prerelease.outputs.prerelease }}" == "true" ]]; then
+          echo "update=true" >> $GITHUB_OUTPUT
+        else
+          echo "update=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build flag
+      id: build
+      shell: bash
+      run: |
+        if [[ "${{ steps.unpublish.outputs.unpublish }}" != "true" && "${{ steps.finalize.outputs.finalize }}" != "true" ]]; then
+          echo "build=true" >> $GITHUB_OUTPUT
+        else
+          echo "build=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Publish flag
+      id: publish
+      shell: bash
+      run: |
+        if [[ "${{ steps.update.outputs.update }}" == "true" && "${{ steps.build.outputs.build }}" == "true" ]]; then
+          echo "publish=true" >> $GITHUB_OUTPUT
+        else
+          echo "publish=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Draft flag
+      id: draft
+      shell: bash
+      run: |
+        if [[ "${{ steps.release.outputs.release }}" == "true" && "${{ inputs.release-on-default-branch }}" != "true" ]]; then
+          echo "draft=true" >> $GITHUB_OUTPUT
+        else
+          echo "draft=false" >> $GITHUB_OUTPUT
+        fi
+
+    # summary
+    - name: Output summary
+      shell: bash
+      run: |
+        echo "**Publish Workflow Control**" >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "***Versions***" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| version-current           | ${{ steps.version-current.outputs.version-current }}                     |" >> $GITHUB_STEP_SUMMARY
+        echo "| version-next-conventional | ${{ steps.version-next-conventional.outputs.version-next-conventional }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| version-next-patch        | ${{ steps.version-next-patch.outputs.version-next-patch }}               |" >> $GITHUB_STEP_SUMMARY
+        echo "| **version-next**          | ${{ steps.version-next.outputs.version-next }}                           |" >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "***Tags***" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| tag-version-current       | ${{ steps.tag-version-current.outputs.tag }}                             |" >> $GITHUB_STEP_SUMMARY
+        echo "| **tag-version-next**      | ${{ steps.tag-version-next.outputs.tag-version-next }}                   |" >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "***Release***" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| publish-manual            | ${{ steps.publish-manual.outputs.publish-manual }}                       |" >> $GITHUB_STEP_SUMMARY
+        echo "| release-auto              | ${{ steps.release-auto.outputs.release-auto }}                           |" >> $GITHUB_STEP_SUMMARY
+        echo "| release-branch            | ${{ steps.release-branch.outputs.release-branch }}                       |" >> $GITHUB_STEP_SUMMARY
+        echo "| release-not-behind        | ${{ steps.release-not-behind.outputs.not-behind }}                       |" >> $GITHUB_STEP_SUMMARY
+        echo "| release-no-drafts         | ${{ steps.release-no-drafts.outputs.no-drafts }}                         |" >> $GITHUB_STEP_SUMMARY
+        echo "| release-tag-next          | ${{ steps.release-tag-next.outputs.release-tag-next }}                   |" >> $GITHUB_STEP_SUMMARY
+        echo "| **release**               | ${{ steps.release.outputs.release }}                                     |" >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "***Prerelease***" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| publish-manual            | ${{ steps.publish-manual.outputs.publish-manual }}                       |" >> $GITHUB_STEP_SUMMARY
+        echo "| prerelease-auto           | ${{ steps.prerelease-auto.outputs.prerelease-auto }}                     |" >> $GITHUB_STEP_SUMMARY
+        echo "| prerelease-branch         | ${{ steps.prerelease-branch.outputs.prerelease-branch }}                 |" >> $GITHUB_STEP_SUMMARY
+        echo "| prerelease-not-behind     | ${{ steps.prerelease-not-behind.outputs.not-behind }}                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| **prerelease**            | ${{ steps.prerelease.outputs.prerelease }}                               |" >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "***Unpublish Draft***" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| unpublish-manual          | ${{ steps.unpublish-manual.outputs.unpublish-manual }}                   |" >> $GITHUB_STEP_SUMMARY
+        echo "| unpublish-branch          | ${{ steps.unpublish-branch.outputs.unpublish-branch }}                   |" >> $GITHUB_STEP_SUMMARY
+        echo "| unpublish-draft           | ${{ steps.unpublish-draft.outputs.is-draft }}                            |" >> $GITHUB_STEP_SUMMARY
+        echo "| unpublish-release         | ${{ steps.unpublish-release.outputs.unpublish-release }}                 |" >> $GITHUB_STEP_SUMMARY
+        echo "| **unpublish**             | ${{ steps.unpublish.outputs.unpublish }}                                 |" >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "***Finalize Draft***" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| finalize-manual          | ${{ steps.finalize-manual.outputs.finalize-manual }}                      |" >> $GITHUB_STEP_SUMMARY
+        echo "| finalize-branch          | ${{ steps.finalize-branch.outputs.finalize-branch }}                      |" >> $GITHUB_STEP_SUMMARY
+        echo "| finalize-draft           | ${{ steps.finalize-draft.outputs.is-draft }}                              |" >> $GITHUB_STEP_SUMMARY
+        echo "| finalize-release         | ${{ steps.finalize-release.outputs.finalize-release }}                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| **finalize**             | ${{ steps.finalize.outputs.finalize }}                                    |" >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "***Branches***" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| release on default branch | ${{ inputs.release-on-default-branch }}                                  |" >> $GITHUB_STEP_SUMMARY
+        echo "| branch-default            | ${{ steps.branch-default.outputs.branch-default }}                       |" >> $GITHUB_STEP_SUMMARY
+        echo "| branch-event              | ${{ steps.branch-event.outputs.branch-event }}                           |" >> $GITHUB_STEP_SUMMARY
+        echo "| branch-build              | ${{ steps.branch-build.outputs.branch-build }}                           |" >> $GITHUB_STEP_SUMMARY
+        echo "| branch-publish            | ${{ steps.branch-publish.outputs.branch-publish }}                       |" >> $GITHUB_STEP_SUMMARY
+        echo "| branch-update             | ${{ steps.branch-update.outputs.branch-update }}                         |" >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "***Control***" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| update                    | ${{ steps.update.outputs.update }}                                       |" >> $GITHUB_STEP_SUMMARY
+        echo "| build                     | ${{ steps.build.outputs.build }}                                         |" >> $GITHUB_STEP_SUMMARY
+        echo "| publish                   | ${{ steps.publish.outputs.publish }}                                     |" >> $GITHUB_STEP_SUMMARY
+        echo "| draft                     | ${{ steps.draft.outputs.draft }}                                         |" >> $GITHUB_STEP_SUMMARY
+        echo "| finalize                  | ${{ steps.finalize.outputs.finalize }}                                   |" >> $GITHUB_STEP_SUMMARY
+        echo "| unpublish                 | ${{ steps.unpublish.outputs.unpublish }}                                 |" >> $GITHUB_STEP_SUMMARY

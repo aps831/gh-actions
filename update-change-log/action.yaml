@@ -1,0 +1,41 @@
+---
+name: Update Change Log
+description: Update change log
+inputs:
+  tag:
+    description: Tag
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # git-add-tag
+    - uses: aps831/gh-actions/git-add-tag@master
+      with:
+        tag: ${{ inputs.tag }}
+
+    # nth release tag
+    - uses: aps831/gh-actions/github-nth-release-tag@master
+      id: nth-release-tag
+      with:
+        index: 20
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # action-update-change-log
+    - uses: aps831/gh-actions/action-update-change-log@master
+      id: changelog
+      with:
+        current-tag: ${{ inputs.tag }}
+        start-tag: ${{ steps.nth-release-tag.outputs.nth-tag }}
+
+    # git-delete-tag
+    - uses: aps831/gh-actions/git-delete-tag@master
+      with:
+        tag: ${{ inputs.tag }}
+
+    # git-add-file
+    - uses: aps831/gh-actions/git-add-file@master
+      with:
+        files: ${{ steps.changelog.outputs.changelog }}

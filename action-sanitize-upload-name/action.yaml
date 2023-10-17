@@ -1,0 +1,19 @@
+---
+name: Action Sanitize Upload Name
+description: Sanitize upload name
+inputs:
+  name:
+    description: Name
+    required: true
+outputs:
+  name:
+    description: Sanitized name
+    value: ${{ steps.name.outputs.name }}
+runs:
+  using: "composite"
+  steps:
+    - id: name
+      shell: bash
+      run: |
+        sanitized=$(echo ${{ inputs.name }} | tr "\":<>|*?\/" "-")
+        echo "name=$sanitized" >> $GITHUB_OUTPUT

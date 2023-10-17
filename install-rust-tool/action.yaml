@@ -1,0 +1,13 @@
+---
+name: Install Rust Tool
+description: Install Rust tool
+inputs:
+  tool:
+    description: Tool including version to install
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: taiki-e/install-action@94488150318c27687effe5a4a5d2f7e0b02d8233 # pin@v2
+      with:
+        tool: ${{ inputs.tool }}

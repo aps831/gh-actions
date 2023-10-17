@@ -1,0 +1,48 @@
+---
+name: Action Terraform Validate
+description: Action Terraform validate
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+  paths:
+    description: Newline separated list of paths within working directory
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Install ansi2txt
+      shell: bash
+      run: sudo apt install colorized-logs
+
+    - name: Output Terraform validate step summary
+      shell: bash
+      run: echo "**Terraform Validate Summary**" >> $GITHUB_STEP_SUMMARY
+
+    - name: Terraform validate
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        paths="${{ inputs.paths }}"
+        while IFS= read -r path || [ -n "$path" ]; do
+          if [[ -n "$path" && -d "$path" ]]; then
+
+            pushd "$path" > /dev/null 2>&1
+
+            terraform init -backend=false
+            terraform validate > validate.log
+
+            ansi2txt < validate.log > validate.txt
+            echo "### $path" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            cat validate.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+            rm validate.log
+            rm validate.txt
+
+            popd > /dev/null 2>&1
+
+          fi
+        done <<< "$paths"

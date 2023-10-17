@@ -1,0 +1,99 @@
+---
+name: Build Maven in Docker Image Artifact
+description: Build Maven in Docker image artifact
+inputs:
+  image-name:
+    description: Docker image name
+    required: true
+  upload-image:
+    description: Upload image as build artifact
+    required: true
+  branch-build:
+    description: Branch used for build
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  dockerfile:
+    description: Dockerfile
+    required: true
+  stage-build:
+    description: Stage for building artifact
+    required: true
+  stage-output:
+    description: Stage for outputting artifact
+    required: true
+  stage-status:
+    description: Stage for returning status
+    required: true
+  build-args:
+    description: Build args
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  build-artifacts-jar-upload-name:
+    description: Name of build artifacts upload
+    value: ${{ steps.artifacts-jar-upload.outputs.name }}
+  build-artifacts-image-upload-name:
+    description: Name of build image upload
+    value: ${{ steps.image.outputs.image-upload-name }}
+runs:
+  using: "composite"
+  steps:
+    # git-checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-build }}
+
+    # action-find-maven-pom-version
+    - uses: aps831/gh-actions/action-find-maven-project-version@master
+      id: project-version
+      with:
+        working-directory: ${{ inputs.working-directory }}
+
+    # docker-build-image
+    - uses: aps831/gh-actions/docker-build-image@master
+      id: image
+      with:
+        image-name: ${{ inputs.image-name }}
+        upload-image: ${{ inputs.upload-image }}
+        docker-context: ${{ inputs.working-directory }}
+        dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile }}
+        output-directory: ${{ inputs.working-directory }}/target
+        build-args: |
+          ARTIFACT_VERSION=${{ steps.project-version.outputs.project-version }}
+          MAVEN_PHASE=clean install
+          ${{ inputs.build-args }}
+        secrets: |
+          GITHUB_USER_REF=${{ github.actor }}
+          GITHUB_TOKEN_REF=${{ inputs.ACCESS_TOKEN }}
+        stage-build: ${{ inputs.stage-build }}
+        stage-output: ${{ inputs.stage-output }}
+        stage-status: ${{ inputs.stage-status }}
+
+    # output-junit-test-summary
+    - uses: aps831/gh-actions/action-output-junit-test-summary@master
+      if: always()
+      with:
+        component-name: ${{ inputs.image-name }}
+        test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
+
+    # upload-test-results
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: always()
+      with:
+        type: unit
+        component-name: ${{ inputs.image-name }}
+        test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
+
+    # build-artifacts-upload
+    - uses: aps831/gh-actions/action-build-artifacts-upload@master
+      id: artifacts-jar-upload
+      with:
+        description: jar-cyclonedx-${{ inputs.image-name }}
+        build-files: |
+          ${{ inputs.working-directory }}/target/*.jar
+          ${{ inputs.working-directory }}/target/*-cyclonedx.json
+          ${{ inputs.working-directory }}/target/*-cyclonedx.xml
