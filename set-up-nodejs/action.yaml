@@ -4,4 +4,4 @@ description: Set up Nodejs
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-node@969bd2663942d722d85b6a8626225850c2f7be4b # pin@v3.5.0
+    - uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # pin@v4.0.1

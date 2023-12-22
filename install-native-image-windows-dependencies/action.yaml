@@ -5,7 +5,7 @@ runs:
   using: "composite"
   steps:
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@c26a08ba26249b81327e26f6ef381897b6a8754d # pin@v1.0.2
+      uses: microsoft/setup-msbuild@1ff57057b5cfdc39105cd07a01d78e9b0ea0c14c # pin@v1.3.1
 
     - name: Visual Studio shell
-      uses: egor-tensin/vs-shell@6d88c01ad4b6b33190d261b45e241e462545652b # pin@v1
+      uses: egor-tensin/vs-shell@9a932a62d05192eae18ca370155cf877eecc2202 # pin@v2.1
