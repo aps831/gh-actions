@@ -1,6 +1,6 @@
 ---
-name: "Monitor"
-description: "Monitor permissions of Github Workflows"
+name: Monitor
+description: Monitor permissions of Github Workflows
 runs:
   using: "composite"
   steps:
