@@ -1,0 +1,17 @@
+# TODO
+---
+name: XXXX
+description: Xxx
+inputs:
+outputs:
+runs:
+  using: "composite"
+  steps:
+#
+# - action-calculate-aws-ecr-registry
+# for each image
+# - docker-pull
+#   ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}
+# - replace ghcr.io/${{ github.repository_owner }} with aws registry
+# - docker-retag
+# - docker-push

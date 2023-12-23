@@ -1,3 +1,4 @@
+# TODO add action updates
 ---
 version: 2
 updates:
@@ -17,6 +18,7 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+  # action-calculate-aws-ecr-registry
   - package-ecosystem: "github-actions"
     directory: "action-build-artifacts-upload/"
     schedule:
@@ -81,6 +83,7 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+  # action-sync-aws-s3-bucket/
   - package-ecosystem: "github-actions"
     directory: "action-trivy-image-scan/"
     schedule:
@@ -145,6 +148,12 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+  # deploy-branch/
+  # deployment-candidate-pub/
+  # deployment-candidate-sub/
+  # deployment-record-pub/
+  # deployment-record-sub/
+  # deployment-terraform/
   - package-ecosystem: "github-actions"
     directory: "docker-build-image/"
     schedule:
@@ -153,6 +162,7 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+  # docker-push/ - if needed
   - package-ecosystem: "github-actions"
     directory: "git-checkout/"
     schedule:
@@ -265,6 +275,8 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+  # login-aws/
+  # login-aws-ecr/
   - package-ecosystem: "github-actions"
     directory: "login-github-ghcr/"
     schedule:
@@ -321,6 +333,12 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+  # terraform-apply
+  # terraform-nodejs-script/
+  # terraform-plan/
+  # terraform-values/
+  # transfer-image-ghcr-to-aws-ecr/
+  # transfer-release-asset-to-aws-s3/
   - package-ecosystem: "github-actions"
     directory: "update-terraform-docs/"
     schedule:

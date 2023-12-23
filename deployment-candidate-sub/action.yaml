@@ -1,0 +1,23 @@
+# TODO
+---
+name: Deployment Candidate Subscribe
+description: Subscribe to deployment candidate
+inputs:
+  tag:
+    description: Tag
+    required: true
+  envs:
+    description: Newline separated list of environments
+    required: true
+  tfvars:
+    description: Terraform vars filename
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # lookup default branch
+    # checkout default branch
+    # create update branch
+    # action-update-terraform-vars
+    # push
+    # create pull request

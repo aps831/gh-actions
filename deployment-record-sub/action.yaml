@@ -1,0 +1,15 @@
+# TODO
+---
+name: XXXX
+description: Xxx
+inputs:
+outputs:
+runs:
+  using: "composite"
+  steps:
+# lookup default branch
+# checkout default branch
+# create dir $env
+# save $env/$timestamp_$tag file
+# save content of terraform apply
+# push

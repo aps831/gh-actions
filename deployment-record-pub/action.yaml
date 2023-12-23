@@ -1,0 +1,25 @@
+# TODO
+---
+name: XXXX
+description: Xxx
+inputs:
+outputs:
+runs:
+  using: "composite"
+  steps:
+# - uses: actions/github-script@v5
+#   with:
+#     script: |
+#       await github.rest.actions.createWorkflowDispatch({
+#         owner: "OWNER",
+#         repo: "REPO",
+#         workflow_id: "workflows/update.yaml",
+#         ref: "master",
+#         inputs: {
+#           env: "dev",
+#           timestamp: "",
+#           tag: "",
+#           msg: ""
+#         }
+#       });
+

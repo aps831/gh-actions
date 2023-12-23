@@ -1,0 +1,33 @@
+---
+name: Update Terraform Vars
+description: Update Terraform vars
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+  tfvars-filename:
+    description: Filename of tfvars files
+    required: true
+  tfvars-update-values:
+    description: Newline separated list of pipe separated variable, value regex and value
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # find-files
+    - uses: aps831/gh-actions/action-find-files@master
+      id: files
+      with:
+        filename: ${{ inputs.tfvars-filename }}
+        working-directory: ${{ inputs.working-directory }}
+
+    # update-terraform-vars
+    - uses: aps831/gh-actions/action-update-terraform-vars@feat/deploy
+      with:
+        paths: ${{ steps.files.outputs.files }}
+        update-values: ${{ inputs.tfvars-update-values }}
+
+    # git-add-file
+    - uses: aps831/gh-actions/git-add-file@master
+      with:
+        files: ${{ steps.files.outputs.files }}

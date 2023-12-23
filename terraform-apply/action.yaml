@@ -1,0 +1,35 @@
+# TODO
+---
+name: Terraform apply
+description: Run Terraform apply
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Run Terraform init
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: terraform init
+
+    - name: Run Terraform apply
+      shell: bash
+      id: apply
+      working-directory: ${{ inputs.working-directory }}
+      continue-on-error: true
+      run: terraform apply -no-color -auto-approve
+
+    - name: Terraform output
+      env:
+        TF_STDOUT: ${{ steps.apply.outputs.stdout }}
+      run: |
+        TF_OUTPUT="\`\`\`terraform\n${TF_STDOUT}\n\`\`\`"
+        echo 'DEPLOY_MESSAGE<<EOF' >> $GITHUB_ENV
+        echo "$TF_OUTPUT" >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+
+    - if: ${{ steps.apply.outcome == 'failure' }}
+      shell: bash
+      run: exit 1

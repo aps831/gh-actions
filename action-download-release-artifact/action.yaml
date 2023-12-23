@@ -2,8 +2,8 @@
 name: Action Download Release Artifact
 description: Download release artifact
 inputs:
-  sbom-name:
-    description: SBOM name
+  artifact-name:
+    description: Artifact name
     required: true
   release-tag:
     description: Release tag
@@ -12,8 +12,8 @@ inputs:
     description: Access token
     required: true
 outputs:
-  sbom-path:
-    description: Path to SBOM
+  artifact-path:
+    description: Path to artifact
     value: ${{ steps.download.outputs.download }}
 runs:
   using: "composite"
@@ -46,7 +46,7 @@ runs:
             return
           }
 
-          const asset_id = release.assets.filter(asset => /${{ inputs.sbom-name }}/.test(asset.name) || /${{ inputs.sbom-name }}/.test(asset.label)).map(asset => asset.id)[0]
+          const asset_id = release.assets.filter(asset => /${{ inputs.artifact-name }}/.test(asset.name) || /${{ inputs.artifact-name }}/.test(asset.label)).map(asset => asset.id)[0]
 
           if (asset_id != undefined) {
             const { data: asset } = await github.rest.repos.getReleaseAsset({
@@ -57,10 +57,10 @@ runs:
                 accept: 'application/octet-stream',
               }
             });
-            fs.writeFileSync("${{ steps.release.outputs.release }}/sbom", Buffer.from(asset));
-            core.setOutput('download', "${{ steps.release.outputs.release }}/sbom");
+            fs.writeFileSync("${{ steps.release.outputs.release }}/${{ inputs.artifact-name }}", Buffer.from(asset));
+            core.setOutput('download', "${{ steps.release.outputs.release }}/${{ inputs.artifact-name }}");
           } else {
-            core.info('No SBOM found')
+            core.info('No artifact found')
             core.setOutput('download', "");
           }
         result-encoding: string

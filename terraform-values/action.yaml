@@ -1,0 +1,16 @@
+# TODO
+---
+name: XXXX
+description: Xxx
+inputs:
+outputs:
+runs:
+  using: "composite"
+  steps:
+#
+# BUCKET_NAME=$(terraform -chdir=operations/deploy/dev output -raw website_bucket_name)
+# take key=value pairs as input
+# echo output
+# =====
+# terraform init
+# BUCKET_NAME=$(terraform -chdir=operations/deploy/prod output -raw website_bucket_name)
