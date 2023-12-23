@@ -1,0 +1,51 @@
+---
+name: Deployment Terraform
+description: Terraform deployment
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+  plan:
+    description: Run plan
+    required: true
+  apply:
+    description: Run apply
+    required: true
+  terraform-version:
+    description: Terraform version
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # github-branch-event
+    - uses: aps831/gh-actions/github-branch-event@master
+      id: branch-event
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # git checkout event branch
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ steps.branch-event.outputs.branch-event }}
+
+    # set-up-terraform
+    - uses: aps831/gh-actions/set-up-terraform@master
+      with:
+        terraform-version: ${{ inputs.terraform-version }}
+
+    # terraform-plan
+    - uses: aps831/gh-actions/terraform-plan@master
+      id: plan
+      if: ${{ inputs.plan == 'true' }}
+      with:
+        working-directory: ${{ inputs.working-directory }}
+
+    # terraform-apply
+    - uses: aps831/gh-actions/terraform-apply@master
+      id: apply
+      if: ${{ inputs.apply == 'true' }}
+      with:
+        working-directory: ${{ inputs.working-directory }}

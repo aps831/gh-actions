@@ -1,0 +1,91 @@
+---
+name: Transfer Release Asset to AWS S3
+description: Transfer release asset to AWS S3
+inputs:
+  artifact-name:
+    description: Artifact name
+    required: true
+  release-tag:
+    description: Release tag
+    required: true
+  working-directory-terraform:
+    description: Working directory for Terraform
+    required: true
+  working-directory-nodejs:
+    description: Working directory for Nodejs
+    required: true
+  terraform-version:
+    description: Terraform version
+    required: true
+  terraform-nodejs-script:
+    description: Script to run
+    required: true
+  terraform-s3-bucket-name-output:
+    description: AWS S3 bucket name
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # github-branch-event
+    - uses: aps831/gh-actions/github-branch-event@master
+      id: branch-event
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # git checkout event branch
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ steps.branch-event.outputs.branch-event }}
+
+    # action-download-release-artifact
+    - uses: aps831/gh-actions/action-download-release-artifact@master
+      id: artifact
+      with:
+        artifact-name: ${{ inputs.artifact-name }}
+        release-tag: ${{ inputs.release-tag }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    - id: artifact-dir
+      shell: bash
+      run: |
+        filename=$(basename "${{ steps.artifact.outputs.artifact-path }}")
+        directory=$(dirname "${{ steps.artifact.outputs.artifact-path }}")
+        cd "$directory"
+        unzip $filename
+        artifact_dir="$directory/${filename%.zip}"
+        echo "artifact-dir=$artifact_dir" >> $GITHUB_OUTPUT
+
+    # inject terraform and artifact directory values into script
+    - id: script
+      shell: bash
+      run: |
+        script="${{ inputs.terraform-nodejs-script }}"
+        script=${script/\%TERRAFORM_DIR/"${{ inputs.working-directory-terraform }}"}
+        script=${script/\%ARTIFACT_DIR/"${{ steps.artifact-dir.outputs.artifact-dir }}"}
+        echo "Updated script with Terraform and artifact directories: $script"
+        echo "script=$script" >> $GITHUB_OUTPUT
+
+    # terraform-nodejs-script
+    - uses: aps831/gh-actions/terraform-nodejs-script@master
+      with:
+        working-directory-terraform: ${{ inputs.working-directory-terraform }}
+        working-directory-nodejs: ${{ inputs.working-directory-nodejs }}
+        terraform-version: ${{ inputs.terraform-version }}
+        script: ${{ steps.script.outputs.script }}
+
+    # terraform-value
+    - uses: aps831/gh-actions/terraform-value@master
+      id: bucket
+      with:
+        working-directory: ${{ inputs.working-directory-terraform }}
+        terraform-version: ${{ inputs.terraform-version }}
+        output: ${{ inputs.terraform-s3-bucket-name-output }}
+
+    # action-sync-aws-s3-bucket
+    - uses: aps831/gh-actions/action-sync-aws-s3-bucket@master
+      with:
+        local-folder-path: ${{ steps.artifact-dir.outputs.artifact-dir }}
+        remote-bucket-name: ${{ steps.bucket.outputs.value }}

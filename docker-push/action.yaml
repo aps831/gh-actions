@@ -1,0 +1,12 @@
+---
+name: Docker Push
+description: Push Docker image
+inputs:
+  image:
+    description: Docker image name
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: docker push ${{ inputs.image }}

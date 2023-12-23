@@ -177,7 +177,7 @@ runs:
       id: publish-manual
       shell: bash
       run: |
-        if [[ "${{ github.event_name }}" == "issue_comment" && "${{ github.event.action }}" == "created" && "${{ github.event.comment.body }}" == ".publish" && "${{ inputs.release-on-default-branch }}" != "true" ]]; then
+        if [[ "${{ github.event_name }}" == "issue_comment" && "${{ github.event.action }}" == "created" && "${{ github.event.comment.body }}" =~ ^.publish[[:space:]]*$ && "${{ inputs.release-on-default-branch }}" != "true" ]]; then
           echo "publish-manual=true" >> $GITHUB_OUTPUT
         else
           echo "publish-manual=false" >> $GITHUB_OUTPUT
@@ -307,7 +307,7 @@ runs:
       id: unpublish-manual
       shell: bash
       run: |
-        if [[ "${{ github.event_name }}" == "issue_comment" && "${{ github.event.action }}" == "created" && "${{ github.event.comment.body }}" == ".unpublish" && "${{ inputs.release-on-default-branch }}" != "true" ]]; then
+        if [[ "${{ github.event_name }}" == "issue_comment" && "${{ github.event.action }}" == "created" && "${{ github.event.comment.body }}" =~ ^.unpublish[[:space:]]*$ && "${{ inputs.release-on-default-branch }}" != "true" ]]; then
           echo "unpublish-manual=true" >> $GITHUB_OUTPUT
         else
           echo "unpublish-manual=false" >> $GITHUB_OUTPUT
@@ -363,7 +363,7 @@ runs:
       id: finalize-manual
       shell: bash
       run: |
-        if [[ "${{ github.event_name }}" == "issue_comment" && "${{ github.event.action }}" == "created" && "${{ github.event.comment.body }}" == ".finalize" && "${{ inputs.release-on-default-branch }}" != "true" ]]; then
+        if [[ "${{ github.event_name }}" == "issue_comment" && "${{ github.event.action }}" == "created" && "${{ github.event.comment.body }}" =~ ^.finalize[[:space:]]*$ && "${{ inputs.release-on-default-branch }}" != "true" ]]; then
           echo "finalize-manual=true" >> $GITHUB_OUTPUT
         else
           echo "finalize-manual=false" >> $GITHUB_OUTPUT

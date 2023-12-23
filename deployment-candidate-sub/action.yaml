@@ -1,0 +1,71 @@
+---
+name: Deployment Candidate Subscribe
+description: Subscribe to deployment candidate
+inputs:
+  tag:
+    description: Tag
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  tfvars-filename:
+    description: Filename of tfvars files
+    required: true
+  tfvars-update-values:
+    description: Newline separated list of pipe separated variable, value regex and value
+    required: true
+  branch-update-base:
+    description: Base name of temporary branch to use for creating update
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # github-branch-default
+    - uses: aps831/gh-actions/github-branch-default@master
+      id: branch-default
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # git checkout default branch
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ steps.branch-default.outputs.branch-default }}
+
+    # git-configure
+    - uses: aps831/gh-actions/git-configure@master
+
+    # timestamp
+    - uses: aps831/gh-actions/action-create-timestamp@master
+      id: timestamp
+
+    # git-create-and-switch-branch
+    - uses: aps831/gh-actions/git-create-and-switch-branch@master
+      with:
+        branch: ${{ inputs.branch-update-base }}-${{ steps.timestamp.outputs.timestamp }}
+
+    # update-terraform-vars
+    - uses: aps831/gh-actions/update-terraform-vars@master
+      with:
+        working-directory: ${{ inputs.working-directory }}
+        tfvars-filename: ${{ inputs.tfvars-filename }}
+        tfvars-update-values: ${{ inputs.tfvars-update-values }}
+
+    # git-commit
+    - uses: aps831/gh-actions/git-commit@master
+      with:
+        message: "chore: update tfvars for ${{ inputs.tag }} release"
+
+    # git-push
+    - uses: aps831/gh-actions/git-push@master
+
+    # create pull request
+    - uses: aps831/gh-actions/action-create-pull-request@master
+      with:
+        title: "Deploy ${{ inputs.tag }}"
+        body: "Deploy ${{ inputs.tag }}"
+        base-branch: ${{ steps.branch-default.outputs.branch-default }}
+        update-branch: ${{ inputs.branch-update-base }}-${{ steps.timestamp.outputs.timestamp }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}

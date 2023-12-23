@@ -55,6 +55,8 @@ runs:
         file: ${{ inputs.dockerfile }}
         pull: true
         push: false
+        sbom: false
+        provenance: false
         build-args: ${{ inputs.build-args }}
         secrets: ${{ inputs.secrets }}
         cache-from: type=gha,scope=build
@@ -70,7 +72,10 @@ runs:
       with:
         context: ${{ inputs.docker-context }}
         file: ${{ inputs.dockerfile }}
+        pull: false
         push: false
+        sbom: false
+        provenance: false
         build-args: ${{ inputs.build-args }}
         secrets: ${{ inputs.secrets }}
         cache-from: type=gha,scope=build
@@ -82,7 +87,10 @@ runs:
       with:
         context: ${{ inputs.docker-context }}
         file: ${{ inputs.dockerfile }}
+        pull: false
         push: false
+        sbom: false
+        provenance: false
         build-args: ${{ inputs.build-args }}
         secrets: ${{ inputs.secrets }}
         cache-from: type=gha,scope=build
@@ -98,7 +106,10 @@ runs:
       with:
         context: ${{ inputs.docker-context }}
         file: ${{ inputs.dockerfile }}
+        pull: false
         push: false
+        sbom: false
+        provenance: false
         build-args: ${{ inputs.build-args }}
         secrets: ${{ inputs.secrets }}
         cache-from: type=gha,scope=build

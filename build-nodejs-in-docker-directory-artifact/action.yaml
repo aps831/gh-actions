@@ -105,7 +105,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
-        zip ${{ inputs.output-artifact-directory }}.zip ${{ inputs.output-artifact-directory }}/*
+        zip -r ${{ inputs.output-artifact-directory }}.zip ${{ inputs.output-artifact-directory }}/*
 
     # release-artifacts-upload
     - uses: aps831/gh-actions/action-release-artifacts-upload@master

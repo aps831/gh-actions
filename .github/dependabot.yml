@@ -162,6 +162,38 @@ updates:
     labels:
       - "github_actions"
   - package-ecosystem: "github-actions"
+    directory: "deploy-branch/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "deployment-candidate-pub/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "deployment-record-pub/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "deployment-terraform/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
     directory: "docker-build-image/"
     schedule:
       interval: "weekly"
@@ -275,6 +307,14 @@ updates:
       - "github_actions"
   - package-ecosystem: "github-actions"
     directory: "install-rust-tool/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "login-aws/"
     schedule:
       interval: "weekly"
     assignees:

@@ -1,0 +1,31 @@
+---
+name: Login AWS
+description: AWS login
+inputs:
+  aws-access-key-id:
+    description: AWS access key ID
+    required: true
+  aws-secret-access-key:
+    description: AWS secret access key
+    required: true
+  aws-region:
+    description: AWS region
+    required: true
+  role-to-assume:
+    description: Role to assume
+    required: true
+  role-session-name:
+    description: Role session name
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # pin@v4
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
+        role-to-assume: ${{ inputs.role-to-assume }}
+        role-duration-seconds: 1200
+        role-session-name: ${{ inputs.role-session-name }}

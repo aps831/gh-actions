@@ -1,0 +1,16 @@
+---
+name: Action Sync AWS S3 bucket
+description: Sync AWS S3 bucket
+inputs:
+  local-folder-path:
+    description: Path to local folder
+    required: true
+  remote-bucket-name:
+    description: Bucket name
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        aws s3 sync --delete ${{ inputs.local-folder-path }} s3://${{ inputs.remote-bucket-name }}

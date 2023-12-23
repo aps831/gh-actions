@@ -1,0 +1,15 @@
+---
+name: Docker Tag
+description: Tag Docker image
+inputs:
+  image-from:
+    description: Docker image name from
+    required: true
+  image-to:
+    description: Docker image name to
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: docker tag ${{ inputs.image-from }} ${{ inputs.image-to }}

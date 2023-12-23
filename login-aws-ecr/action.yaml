@@ -1,0 +1,22 @@
+---
+name: Login AWS ECR
+description: Login AWS ECR
+inputs:
+  aws-region:
+    description: AWS region
+    required: true
+outputs:
+  registry:
+    description: URL for AWS registry
+    value: ${{ steps.registry.outputs.registry }}
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/action-calculate-aws-ecr-registry@master
+      id: registry
+      with:
+        aws-region: ${{ inputs.aws-region }}
+
+    - shell: bash
+      run: |
+        aws ecr get-login-password --region ${{ inputs.aws-region }} | docker login --username AWS --password-stdin ${{ steps.registry.outputs.registry }}

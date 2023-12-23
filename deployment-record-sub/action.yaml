@@ -1,0 +1,57 @@
+---
+name: Deployment Record Subscribe
+description: Subscribe to deployment record
+inputs:
+  tag:
+    description: Tag
+    required: true
+  env:
+    description: Environment
+    required: true
+  timestamp:
+    description: Timestamp
+    required: true
+  message:
+    description: Deployment message
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # github-branch-default
+    - uses: aps831/gh-actions/github-branch-default@master
+      id: branch-default
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # git checkout default branch
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ steps.branch-default.outputs.branch-default }}
+
+    # git-configure
+    - uses: aps831/gh-actions/git-configure@master
+
+    # create directory
+    - shell: bash
+      run: mkdir -p "${{ inputs.env }}"
+
+    # write deployment message
+    - shell: bash
+      run:
+        echo "${{ inputs.message }}" > ${{ inputs.env }}/${{ inputs.timestamp }}-${{ inputs.tag }}
+
+    # git-add-file
+    - uses: aps831/gh-actions/git-add-file@master
+      with:
+        files: ${{ inputs.env }}/${{ inputs.timestamp }}-${{ inputs.tag }}
+
+    # git-commit
+    - uses: aps831/gh-actions/git-commit@master
+      with:
+        message: "feat: add deployment record for ${{ inputs.env }} at ${{ inputs.tag }}"
+
+    # git-push
+    - uses: aps831/gh-actions/git-push@master

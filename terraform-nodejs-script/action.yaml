@@ -1,0 +1,40 @@
+---
+name: Terraform Nodejs Script
+description: Run Terraform Nodejs script
+inputs:
+  working-directory-terraform:
+    description: Terraform working directory
+    required: true
+  working-directory-nodejs:
+    description: Nodejs working directory
+    required: true
+  terraform-version:
+    description: Terraform version
+    required: true
+  script:
+    description: Nodejs script
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/set-up-nodejs@master
+
+    - uses: aps831/gh-actions/set-up-terraform@master
+      with:
+        terraform-version: ${{ inputs.terraform-version }}
+
+    - name: Install Nodejs dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory-nodejs }}
+      run: npm ci
+
+    - name: Run Terraform init
+      shell: bash
+      working-directory: ${{ inputs.working-directory-terraform }}
+      run: terraform init
+
+    - name: Run script
+      shell: bash
+      working-directory: ${{ inputs.working-directory-nodejs }}
+      run: |
+        node ${{ inputs.script }}

@@ -1,0 +1,51 @@
+---
+name: Deployment Record Publish
+description: Publish deployment record
+inputs:
+  target-owner:
+    description: Target owner
+    required: true
+  target-repo:
+    description: Target repository
+    required: true
+  target-workflow:
+    description: Target workflow
+    required: true
+  target-branch:
+    description: Target branch
+    required: true
+  tag:
+    description: Tag
+    required: true
+  env:
+    description: Environment
+    required: true
+  timestamp:
+    description: Timestamp
+    required: true
+  message:
+    description: Deployment message
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      with:
+        script: |
+          await github.rest.actions.createWorkflowDispatch({
+            owner: "${{ inputs.target-owner }}",
+            repo: "${{ inputs.target-repo }}",
+            workflow_id: "${{ inputs.target-workflow }}",
+            ref: "${{ inputs.target-branch }}",
+            inputs: {
+              tag: "${{ inputs.tag }}",
+              env: "${{ inputs.env }}",
+              timestamp: "${{ inputs.timestamp }}",
+              message: "${{ inputs.message }}"
+            }
+          });
+        result-encoding: string
+        github-token: ${{ inputs.ACCESS_TOKEN }}

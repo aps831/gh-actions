@@ -1,0 +1,42 @@
+---
+name: Deploy Branch
+description: Deploy branch
+inputs:
+  environment:
+    description: Default environment
+    required: true
+  environment-targets:
+    description: Comma separated list of environments
+    required: true
+  ACCESS_TOKEN:
+    description: Access tokens
+    required: true
+outputs:
+  continue:
+    description: Flag to indicate deployment should continue
+    value: ${{ steps.branch-deploy.outputs.continue }}
+  noop:
+    description: Flag to indicate noop deployment
+    value: ${{ steps.branch-deploy.outputs.noop }}
+  op:
+    description: Flag to indicate deployment
+    value: ${{ steps.branch-deploy.outputs.noop == 'true' && 'false' || 'true' }}
+  environment:
+    description: Environment to deploy to
+    value: ${{ steps.branch-deploy.outputs.environment }}
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/github-branch-default@master
+      if: ${{ github.event.issue.pull_request }}
+      id: branch-default
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    - uses: github/branch-deploy@153de21b172e233a55f980e94051073494651fbb # pin@v8.2.1
+      if: ${{ github.event.issue.pull_request }}
+      id: branch-deploy
+      with:
+        environment: "${{ inputs.environment }}"
+        environment_targets: "${{ inputs.environment-targets }}"
+        stable_branch: "${{ steps.branch-default.outputs.branch-default }}"

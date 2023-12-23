@@ -20,6 +20,12 @@ inputs:
   persist-updates:
     description: Persist updates
     required: true
+  tfvars-filename:
+    description: Filename of tfvars files
+    required: true
+  tfvars-update-values:
+    description: Newline separated list of pipe separated variable, value regex and value
+    required: true
   ACCESS_TOKEN:
     description: Access token
     required: true
@@ -46,6 +52,13 @@ runs:
         tag: ${{ inputs.tag }}
         working-directory: ${{ inputs.working-directory }}
         templated-files: ${{ inputs.templated-files }}
+
+    # update-terraform-vars
+    - uses: aps831/gh-actions/update-terraform-vars@master
+      with:
+        working-directory: ${{ inputs.working-directory }}
+        tfvars-filename: ${{ inputs.tfvars-filename }}
+        tfvars-update-values: ${{ inputs.tfvars-update-values }}
 
     # update-change-log
     - uses: aps831/gh-actions/update-change-log@master

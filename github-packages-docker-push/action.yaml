@@ -1,0 +1,25 @@
+---
+name: Docker Pull Tag Push
+description: Pull Tag and Push Docker image
+inputs:
+  image-from:
+    description: Docker image name from
+    required: true
+  image-to:
+    description: Docker image name to
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/docker-pull@master
+      with:
+        image: "ghcr.io/${{ github.repository_owner }}/${{ inputs.image-from }}"
+
+    - uses: aps831/gh-actions/docker-tag@master
+      with:
+        image-from: "ghcr.io/${{ github.repository_owner }}/${{ inputs.image-from }}"
+        image-to: ${{ inputs.image-to }}
+
+    - uses: aps831/gh-actions/docker-push@master
+      with:
+        image: ${{ inputs.image-to }}
