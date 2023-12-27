@@ -1,0 +1,67 @@
+---
+name: Action Download Release Artifact
+description: Download release artifact
+inputs:
+  sbom-name:
+    description: SBOM name
+    required: true
+  release-tag:
+    description: Release tag
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  sbom-path:
+    description: Path to SBOM
+    value: ${{ steps.download.outputs.download }}
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      id: release
+      run: echo "release=$(mktemp -d)" >> $GITHUB_OUTPUT
+
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      id: download
+      with:
+        script: |
+          const fs = require('fs');
+
+          var release = undefined;
+          const { data: releases } = await github.rest.repos.listReleases({
+            owner: context.repo.owner,
+            repo: context.repo.repo
+          });
+
+          if ("${{ inputs.release-tag }}" == "") {
+            release = releases[0];
+          } else {
+            release = releases.filter(r => r.tag_name == "${{ inputs.release-tag }}")[0];
+          }
+
+          if (release == undefined) {
+            core.info('No release found')
+            core.setOutput('download', "");
+            return
+          }
+
+          const asset_id = release.assets.filter(asset => /${{ inputs.sbom-name }}/.test(asset.name) || /${{ inputs.sbom-name }}/.test(asset.label)).map(asset => asset.id)[0]
+
+          if (asset_id != undefined) {
+            const { data: asset } = await github.rest.repos.getReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              asset_id: asset_id,
+              headers: {
+                accept: 'application/octet-stream',
+              }
+            });
+            fs.writeFileSync("${{ steps.release.outputs.release }}/sbom", Buffer.from(asset));
+            core.setOutput('download', "${{ steps.release.outputs.release }}/sbom");
+          } else {
+            core.info('No SBOM found')
+            core.setOutput('download', "");
+          }
+        result-encoding: string
+        github-token: ${{ inputs.ACCESS_TOKEN }}

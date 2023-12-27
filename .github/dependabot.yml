@@ -50,7 +50,39 @@ updates:
     labels:
       - "github_actions"
   - package-ecosystem: "github-actions"
+    directory: "action-download-release-artifact/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
     directory: "action-find-files/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-grype-image-scan/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-grype-sbom-scan/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-trivy-image-scan/"
     schedule:
       interval: "weekly"
     assignees:

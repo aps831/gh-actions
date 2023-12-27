@@ -1,0 +1,28 @@
+---
+name: Action Grype Image Scan
+description: Scan Docker image with Grype
+inputs:
+  image:
+    description: Image name and tag
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/install-rust-tool@master
+      with:
+        tool: sarif-fmt
+
+    - uses: anchore/scan-action@65161264d84bfeed55775e43bdbe5eb7c8a433fb # pin@v3
+      id: scan
+      with:
+        image: "${{ inputs.name }}"
+        output-format: "sarif"
+        fail-build: true
+
+    - shell: bash
+      if: ${{ always() }}
+      run: |
+        echo "**Grype Image '${{ inputs.image }}' Scan Summary**" >> $GITHUB_STEP_SUMMARY
+        echo '```text' >> $GITHUB_STEP_SUMMARY
+        cat ${{ steps.scan.outputs.sarif }} | sarif-fmt >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY

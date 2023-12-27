@@ -1,0 +1,28 @@
+---
+name: Action Grype SBOM Scan
+description: Scan SBOM with Grype
+inputs:
+  path:
+    description: Path of SBOM file
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/install-rust-tool@master
+      with:
+        tool: sarif-fmt
+
+    - uses: anchore/scan-action@65161264d84bfeed55775e43bdbe5eb7c8a433fb # pin@v3
+      id: scan
+      with:
+        sbom: "${{ inputs.path }}"
+        output-format: "sarif"
+        fail-build: true
+
+    - shell: bash
+      if: ${{ always() }}
+      run: |
+        echo "**Grype SBOM Scan Summary**" >> $GITHUB_STEP_SUMMARY
+        echo '```text' >> $GITHUB_STEP_SUMMARY
+        cat ${{ steps.scan.outputs.sarif }} | sarif-fmt >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
