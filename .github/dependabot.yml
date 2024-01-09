@@ -194,7 +194,7 @@ updates:
     labels:
       - "github_actions"
   - package-ecosystem: "github-actions"
-    directory: "github-latest-release-is-draft/"
+    directory: "github-is-latest-release-draft/"
     schedule:
       interval: "weekly"
     assignees:

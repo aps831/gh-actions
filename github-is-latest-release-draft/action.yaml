@@ -1,5 +1,5 @@
 ---
-name: Github Latest Release Is Draft
+name: Github Is Latest Release Draft
 description: Check if Github latest release is draft
 inputs:
   ACCESS_TOKEN:

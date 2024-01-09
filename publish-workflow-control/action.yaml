@@ -330,7 +330,7 @@ runs:
         fi
 
     - name: Test latest release is draft
-      uses: aps831/gh-actions/github-latest-release-is-draft@master
+      uses: aps831/gh-actions/github-is-latest-release-draft@master
       id: unpublish-draft
       with:
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
@@ -386,7 +386,7 @@ runs:
         fi
 
     - name: Test latest release is draft
-      uses: aps831/gh-actions/github-latest-release-is-draft@master
+      uses: aps831/gh-actions/github-is-latest-release-draft@master
       id: finalize-draft
       with:
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
