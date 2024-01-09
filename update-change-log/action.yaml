@@ -17,7 +17,7 @@ runs:
         tag: ${{ inputs.tag }}
 
     # nth release tag
-    - uses: aps831/gh-actions/github-nth-release-tag@master
+    - uses: aps831/gh-actions/github-get-nth-release-tag@master
       id: nth-release-tag
       with:
         index: 20

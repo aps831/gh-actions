@@ -210,7 +210,7 @@ updates:
     labels:
       - "github_actions"
   - package-ecosystem: "github-actions"
-    directory: "github-nth-release-tag/"
+    directory: "github-get-nth-release-tag/"
     schedule:
       interval: "weekly"
     assignees:

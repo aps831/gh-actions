@@ -1,5 +1,5 @@
 ---
-name: Github nth Release Tag
+name: Github Get nth Release Tag
 description: Get Github nth release tag
 inputs:
   index:
