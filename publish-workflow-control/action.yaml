@@ -116,6 +116,17 @@ runs:
         prefix=${{ inputs.tag-prefix }}
         echo "version-current=${version//$prefix}" >> $GITHUB_OUTPUT
 
+    # tag-version-draft
+    - uses: aps831/gh-actions/github-latest-draft-release-tag@master
+      id: tag-version-draft
+      with:
+        fallback: ""
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # tag-latest-release-file
+    - uses: aps831/gh-actions/action-latest-release-file-read@master
+      id: tag-latest-release-file
+
     # version-next-conventional
     - name: Get next conventional version
       id: version-next-conventional
@@ -324,13 +335,11 @@ runs:
       with:
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
 
-    - name: Test that branch is at current release
+    - name: Test that branch is at current draft release
       id: unpublish-release
       shell: bash
       run: |
-        tag=${{ steps.tag-version-next-conventional.outputs.tag-version-next-conventional }}
-        branch_publish=${{ steps.branch-publish.outputs.branch-publish }}
-        if [[ $(git branch --contains "$tag" 2>/dev/null | grep "$branch_publish" ) ]]; then
+        if [[ "${{ steps.tag-version-draft.outputs.tag }}" == "${{ steps.tag-latest-release-file.outputs.tag }}" ]]; then
           echo "unpublish-release=true" >> $GITHUB_OUTPUT
         else
           echo "unpublish-release=false" >> $GITHUB_OUTPUT
@@ -382,13 +391,11 @@ runs:
       with:
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
 
-    - name: Test that publish branch contains latest release
+    - name: Test that branch is at current draft release
       id: finalize-release
       shell: bash
       run: |
-        tag=${{ steps.tag-version-next-conventional.outputs.tag-version-next-conventional }}
-        branch_publish=${{ steps.branch-publish.outputs.branch-publish }}
-        if [[ $(git branch --contains "$tag" 2>/dev/null | grep "$branch_publish" ) ]]; then
+        if [[ "${{ steps.tag-version-draft.outputs.tag }}" == "${{ steps.tag-latest-release-file.outputs.tag }}" ]]; then
           echo "finalize-release=true" >> $GITHUB_OUTPUT
         else
           echo "finalize-release=false" >> $GITHUB_OUTPUT
@@ -532,6 +539,8 @@ runs:
         echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
         echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
         echo "| tag-version-current       | ${{ steps.tag-version-current.outputs.tag }}                             |" >> $GITHUB_STEP_SUMMARY
+        echo "| tag-version-draft         | ${{ steps.tag-version-draft.outputs.tag }}                               |" >> $GITHUB_STEP_SUMMARY
+        echo "| tag-latest-release-file   | ${{ steps.tag-latest-release-file.outputs.tag }}                         |" >> $GITHUB_STEP_SUMMARY
         echo "| **tag-version-next**      | ${{ steps.tag-version-next.outputs.tag-version-next }}                   |" >> $GITHUB_STEP_SUMMARY
 
         echo "" >> $GITHUB_STEP_SUMMARY

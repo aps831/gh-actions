@@ -62,6 +62,11 @@ runs:
         version: ${{ inputs.version }}
         working-directory: ${{ inputs.working-directory }}
 
+    # update-latest-release-file
+    - uses: aps831/gh-actions/update-latest-release-file@master
+      with:
+        tag: ${{ inputs.tag }}
+
     # git-commit
     - uses: aps831/gh-actions/git-commit@master
       if: ${{ inputs.persist-updates == 'true' }}

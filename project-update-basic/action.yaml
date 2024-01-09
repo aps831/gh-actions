@@ -53,6 +53,11 @@ runs:
         tag: ${{ inputs.tag }}
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
 
+    # update-latest-release-file
+    - uses: aps831/gh-actions/update-latest-release-file@master
+      with:
+        tag: ${{ inputs.tag }}
+
     # git-commit
     - uses: aps831/gh-actions/git-commit@master
       if: ${{ inputs.persist-updates == 'true' }}

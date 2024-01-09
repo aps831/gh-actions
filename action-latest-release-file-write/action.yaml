@@ -1,0 +1,17 @@
+---
+name: Action Latest Release File Write
+description: Write latest release file
+inputs:
+  tag:
+    description: Release tag
+    required: true
+  filename:
+    description: Filename to write to
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - id: tag
+      shell: bash
+      run: |
+        echo ${{ inputs.tag }} > ${{ inputs.filename }}
