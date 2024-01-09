@@ -202,7 +202,7 @@ updates:
     labels:
       - "github_actions"
   - package-ecosystem: "github-actions"
-    directory: "github-no-draft-releases/"
+    directory: "github-is-no-draft-releases/"
     schedule:
       interval: "weekly"
     assignees:

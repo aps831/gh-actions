@@ -1,6 +1,6 @@
 ---
-name: Github No Draft Releases
-description: Check Github no draft releases
+name: Github Is No Draft Releases
+description: Check Github for no draft releases
 inputs:
   ACCESS_TOKEN:
     description: Access token

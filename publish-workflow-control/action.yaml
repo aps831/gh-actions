@@ -224,7 +224,7 @@ runs:
         branch-check-against: ${{ steps.branch-default.outputs.branch-default }}
 
     - name: Test for no draft releases
-      uses: aps831/gh-actions/github-no-draft-releases@master
+      uses: aps831/gh-actions/github-is-no-draft-releases@master
       id: release-no-drafts
       with:
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
