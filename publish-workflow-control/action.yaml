@@ -458,7 +458,7 @@ runs:
       id: branch-update
       shell: bash
       run: |
-        echo "branch-update=${{ inputs.branch-update-base }}-${{ steps.tag-version-next.outputs.tag-version-next }}" >> $GITHUB_OUTPUT
+        echo "branch-update=${{ inputs.branch-update-base }}-${{ steps.timestamp.outputs.timestamp }}" >> $GITHUB_OUTPUT
 
     # Build branch name
     - name: Build branch name
