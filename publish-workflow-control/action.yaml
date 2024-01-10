@@ -160,11 +160,8 @@ runs:
         fi
 
     # timestamp
-    - name: Calculate timestamp
+    - uses: aps831/gh-actions/action-create-timestamp@master
       id: timestamp
-      shell: bash
-      run: |
-        echo "timestamp=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_OUTPUT
 
     # tag-version-next-patch
     - name: Get tag next patch version
