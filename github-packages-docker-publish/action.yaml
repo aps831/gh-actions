@@ -11,17 +11,9 @@ inputs:
   build-artifacts-upload-name:
     description: Name of build artifacts upload
     required: true
-  ACCESS_TOKEN:
-    description: Access token
-    required: true
 runs:
   using: "composite"
   steps:
-    # login-github-ghcr
-    - uses: aps831/gh-actions/login-github-ghcr@master
-      with:
-        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
-
     # build-artifacts-download
     - uses: aps831/gh-actions/action-build-artifacts-download@master
       id: artifacts-folder
