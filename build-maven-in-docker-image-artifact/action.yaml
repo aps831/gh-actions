@@ -33,12 +33,12 @@ inputs:
     description: Access token
     required: true
 outputs:
-  build-artifacts-jar-upload-name:
-    description: Name of build artifacts upload
-    value: ${{ steps.artifacts-jar-upload.outputs.name }}
-  build-artifacts-image-upload-name:
-    description: Name of build image upload
-    value: ${{ steps.image.outputs.image-upload-name }}
+  build-artifacts-release-upload-name:
+    description: Name of release build artifacts upload
+    value: ${{ steps.release-artifacts-upload.outputs.name }}
+  build-artifacts-publish-upload-name:
+    description: Name of publication build image upload
+    value: ${{ steps.image.outputs.build-artifacts-publish-upload-name }}
 runs:
   using: "composite"
   steps:
@@ -88,9 +88,9 @@ runs:
         component-name: ${{ inputs.image-name }}
         test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
 
-    # build-artifacts-upload
-    - uses: aps831/gh-actions/action-build-artifacts-upload@master
-      id: artifacts-jar-upload
+    # release-artifacts-upload
+    - uses: aps831/gh-actions/action-release-artifacts-upload@master
+      id: release-artifacts-upload
       with:
         description: jar-cyclonedx-${{ inputs.image-name }}
         build-files: |

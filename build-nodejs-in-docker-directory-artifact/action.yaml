@@ -42,8 +42,8 @@ inputs:
     description: Access token
     required: true
 outputs:
-  build-artifacts-directory-upload-name:
-    description: Name of build artifacts upload
+  build-artifacts-release-upload-name:
+    description: Name of release build artifacts upload
     value: ${{ steps.upload.outputs.name }}
 runs:
   using: "composite"
@@ -107,8 +107,8 @@ runs:
       run: |
         zip ${{ inputs.output-artifact-directory }}.zip ${{ inputs.output-artifact-directory }}/*
 
-    # build-artifacts-upload
-    - uses: aps831/gh-actions/action-build-artifacts-upload@master
+    # release-artifacts-upload
+    - uses: aps831/gh-actions/action-release-artifacts-upload@master
       id: upload
       with:
         description: directory-artifact

@@ -1,0 +1,32 @@
+---
+name: Action Publish Artifacts Upload
+description: Upload publish artifacts
+inputs:
+  description:
+    description: Description of artifact
+    required: true
+  build-files:
+    description: Build files
+    required: true
+outputs:
+  name:
+    description: Name of build artifacts upload
+    value: ${{ steps.name.outputs.name }}
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/action-sanitize-upload-name@5f7062ad30f196e2a44dd53eb031549ef8944895 # pin@master
+      id: description
+      with:
+        name: ${{ inputs.description }}
+
+    - shell: bash
+      id: name
+      run: |
+        echo "name=publish-artifacts-${{ steps.description.outputs.name }}" >> $GITHUB_OUTPUT
+
+    - uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595 # pin@v4
+      with:
+        name: ${{ steps.name.outputs.name }}
+        path: ${{ inputs.build-files }}
+        retention-days: 1

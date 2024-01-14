@@ -35,9 +35,9 @@ inputs:
     description: Stage for returning status
     required: true
 outputs:
-  image-upload-name:
-    description: Name of build image upload
-    value: ${{ steps.upload.outputs.name }}
+  build-artifacts-publish-upload-name:
+    description: Name of publication build image upload
+    value: ${{ steps.release-artifacts-upload.outputs.name }}
 runs:
   using: "composite"
   steps:
@@ -107,10 +107,10 @@ runs:
           steps.hash.outputs.hash }}
         outputs: type=docker,dest=${{ env.TEMP_FILE }}
 
-    # build-artifacts-upload
-    - uses: aps831/gh-actions/action-build-artifacts-upload@master
+    # publish-artifacts-upload
+    - uses: aps831/gh-actions/action-publish-artifacts-upload@master
       if: ${{ inputs.upload-image == 'true' }}
-      id: upload
+      id: release-artifacts-upload
       with:
         description: ${{ inputs.image-name }}-image
         build-files: ${{ env.TEMP_FILE }}

@@ -1,0 +1,23 @@
+---
+name: Action Release Artifacts Download
+description: Download release artifacts
+inputs:
+  pattern:
+    description: Glob pattern of artifacts to download
+    required: true
+outputs:
+  artifacts-folder:
+    description: Artifacts folder
+    value: ${{ steps.artifacts-directory.outputs.artifacts-directory }}
+runs:
+  using: "composite"
+  steps:
+    - name: create temporary output directory
+      shell: bash
+      id: artifacts-directory
+      run: echo "artifacts-directory=$(mktemp -d)" >> $GITHUB_OUTPUT
+
+    - uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # pin@v4
+      with:
+        path: "${{ steps.artifacts-directory.outputs.artifacts-directory }}"
+        pattern: ${{ inputs.pattern }}

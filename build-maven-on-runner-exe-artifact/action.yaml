@@ -33,8 +33,8 @@ inputs:
     description: Access token
     required: true
 outputs:
-  build-artifacts-exe-upload-name:
-    description: Name of build artifacts upload
+  build-artifacts-release-upload-name:
+    description: Name of release build artifacts upload
     value: ${{ steps.upload.outputs.name }}
 runs:
   using: "composite"
@@ -82,8 +82,8 @@ runs:
         os-name: "${{ runner.os }}"
         test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
 
-    # build-artifacts-upload
-    - uses: aps831/gh-actions/action-build-artifacts-upload@master
+    # release-artifacts-upload
+    - uses: aps831/gh-actions/action-release-artifacts-upload@master
       id: upload
       with:
         description: exe-cyclonedx-${{ runner.os }}

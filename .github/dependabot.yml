@@ -10,22 +10,6 @@ updates:
     labels:
       - "github_actions"
   - package-ecosystem: "github-actions"
-    directory: "action-build-artifacts-download/"
-    schedule:
-      interval: "weekly"
-    assignees:
-      - "aps831"
-    labels:
-      - "github_actions"
-  - package-ecosystem: "github-actions"
-    directory: "action-build-artifacts-upload/"
-    schedule:
-      interval: "weekly"
-    assignees:
-      - "aps831"
-    labels:
-      - "github_actions"
-  - package-ecosystem: "github-actions"
     directory: "action-create-github-release/"
     schedule:
       interval: "weekly"
@@ -107,6 +91,38 @@ updates:
       - "github_actions"
   - package-ecosystem: "github-actions"
     directory: "action-output-update-change-log/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-publish-artifacts-download/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-release-artifacts-download/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-publish-artifacts-upload/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-release-artifacts-upload/"
     schedule:
       interval: "weekly"
     assignees:

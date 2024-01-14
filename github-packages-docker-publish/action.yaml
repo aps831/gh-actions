@@ -15,10 +15,10 @@ runs:
   using: "composite"
   steps:
     # build-artifacts-download
-    - uses: aps831/gh-actions/action-build-artifacts-download@master
+    - uses: aps831/gh-actions/action-publish-artifacts-download@master
       id: artifacts-folder
       with:
-        names: ${{ inputs.build-artifacts-upload-name }}
+        pattern: ${{ inputs.build-artifacts-upload-name }}
 
     # git-short-hash
     - uses: aps831/gh-actions/git-short-hash@master
