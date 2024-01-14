@@ -90,14 +90,6 @@ updates:
     labels:
       - "github_actions"
   - package-ecosystem: "github-actions"
-    directory: "action-output-update-change-log/"
-    schedule:
-      interval: "weekly"
-    assignees:
-      - "aps831"
-    labels:
-      - "github_actions"
-  - package-ecosystem: "github-actions"
     directory: "action-publish-artifacts-download/"
     schedule:
       interval: "weekly"
@@ -123,6 +115,14 @@ updates:
       - "github_actions"
   - package-ecosystem: "github-actions"
     directory: "action-release-artifacts-upload/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+  - package-ecosystem: "github-actions"
+    directory: "action-update-change-log/"
     schedule:
       interval: "weekly"
     assignees:
