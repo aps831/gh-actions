@@ -22,7 +22,7 @@ runs:
       with:
         name: ${{ inputs.component-name }}
 
-    - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # pin@v3
+    - uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595 # pin@v3
       with:
         name: >
           test-reports-type-${{ inputs.type }}${{ inputs.os-name != '' && '-on-' || '' }}${{
