@@ -39,4 +39,5 @@ runs:
       with:
         environment: "${{ inputs.environment }}"
         environment_targets: "${{ inputs.environment-targets }}"
+        skip_ci: "${{ inputs.environment-targets }}"
         stable_branch: "${{ steps.branch-default.outputs.branch-default }}"
