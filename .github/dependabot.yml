@@ -9,6 +9,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-create-github-release/"
     schedule:
@@ -17,6 +25,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-create-pull-request/"
     schedule:
@@ -25,6 +41,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-create-release-notes/"
     schedule:
@@ -33,6 +57,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-download-release-artifact/"
     schedule:
@@ -41,6 +73,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-find-files/"
     schedule:
@@ -49,6 +89,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-grype-image-scan/"
     schedule:
@@ -57,6 +105,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-grype-sbom-scan/"
     schedule:
@@ -65,14 +121,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
-  - package-ecosystem: "github-actions"
-    directory: "action-trivy-image-scan/"
-    schedule:
-      interval: "weekly"
-    assignees:
-      - "aps831"
-    labels:
-      - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-output-junit-test-summary/"
     schedule:
@@ -81,6 +137,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-output-tap-test-summary/"
     schedule:
@@ -89,6 +153,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-publish-artifacts-download/"
     schedule:
@@ -97,14 +169,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
-  - package-ecosystem: "github-actions"
-    directory: "action-release-artifacts-download/"
-    schedule:
-      interval: "weekly"
-    assignees:
-      - "aps831"
-    labels:
-      - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-publish-artifacts-upload/"
     schedule:
@@ -113,6 +185,30 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "github-actions"
+    directory: "action-release-artifacts-download/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-release-artifacts-upload/"
     schedule:
@@ -121,6 +217,30 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "github-actions"
+    directory: "action-trivy-image-scan/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-update-change-log/"
     schedule:
@@ -129,6 +249,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "action-upload-test-results/"
     schedule:
@@ -137,14 +265,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
-  - package-ecosystem: "github-actions"
-    directory: "docker-build-artifact/"
-    schedule:
-      interval: "weekly"
-    assignees:
-      - "aps831"
-    labels:
-      - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "build-basic-project/"
     schedule:
@@ -153,6 +281,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "build-nodejs-in-docker-directory-artifact/"
     schedule:
@@ -161,6 +297,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "deploy-branch/"
     schedule:
@@ -169,6 +313,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "deployment-candidate-pub/"
     schedule:
@@ -177,6 +329,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "deployment-record-pub/"
     schedule:
@@ -185,6 +345,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "deployment-terraform/"
     schedule:
@@ -193,6 +361,30 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "github-actions"
+    directory: "docker-build-artifact/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "docker-build-image/"
     schedule:
@@ -201,6 +393,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "git-checkout/"
     schedule:
@@ -209,6 +409,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "github-add-issue-comment/"
     schedule:
@@ -217,6 +425,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "github-branch-default/"
     schedule:
@@ -225,6 +441,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "github-branch-event/"
     schedule:
@@ -233,14 +457,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
-  - package-ecosystem: "github-actions"
-    directory: "github-latest-good-release-tag/"
-    schedule:
-      interval: "weekly"
-    assignees:
-      - "aps831"
-    labels:
-      - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "github-is-latest-release-draft/"
     schedule:
@@ -249,6 +473,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "github-is-no-draft-releases/"
     schedule:
@@ -257,6 +489,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "github-get-nth-release-tag/"
     schedule:
@@ -265,6 +505,46 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "github-actions"
+    directory: "github-latest-draft-release-tag/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "github-actions"
+    directory: "github-latest-good-release-tag/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "github-packages-docker-publish/"
     schedule:
@@ -273,6 +553,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "github-packages-unpublish/"
     schedule:
@@ -281,6 +569,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "github-release-finalize/"
     schedule:
@@ -289,6 +585,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "github-release-unpublish/"
     schedule:
@@ -297,6 +601,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "install-native-image-windows-dependencies/"
     schedule:
@@ -305,6 +617,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "install-rust-tool/"
     schedule:
@@ -313,6 +633,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "login-aws/"
     schedule:
@@ -321,6 +649,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "login-github-ghcr/"
     schedule:
@@ -329,6 +665,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "monitor/"
     schedule:
@@ -337,6 +681,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "set-up-docker/"
     schedule:
@@ -345,6 +697,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "set-up-graalvm-native-image/"
     schedule:
@@ -353,6 +713,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "set-up-jdk/"
     schedule:
@@ -361,6 +729,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "set-up-nodejs/"
     schedule:
@@ -369,6 +745,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "set-up-terraform/"
     schedule:
@@ -377,6 +761,14 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "update-terraform-docs/"
     schedule:
@@ -385,3 +777,11 @@ updates:
       - "aps831"
     labels:
       - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "chore"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
