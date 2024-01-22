@@ -25,7 +25,7 @@ runs:
       run: |
         echo "name=release-artifacts-${{ steps.description.outputs.name }}" >> $GITHUB_OUTPUT
 
-    - uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595 # pin@v4
+    - uses: actions/upload-artifact@694cdabd8bdb0f10b2cea11669e1bf5453eed0a6 # pin@v4
       with:
         name: ${{ steps.name.outputs.name }}
         path: ${{ inputs.build-files }}
