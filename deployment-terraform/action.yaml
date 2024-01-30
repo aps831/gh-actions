@@ -44,5 +44,7 @@ runs:
     - uses: aps831/gh-actions/action-terraform-cmd@master
       id: cmd
       with:
-        cmd: ${{ (inputs.plan == 'true' || inputs.apply != 'true') && 'plan' || 'apply' }}
+        cmd:
+          ${{ (inputs.plan == 'true' || inputs.apply != 'true') && 'plan' || 'apply  -auto-approve'
+          }}
         working-directory: ${{ inputs.working-directory }}
