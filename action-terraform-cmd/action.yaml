@@ -1,0 +1,39 @@
+---
+name: Action Terraform Cmd
+description: Run Terraform command
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+  cmd:
+    description: Command
+    required: true
+outputs:
+  stdout:
+    description: Standard output
+    value: ${{ steps.cmd.outputs.stdout }}
+runs:
+  using: "composite"
+  steps:
+    - name: Run Terraform command
+      shell: bash
+      id: cmd
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        set +e
+        stdout=$(mktemp)
+        echo "**terraform init**" |& tee $stdout
+        terraform init -no-color |& tee -a $stdout
+        echo "" |& tee -a $stdout
+        echo "**terraform ${{ inputs.cmd }}**" |& tee -a $stdout
+        terraform ${{ inputs.cmd }} -no-color |& tee -a $stdout
+        exit_value=$?
+        cat $stdout
+        echo 'stdout<<EOF' >> $GITHUB_OUTPUT
+        cat "$stdout" >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
+        exit $exit_value
+
+    - if: ${{ steps.cmd.outcome == 'failure' }}
+      shell: bash
+      run: exit 1

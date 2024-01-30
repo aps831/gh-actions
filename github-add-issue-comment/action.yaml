@@ -15,13 +15,15 @@ runs:
   using: "composite"
   steps:
     - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      env:
+        BODY: ${{ inputs.comment }}
       with:
         script: |
           await github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: "${{ inputs.issue-number }}",
-            body: "${{ inputs.comment }}",
+            body: process.env.BODY
           });
         result-encoding: string
         github-token: ${{ inputs.ACCESS_TOKEN }}

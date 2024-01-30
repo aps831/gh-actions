@@ -17,6 +17,10 @@ inputs:
   ACCESS_TOKEN:
     description: Access token
     required: true
+outputs:
+  stdout:
+    description: Stdout from Terraform command
+    value: ${{ steps.cmd.outputs.stdout }}
 runs:
   using: "composite"
   steps:
@@ -36,16 +40,9 @@ runs:
       with:
         terraform-version: ${{ inputs.terraform-version }}
 
-    # terraform-plan
-    - uses: aps831/gh-actions/terraform-plan@master
-      id: plan
-      if: ${{ inputs.plan == 'true' }}
+    # terraform-cmd
+    - uses: aps831/gh-actions/action-terraform-cmd@master
+      id: cmd
       with:
-        working-directory: ${{ inputs.working-directory }}
-
-    # terraform-apply
-    - uses: aps831/gh-actions/terraform-apply@master
-      id: apply
-      if: ${{ inputs.apply == 'true' }}
-      with:
+        cmd: ${{ (inputs.plan == 'true' || inputs.apply != 'true') && 'plan' || 'apply' }}
         working-directory: ${{ inputs.working-directory }}
