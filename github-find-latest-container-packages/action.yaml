@@ -1,0 +1,52 @@
+---
+name: Github Find Latest Container Packages
+description: Find latest Github container packages
+inputs:
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  images:
+    description: List of images
+    value: ${{ steps.images.outputs.result }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # pin@v7
+      id: images
+      with:
+        script: |
+          const { data: private_packages } = await github.rest.packages.listPackagesForUser({
+            username: context.repo.owner,
+            package_type: "container",
+            visibility: "private"
+          });
+
+          const { data: public_packages } = await github.rest.packages.listPackagesForUser({
+            username: context.repo.owner,
+            package_type: "container",
+            visibility: "public"
+          });
+
+          const containers = private_packages.concat(public_packages).filter(p => p.repository.name == context.repo.repo);
+
+          var images = [];
+
+          for (const container of containers) {
+
+            const { data: packageVersions } = await github.rest.packages.getAllPackageVersionsForPackageOwnedByUser({
+              username: context.repo.owner,
+              package_type: "container",
+              package_name: container.name
+            });
+
+            images.push({
+              owner: context.repo.owner,
+              name: container.name,
+              tag: packageVersions[0].metadata.container.tags[0]
+            })
+
+          }
+
+          return images;
+        github-token: ${{ inputs.ACCESS_TOKEN }}
