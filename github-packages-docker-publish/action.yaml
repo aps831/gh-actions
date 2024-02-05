@@ -11,9 +11,18 @@ inputs:
   build-artifacts-upload-name:
     description: Name of build artifacts upload
     required: true
+  COSIGN_PRIVATE_KEY:
+    description: Cosign private key
+    required: true
+  COSIGN_PASSWORD:
+    description: Cosign password
+    required: true
 runs:
   using: "composite"
   steps:
+    # cosign-installer
+    - uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 # pin@v3.4.0
+
     # build-artifacts-download
     - uses: aps831/gh-actions/action-publish-artifacts-download@master
       id: artifacts-folder
@@ -24,21 +33,59 @@ runs:
     - uses: aps831/gh-actions/git-short-hash@master
       id: hash
 
-    # publish
-    - name: Publish image
+    # load docker image
+    - shell: bash
       working-directory:
         ${{ steps.artifacts-folder.outputs.artifacts-folder }}/${{
         inputs.build-artifacts-upload-name }}
-      shell: bash
       run: |
         for file in *; do
-          base="ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}"
-          hash="${base}:${{ steps.hash.outputs.hash }}"
-          version="${base}:${{ inputs.tag }}"
-          latest="${base}:latest"
           docker load --input $file
-          docker tag "$hash" "$version"
-          docker tag "$hash" "$latest"
-          docker rmi "$hash"
-          docker push --all-tags "${base}"
         done
+
+    # base image name
+    - id: base
+      shell: bash
+      run: |
+        base="ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}"
+        echo "base=$base" >> $GITHUB_OUTPUT
+
+    # calculate tags
+    - id: tags
+      shell: bash
+      run: |
+        hash="${{ steps.base.outputs.base }}:${{ steps.hash.outputs.hash }}"
+        version="${{ steps.base.outputs.base }}:${{ inputs.tag }}"
+        latest="${{ steps.base.outputs.base }}:latest"
+        echo "hash=$hash" >> $GITHUB_OUTPUT
+        echo "version=$version" >> $GITHUB_OUTPUT
+        echo "latest=$latest" >> $GITHUB_OUTPUT
+
+    # retag images
+    - shell: bash
+      run: |
+        docker tag "${{ steps.tags.outputs.hash }}" "${{ steps.tags.outputs.version }}"
+        docker tag "${{ steps.tags.outputs.hash }}" "${{ steps.tags.outputs.latest }}"
+
+    # publish
+    - shell: bash
+      run: |
+        docker push "${{ steps.tags.outputs.version }}"
+        docker push "${{ steps.tags.outputs.latest }}"
+
+    # calculate digest
+    - id: digest
+      shell: bash
+      run: |
+        digest=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ steps.base.outputs.base }})
+        digest="${digest##*@}"
+        echo "digest=${{ steps.base.outputs.base }}@$digest" >> $GITHUB_OUTPUT
+
+    # sign image
+    - name: Sign image with a key
+      shell: bash
+      run: |
+        cosign sign --yes --key env://COSIGN_PRIVATE_KEY "${{ steps.digest.outputs.digest }}"
+      env:
+        COSIGN_PRIVATE_KEY: ${{ inputs.COSIGN_PRIVATE_KEY }}
+        COSIGN_PASSWORD: ${{ inputs.COSIGN_PASSWORD }}
