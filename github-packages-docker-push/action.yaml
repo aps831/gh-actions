@@ -8,12 +8,20 @@ inputs:
   image-to:
     description: Docker image name to
     required: true
+  COSIGN_PUBLIC_KEY:
+    description: Cosign public key
+    required: true
 runs:
   using: "composite"
   steps:
     - uses: aps831/gh-actions/docker-pull@master
       with:
         image: "ghcr.io/${{ github.repository_owner }}/${{ inputs.image-from }}"
+
+    - uses: aps831/gh-actions/docker-cosign-verify@master
+      with:
+        image: "ghcr.io/${{ github.repository_owner }}/${{ inputs.image-from }}"
+        COSIGN_PUBLIC_KEY: ${{ inputs.COSIGN_PUBLIC_KEY }}
 
     - uses: aps831/gh-actions/docker-tag@master
       with:
