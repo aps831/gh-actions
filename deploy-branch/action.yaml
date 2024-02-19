@@ -33,7 +33,7 @@ runs:
       with:
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
 
-    - uses: github/branch-deploy@153de21b172e233a55f980e94051073494651fbb # pin@v8.2.1
+    - uses: github/branch-deploy@ad494b2622ba3a88d455cfa8e495a7c0ae28f841 # pin@v9.1.0
       if: ${{ github.event.issue.pull_request }}
       id: branch-deploy
       with:
