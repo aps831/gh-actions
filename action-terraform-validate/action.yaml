@@ -42,7 +42,7 @@ runs:
               ansi2txt < validate.log > validate.txt
               cat validate.txt >> $GITHUB_STEP_SUMMARY
             else
-              echo "Format check failed" >> $GITHUB_STEP_SUMMARY
+              echo "Validation check failed" >> $GITHUB_STEP_SUMMARY
             fi
 
             echo '```' >> $GITHUB_STEP_SUMMARY
