@@ -11,10 +11,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Install ansi2txt
-      shell: bash
-      run: sudo apt install colorized-logs
-
     - name: Output Terraform validate step summary
       shell: bash
       run: echo "**Terraform Validate Summary**" >> $GITHUB_STEP_SUMMARY
@@ -31,7 +27,7 @@ runs:
             pushd "$path" > /dev/null 2>&1
 
             terraform init -backend=false
-            terraform validate > validate.log
+            terraform validate
             exit_code=$?
 
             echo "### $path" >> $GITHUB_STEP_SUMMARY
@@ -39,16 +35,12 @@ runs:
             echo '```text' >> $GITHUB_STEP_SUMMARY
 
             if [[ "$exit_code" == "0" ]]; then
-              ansi2txt < validate.log > validate.txt
-              cat validate.txt >> $GITHUB_STEP_SUMMARY
+              echo "Validation check passed" >> $GITHUB_STEP_SUMMARY
             else
               echo "Validation check failed" >> $GITHUB_STEP_SUMMARY
             fi
 
             echo '```' >> $GITHUB_STEP_SUMMARY
-
-            rm validate.log || true
-            rm validate.txt || true
 
             popd > /dev/null 2>&1
 
