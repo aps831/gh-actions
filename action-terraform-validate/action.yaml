@@ -23,6 +23,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
+        set +e
         paths="${{ inputs.paths }}"
         while IFS= read -r path || [ -n "$path" ]; do
           if [[ -n "$path" && -d "$path" ]]; then
@@ -31,18 +32,29 @@ runs:
 
             terraform init -backend=false
             terraform validate > validate.log
+            exit_code=$?
 
-            ansi2txt < validate.log > validate.txt
             echo "### $path" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo '```text' >> $GITHUB_STEP_SUMMARY
-            cat validate.txt >> $GITHUB_STEP_SUMMARY
+
+            if [[ "$exit_code" == "0" ]]; then
+              ansi2txt < validate.log > validate.txt
+              cat validate.txt >> $GITHUB_STEP_SUMMARY
+            else
+              echo "Format check failed" >> $GITHUB_STEP_SUMMARY
+            fi
+
             echo '```' >> $GITHUB_STEP_SUMMARY
 
-            rm validate.log
-            rm validate.txt
+            rm validate.log || true
+            rm validate.txt || true
 
             popd > /dev/null 2>&1
+
+            if [[ "$exit_code" != "0" ]]; then
+              exit $exit_code
+            fi
 
           fi
         done <<< "$paths"
