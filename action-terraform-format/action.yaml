@@ -23,6 +23,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
+        set +e
         paths="${{ inputs.paths }}"
         while IFS= read -r path || [ -n "$path" ]; do
           if [[ -n "$path" && -d "$path" ]]; then
@@ -30,18 +31,29 @@ runs:
             pushd "$path" > /dev/null 2>&1
 
             terraform fmt -check -recursive > format.log
-            ansi2txt < format.log > format.txt
+            exit_code=$?
 
             echo "### $path" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo '```text' >> $GITHUB_STEP_SUMMARY
-            cat format.txt >> $GITHUB_STEP_SUMMARY
+
+            if [[ "$exit_code" == "0" ]]; then
+              ansi2txt < format.log > format.txt
+              cat format.txt >> $GITHUB_STEP_SUMMARY
+            else
+              echo "Format check failed" >> $GITHUB_STEP_SUMMARY
+            fi
+
             echo '```' >> $GITHUB_STEP_SUMMARY
 
-            rm format.log
-            rm format.txt
+            rm format.log || true
+            rm format.txt || true
 
             popd > /dev/null 2>&1
+
+            if [[ "$exit_code" != "0" ]]; then
+              exit $exit_code
+            fi
 
           fi
         done <<< "$paths"
