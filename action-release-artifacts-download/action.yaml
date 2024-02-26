@@ -17,7 +17,7 @@ runs:
       id: artifacts-directory
       run: echo "artifacts-directory=$(mktemp -d)" >> $GITHUB_OUTPUT
 
-    - uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # pin@v4
+    - uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # pin@v4
       with:
         path: "${{ steps.artifacts-directory.outputs.artifacts-directory }}"
         pattern: ${{ inputs.pattern }}
