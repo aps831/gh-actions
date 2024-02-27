@@ -40,11 +40,15 @@ runs:
               package_name: container.name
             });
 
-            images.push({
-              owner: context.repo.owner,
-              name: container.name,
-              tag: packageVersions[0].metadata.container.tags[0]
-            })
+            const packageVersion = packageVersions.filter(pv => !pv.metadata.container.tags.some(tag => tag.endsWith(".sig")))[0]
+
+            if (packageVersion != undefined) {
+              images.push({
+                owner: context.repo.owner,
+                name: container.name,
+                tag: packageVersion.metadata.container.tags[0]
+              });
+            }
 
           }
 
