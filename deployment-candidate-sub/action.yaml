@@ -5,6 +5,9 @@ inputs:
   tag:
     description: Tag
     required: true
+  env:
+    description: Environment name
+    required: true
   working-directory:
     description: Working directory
     required: true
@@ -44,19 +47,23 @@ runs:
     # git-create-and-switch-branch
     - uses: aps831/gh-actions/git-create-and-switch-branch@master
       with:
-        branch: ${{ inputs.branch-update-base }}-${{ steps.timestamp.outputs.timestamp }}
+        branch:
+          ${{ inputs.branch-update-base }}-${{ inputs.env }}${{ inputs.env != '' && '-' || '' }}${{
+          steps.timestamp.outputs.timestamp }}
 
     # update-terraform-vars
     - uses: aps831/gh-actions/update-terraform-vars@master
       with:
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ inputs.working-directory }}/${{ inputs.env }}
         tfvars-filename: ${{ inputs.tfvars-filename }}
         tfvars-update-values: ${{ inputs.tfvars-update-values }}
 
     # git-commit
     - uses: aps831/gh-actions/git-commit@master
       with:
-        message: "chore: update tfvars for ${{ inputs.tag }} release"
+        message:
+          "chore: update tfvars for ${{ inputs.tag }} release${{ inputs.env != '' && ' on ' || ''
+          }}${{ inputs.env }}"
 
     # git-push
     - uses: aps831/gh-actions/git-push@master
@@ -64,8 +71,10 @@ runs:
     # create pull request
     - uses: aps831/gh-actions/action-create-pull-request@master
       with:
-        title: "Deploy ${{ inputs.tag }}"
-        body: "Deploy ${{ inputs.tag }}"
+        title: "Deploy ${{ inputs.tag }}${{ inputs.env == '' && '' || ' to ' }}${{ inputs.env }}"
+        body: "Deploy ${{ inputs.tag }}${{ inputs.env == '' && '' || ' to ' }}${{ inputs.env }}"
         base-branch: ${{ steps.branch-default.outputs.branch-default }}
-        update-branch: ${{ inputs.branch-update-base }}-${{ steps.timestamp.outputs.timestamp }}
+        update-branch:
+          ${{ inputs.branch-update-base }}-${{ inputs.env }}${{ inputs.env != '' && '-' || '' }}${{
+          steps.timestamp.outputs.timestamp }}
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
