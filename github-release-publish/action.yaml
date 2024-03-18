@@ -15,7 +15,7 @@ inputs:
     description: Draft flag
     required: true
   build-artifacts-upload-name:
-    description: Name of build artifacts upload
+    description: Newline separated list of names of build artifacts upload
     required: true
   ACCESS_TOKEN:
     description: Access token
@@ -38,11 +38,20 @@ runs:
       with:
         tag: ${{ inputs.tag }}
 
+    # calculate pattern from build-artifacts-upload-name
+    - shell: bash
+      id: pattern
+      run: |
+        pattern=$(node ${{ github.action_path }}/pattern.js $'${{ inputs.build-artifacts-upload-name }}')
+        echo 'pattern<<EOF' >> $GITHUB_OUTPUT
+        echo $pattern >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
+
     # release-artifacts-download
     - uses: aps831/gh-actions/action-release-artifacts-download@master
       id: artifacts-folder
       with:
-        pattern: ${{ inputs.build-artifacts-upload-name }}
+        pattern: ${{ steps.pattern.outputs.pattern }}
 
     # latest release tag
     - uses: aps831/gh-actions/github-latest-good-release-tag@master
