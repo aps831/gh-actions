@@ -50,6 +50,7 @@ runs:
 
     # build
     - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
+      if: ${{ inputs.stage-build != '' }}
       with:
         context: ${{ inputs.docker-context }}
         file: ${{ inputs.dockerfile }}
@@ -69,6 +70,7 @@ runs:
       run: rm -rf ${{ inputs.output-directory }}
 
     - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
+      if: ${{ inputs.stage-output != '' }}
       with:
         context: ${{ inputs.docker-context }}
         file: ${{ inputs.dockerfile }}
@@ -84,6 +86,7 @@ runs:
 
     # status
     - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
+      if: ${{ inputs.stage-status != '' }}
       with:
         context: ${{ inputs.docker-context }}
         file: ${{ inputs.dockerfile }}
