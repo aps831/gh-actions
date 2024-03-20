@@ -101,7 +101,7 @@ runs:
 
     # create temp file
     - name: create temp file
-      run: echo "TEMP_FILE=$(mktemp)" >> $GITHUB_ENV
+      run: echo "TEMP_PATH=$(mktemp)" >> $GITHUB_ENV
       shell: bash
 
     # image
@@ -119,7 +119,17 @@ runs:
         tags:
           ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}:${{
           steps.hash.outputs.hash }}
-        outputs: type=docker,dest=${{ env.TEMP_FILE }}
+        outputs: type=docker,dest=${{ env.TEMP_PATH }}
+
+    - shell: bash
+      run: |
+        TEMP_DIR="$(dirname ${{ env.TEMP_PATH }})"
+        echo "TEMP_DIR=$TEMP_DIR" >> $GITHUB_ENV
+
+    - shell: bash
+      run: |
+        TEMP_FILENAME="$(basename ${{ env.TEMP_PATH }})"
+        echo "TEMP_FILENAME=${TEMP_FILENAME}" >> $GITHUB_ENV
 
     # publish-artifacts-upload
     - uses: aps831/gh-actions/action-publish-artifacts-upload@master
@@ -127,4 +137,5 @@ runs:
       id: release-artifacts-upload
       with:
         description: ${{ inputs.image-name }}-image
-        build-files: ${{ env.TEMP_FILE }}
+        working-directory: ${{ env.TEMP_DIR }}
+        build-files: ${{ env.TEMP_FILENAME }}

@@ -84,5 +84,6 @@ runs:
       id: publish-artifacts-upload
       with:
         description: jar
+        working-directory: ${{ inputs.working-directory }}
         build-files: |
-          ${{ inputs.working-directory }}/target/*.jar
+          target/*.jar

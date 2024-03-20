@@ -37,8 +37,8 @@ runs:
 
     - shell: bash
       run: |
-        sed -i -e 's/^./${{ inputs.working-directory }}\/&/' ${{ steps.build-files.outputs.build-files }}
-        sed -i -e 's/^${{ inputs.working-directory }}\/!/\!${{ inputs.working-directory }}\//g' ${{ steps.build-files.outputs.build-files }}
+        sed -i -e 's|^.|${{ inputs.working-directory }}/&|' ${{ steps.build-files.outputs.build-files }}
+        sed -i -e 's|^${{ inputs.working-directory }}/!|\!${{ inputs.working-directory }}/|g' ${{ steps.build-files.outputs.build-files }}
 
     - shell: bash
       id: working-directory-build-files

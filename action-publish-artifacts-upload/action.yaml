@@ -5,8 +5,11 @@ inputs:
   description:
     description: Description of artifact
     required: true
+  working-directory:
+    description: Working directory
+    required: true
   build-files:
-    description: Build files
+    description: Build files relative to working directory
     required: true
 outputs:
   name:
@@ -25,8 +28,27 @@ runs:
       run: |
         echo "name=publish-artifacts-${{ steps.description.outputs.name }}" >> $GITHUB_OUTPUT
 
+    - shell: bash
+      id: build-files
+      run: echo "build-files=$(mktemp)" >> $GITHUB_OUTPUT
+
+    - shell: bash
+      run: echo "${{ inputs.build-files }}" > ${{ steps.build-files.outputs.build-files }}
+
+    - shell: bash
+      run: |
+        sed -i -e 's|^.|${{ inputs.working-directory }}/&|' ${{ steps.build-files.outputs.build-files }}
+        sed -i -e 's|^${{ inputs.working-directory }}/!|\!${{ inputs.working-directory }}/|g' ${{ steps.build-files.outputs.build-files }}
+
+    - shell: bash
+      id: working-directory-build-files
+      run: |
+        echo 'working-directory-build-files<<EOF' >> $GITHUB_OUTPUT
+        cat ${{ steps.build-files.outputs.build-files }} >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
+
     - uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # pin@v4
       with:
         name: ${{ steps.name.outputs.name }}
-        path: ${{ inputs.build-files }}
+        path: ${{ steps.working-directory-build-files.outputs.working-directory-build-files }}
         retention-days: 1
