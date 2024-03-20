@@ -47,12 +47,6 @@ runs:
       with:
         branch: ${{ inputs.branch-build }}
 
-    # action-find-maven-pom-version
-    - uses: aps831/gh-actions/action-find-maven-project-version@master
-      id: project-version
-      with:
-        working-directory: ${{ inputs.working-directory }}
-
     # docker-build-image
     - uses: aps831/gh-actions/docker-build-image@master
       id: image
@@ -63,7 +57,6 @@ runs:
         dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile }}
         output-directory: ${{ inputs.working-directory }}/target
         build-args: |
-          ARTIFACT_VERSION=${{ steps.project-version.outputs.project-version }}
           MAVEN_PHASE=clean install
           ${{ inputs.build-args }}
         secrets: |
