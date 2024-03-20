@@ -5,9 +5,6 @@ inputs:
   branch-build:
     description: Branch used for build
     required: true
-  maven-enforcer-fail:
-    description: Fail on Maven enforcer
-    required: true
   working-directory:
     description: Working directory
     required: true
@@ -22,6 +19,9 @@ inputs:
     required: true
   stage-status:
     description: Stage for returning status
+    required: true
+  build-args:
+    description: Build args
     required: true
   ACCESS_TOKEN:
     description: Access token
@@ -47,7 +47,7 @@ runs:
         docker-context: ${{ inputs.working-directory }}
         dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile }}
         output-directory: ${{ inputs.working-directory }}/target
-        build-args: ENFORCER_FAIL=${{ inputs.maven-enforcer-fail }}
+        build-args: ${{ inputs.build-args }}
         secrets: |
           GITHUB_USER_REF=${{ github.actor }}
           GITHUB_TOKEN_REF=${{ inputs.ACCESS_TOKEN }}
