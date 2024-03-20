@@ -87,14 +87,15 @@ runs:
       id: upload
       with:
         description: exe-cyclonedx-${{ runner.os }}
+        working-directory: ${{ inputs.working-directory }}
         build-files: |
-          ${{ inputs.working-directory }}/target/gluonfx/x86_64-linux/*
-          !${{ inputs.working-directory }}/target/gluonfx/x86_64-linux/gensrc
-          !${{ inputs.working-directory }}/target/gluonfx/x86_64-linux/gvm
-          ${{ inputs.working-directory }}/target/gluonfx/x86_64-windows/*
-          !${{ inputs.working-directory }}/target/gluonfx/x86_64-windows/gensrc
-          !${{ inputs.working-directory }}/target/gluonfx/x86_64-windows/gvm
-          ${{ inputs.working-directory }}/target/installer/*
-          !${{ inputs.working-directory }}/target/installer/input/
-          ${{ inputs.working-directory }}/target/*cyclonedx*.json
-          ${{ inputs.working-directory }}/target/*cyclonedx*.xml
+          target/gluonfx/x86_64-linux/*
+          !target/gluonfx/x86_64-linux/gensrc
+          !target/gluonfx/x86_64-linux/gvm
+          target/gluonfx/x86_64-windows/*
+          !target/gluonfx/x86_64-windows/gensrc
+          !target/gluonfx/x86_64-windows/gvm
+          target/installer/*
+          !target/installer/input/
+          target/*cyclonedx*.json
+          target/*cyclonedx*.xml

@@ -73,10 +73,11 @@ runs:
       id: release-artifacts-upload
       with:
         description: jar-cyclonedx
+        working-directory: ${{ inputs.working-directory }}
         build-files: |
-          ${{ inputs.working-directory }}/target/*.jar
-          ${{ inputs.working-directory }}/target/*-cyclonedx.json
-          ${{ inputs.working-directory }}/target/*-cyclonedx.xml
+          target/*.jar
+          target/*-cyclonedx.json
+          target/*-cyclonedx.xml
 
     # publish-artifacts-upload
     - uses: aps831/gh-actions/action-publish-artifacts-upload@master

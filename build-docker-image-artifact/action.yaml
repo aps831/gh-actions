@@ -14,6 +14,9 @@ inputs:
   working-directory:
     description: Working directory
     required: true
+  output-directory:
+    description: Output directory relative to working directory
+    required: true
   dockerfile:
     description: Dockerfile
     required: true
@@ -28,6 +31,15 @@ inputs:
     required: true
   build-args:
     description: Build args
+    required: true
+  test-result-files:
+    description: Test result files relative to working directory
+    required: true
+  release-artifacts-name-prefix:
+    description: Prefix for release artifacts name
+    required: true
+  release-artifacts-files:
+    description: Release artifact files relative to working directory
     required: true
   ACCESS_TOKEN:
     description: Access token
@@ -55,7 +67,7 @@ runs:
         upload-image: ${{ inputs.upload-image }}
         docker-context: ${{ inputs.working-directory }}
         dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile }}
-        output-directory: ${{ inputs.working-directory }}/target
+        output-directory: ${{ inputs.working-directory }}/${{ inputs.output-directory }}
         build-args: ${{ inputs.build-args }}
         secrets: |
           GITHUB_USER_REF=${{ github.actor }}
@@ -69,7 +81,7 @@ runs:
       if: ${{ always() && inputs.stage-output != '' }}
       with:
         component-name: ${{ inputs.image-name }}
-        test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
+        test-result-files: ${{ inputs.working-directory }}/${{ inputs.test-result-files }}
 
     # upload-test-results
     - uses: aps831/gh-actions/action-upload-test-results@master
@@ -77,15 +89,13 @@ runs:
       with:
         type: unit
         component-name: ${{ inputs.image-name }}
-        test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
+        test-result-files: ${{ inputs.working-directory }}/${{ inputs.test-result-files }}
 
     # release-artifacts-upload
     - uses: aps831/gh-actions/action-release-artifacts-upload@master
       id: release-artifacts-upload
       if: ${{ inputs.stage-output != '' }}
       with:
-        description: jar-cyclonedx-${{ inputs.image-name }}
-        build-files: |
-          ${{ inputs.working-directory }}/target/*.jar
-          ${{ inputs.working-directory }}/target/*-cyclonedx.json
-          ${{ inputs.working-directory }}/target/*-cyclonedx.xml
+        description: ${{ inputs.release-artifacts-name-prefix }}-${{ inputs.image-name }}
+        working-directory: ${{ inputs.working-directory }}
+        build-files: ${{ inputs.release-artifacts-files }}

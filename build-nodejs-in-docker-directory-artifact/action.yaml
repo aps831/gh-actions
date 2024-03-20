@@ -112,9 +112,10 @@ runs:
       id: upload
       with:
         description: directory-artifact
+        working-directory: ${{ inputs.working-directory }}
         build-files: |
-          ${{ inputs.working-directory }}/${{ inputs.output-artifact-directory }}.zip
-          ${{ inputs.working-directory }}/${{ inputs.output-sbom-directory }}/cyclonedx.json
+          ${{ inputs.output-artifact-directory }}.zip
+          ${{ inputs.output-sbom-directory }}/cyclonedx.json
 
     # delete zip file
     - name: delete zip file
