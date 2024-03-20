@@ -56,9 +56,7 @@ runs:
         docker-context: ${{ inputs.working-directory }}
         dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile }}
         output-directory: ${{ inputs.working-directory }}/target
-        build-args: |
-          MAVEN_PHASE=clean install
-          ${{ inputs.build-args }}
+        build-args: ${{ inputs.build-args }}
         secrets: |
           GITHUB_USER_REF=${{ github.actor }}
           GITHUB_TOKEN_REF=${{ inputs.ACCESS_TOKEN }}

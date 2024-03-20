@@ -47,9 +47,7 @@ runs:
         docker-context: ${{ inputs.working-directory }}
         dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile }}
         output-directory: ${{ inputs.working-directory }}/target
-        build-args: |
-          MAVEN_PHASE=clean install
-          ENFORCER_FAIL=${{ inputs.maven-enforcer-fail }}
+        build-args: ENFORCER_FAIL=${{ inputs.maven-enforcer-fail }}
         secrets: |
           GITHUB_USER_REF=${{ github.actor }}
           GITHUB_TOKEN_REF=${{ inputs.ACCESS_TOKEN }}
