@@ -1,6 +1,6 @@
 ---
-name: Build Maven in Docker Jar Artifact
-description: Build Maven in Docker jar artifact
+name: Build Java in Docker Jar Artifact
+description: Build Java in Docker jar artifact
 inputs:
   branch-build:
     description: Branch used for build
