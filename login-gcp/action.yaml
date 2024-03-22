@@ -1,0 +1,17 @@
+---
+name: Login to Google Cloud
+description: Login to Google Cloud
+inputs:
+  workload-identity-provider:
+    description: Workload identity provider
+    required: true
+  service-account:
+    description: Service account
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: "google-github-actions/auth@35b0e87d162680511bf346c299f71c9c5c379033" # pin@v1
+      with:
+        workload_identity_provider: "${{ inputs.workload-identity-provider }}"
+        service_account: "${{ inputs.service-account }}"

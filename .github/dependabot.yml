@@ -674,6 +674,22 @@ updates:
           - "minor"
           - "patch"
   - package-ecosystem: "github-actions"
+    directory: "login-gcp/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "ci"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "github-actions"
     directory: "login-github-ghcr/"
     schedule:
       interval: "weekly"
@@ -707,6 +723,22 @@ updates:
           - "patch"
   - package-ecosystem: "github-actions"
     directory: "set-up-docker/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "aps831"
+    labels:
+      - "github_actions"
+      - "no_ci_cd_run"
+    commit-message:
+      prefix: "ci"
+    groups:
+      patch-minor-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "github-actions"
+    directory: "set-up-gcloud/"
     schedule:
       interval: "weekly"
     assignees:

@@ -1,0 +1,16 @@
+---
+name: Login to Google Cloud Artifact Registry
+description: Login to Google Cloud Artifact Registry
+inputs:
+  region:
+    description: GCP region
+    required: true
+outputs:
+  registry:
+    description: URL for GCP artifact registry
+    value: ${{ inputs.region }}-docker.pkg.dev
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: gcloud auth configure-docker ${{ inputs.region }}-docker.pkg.dev --quiet
