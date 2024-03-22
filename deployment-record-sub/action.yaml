@@ -2,9 +2,6 @@
 name: Deployment Record Subscribe
 description: Subscribe to deployment record
 inputs:
-  tag:
-    description: Tag
-    required: true
   env:
     description: Environment
     required: true
@@ -40,18 +37,17 @@ runs:
 
     # write deployment message
     - shell: bash
-      run:
-        echo "${{ inputs.message }}" > ${{ inputs.env }}/${{ inputs.timestamp }}-${{ inputs.tag }}
+      run: echo "${{ inputs.message }}" > ${{ inputs.env }}/${{ inputs.timestamp }}
 
     # git-add-file
     - uses: aps831/gh-actions/git-add-file@master
       with:
-        files: ${{ inputs.env }}/${{ inputs.timestamp }}-${{ inputs.tag }}
+        files: ${{ inputs.env }}/${{ inputs.timestamp }}
 
     # git-commit
     - uses: aps831/gh-actions/git-commit@master
       with:
-        message: "feat: add deployment record for ${{ inputs.env }} at ${{ inputs.tag }}"
+        message: "feat: add deployment record for ${{ inputs.env }}"
 
     # git-push
     - uses: aps831/gh-actions/git-push@master

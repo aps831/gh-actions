@@ -14,9 +14,6 @@ inputs:
   target-branch:
     description: Target branch
     required: true
-  tag:
-    description: Tag
-    required: true
   env:
     description: Environment
     required: true
@@ -41,7 +38,6 @@ runs:
             workflow_id: "${{ inputs.target-workflow }}",
             ref: "${{ inputs.target-branch }}",
             inputs: {
-              tag: "${{ inputs.tag }}",
               env: "${{ inputs.env }}",
               timestamp: "${{ inputs.timestamp }}",
               message: "${{ inputs.message }}"
