@@ -2,8 +2,8 @@
 name: Docker Pull Tag Push
 description: Pull Tag and Push Docker image
 inputs:
-  image-from:
-    description: Docker image name from
+  image-from-ghcr:
+    description: Docker image on Github container registry name
     required: true
   image-to:
     description: Docker image name to
@@ -16,16 +16,16 @@ runs:
   steps:
     - uses: aps831/gh-actions/docker-pull@master
       with:
-        image: "ghcr.io/${{ github.repository_owner }}/${{ inputs.image-from }}"
+        image: "ghcr.io/${{ inputs.image-from-ghcr }}"
 
     - uses: aps831/gh-actions/docker-cosign-verify@master
       with:
-        image: "ghcr.io/${{ github.repository_owner }}/${{ inputs.image-from }}"
+        image: "ghcr.io/${{ inputs.image-from-ghcr }}"
         COSIGN_PUBLIC_KEY: ${{ inputs.COSIGN_PUBLIC_KEY }}
 
     - uses: aps831/gh-actions/docker-tag@master
       with:
-        image-from: "ghcr.io/${{ github.repository_owner }}/${{ inputs.image-from }}"
+        image-from: "ghcr.io/${{ inputs.image-from-ghcr }}"
         image-to: ${{ inputs.image-to }}
 
     - uses: aps831/gh-actions/docker-push@master
