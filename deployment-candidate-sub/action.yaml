@@ -5,6 +5,9 @@ inputs:
   tag:
     description: Tag
     required: true
+  component:
+    description: Component
+    required: true
   env:
     description: Environment name
     required: true
@@ -47,12 +50,39 @@ runs:
     - uses: aps831/gh-actions/action-create-timestamp@master
       id: timestamp
 
+    # branch name
+    - shell: bash
+      id: branch
+      run: |
+        branch=${{ inputs.branch-update-base }}-${{ inputs.component }}-${{ inputs.env }}${{ inputs.env != '' && '-' || '' }}${{ steps.timestamp.outputs.timestamp }}
+        echo "branch=$branch" >> $GITHUB_OUTPUT
+
+    # message
+    - shell: bash
+      id: message
+      run: |
+        message="chore: update tfvars for ${{ inputs.tag }} release of '${{ inputs.component }}'${{ inputs.env != '' && ' to ' || '' }}${{ inputs.env }}"
+        echo "message=$message" >> $GITHUB_OUTPUT
+
+    # prrequest
+    - shell: bash
+      id: prrequest
+      run: |
+        prrequest="Deploy ${{ inputs.tag }} of '${{ inputs.component }}'${{ inputs.env != '' && ' to ' || '' }}${{ inputs.env }}"
+        echo "prrequest=$prrequest" >> $GITHUB_OUTPUT
+
     # git-create-and-switch-branch
     - uses: aps831/gh-actions/git-create-and-switch-branch@master
       with:
-        branch:
-          ${{ inputs.branch-update-base }}-${{ inputs.env }}${{ inputs.env != '' && '-' || '' }}${{
-          steps.timestamp.outputs.timestamp }}
+        branch: ${{ steps.branch.outputs.branch }}
+
+    # update-latest-deployment-file
+    - uses: aps831/gh-actions/update-latest-deployment-file@master
+      id: deployment-file
+      with:
+        tag: ${{ inputs.tag }}
+        component: ${{ inputs.component }}
+        env: ${{ inputs.env }}
 
     # update-terraform-vars
     - uses: aps831/gh-actions/update-terraform-vars@master
@@ -66,9 +96,7 @@ runs:
     # git-commit
     - uses: aps831/gh-actions/git-commit@master
       with:
-        message:
-          "chore: update tfvars for ${{ inputs.tag }} release${{ inputs.env != '' && ' on ' || ''
-          }}${{ inputs.env }}"
+        message: ${{ steps.message.outputs.message }}
 
     # git-push
     - uses: aps831/gh-actions/git-push@master
@@ -76,10 +104,8 @@ runs:
     # create pull request
     - uses: aps831/gh-actions/action-create-pull-request@master
       with:
-        title: "Deploy ${{ inputs.tag }}${{ inputs.env == '' && '' || ' to ' }}${{ inputs.env }}"
-        body: "Deploy ${{ inputs.tag }}${{ inputs.env == '' && '' || ' to ' }}${{ inputs.env }}"
+        title: ${{ steps.prrequest.outputs.prrequest }}
+        body: ${{ steps.prrequest.outputs.prrequest }}
         base-branch: ${{ steps.branch-default.outputs.branch-default }}
-        update-branch:
-          ${{ inputs.branch-update-base }}-${{ inputs.env }}${{ inputs.env != '' && '-' || '' }}${{
-          steps.timestamp.outputs.timestamp }}
+        update-branch: ${{ steps.branch.outputs.branch }}
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}

@@ -1,0 +1,25 @@
+---
+name: Action Latest Deployment File Write
+description: Write latest deployment file
+inputs:
+  tag:
+    description: Tag
+    required: true
+  component:
+    description: Component
+    required: true
+  env:
+    description: Environment
+    required: true
+outputs:
+  filename:
+    description: New or updated filename
+    value: .latest-deployment/${{ inputs.env }}/${{ inputs.component }}
+runs:
+  using: "composite"
+  steps:
+    - id: tag
+      shell: bash
+      run: |
+        mkdir -p .latest-deployment/${{ inputs.env }}
+        echo "${{ inputs.tag }}" > .latest-deployment/${{ inputs.env }}/${{ inputs.component }}

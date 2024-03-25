@@ -1,0 +1,30 @@
+---
+name: Update Latest Deployment File
+description: Update latest deployment file
+inputs:
+  tag:
+    description: Tag
+    required: true
+  component:
+    description: Component
+    required: true
+  env:
+    description: Environment
+    required: true
+outputs:
+  filename:
+    description: Deployment versions filename
+    value: ${{ steps.file.outputs.filename }}
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/action-latest-deployment-file-write@master
+      id: file
+      with:
+        tag: ${{ inputs.tag }}
+        component: ${{ inputs.component }}
+        env: ${{ inputs.env }}
+
+    - uses: aps831/gh-actions/git-add-file@master
+      with:
+        files: ${{ steps.file.outputs.filename }}
