@@ -1,0 +1,21 @@
+---
+name: Action Latest Deployment File Write
+description: Write latest deployment file
+inputs:
+  versions:
+    description: Deployment versions in properties file format
+    required: true
+  env:
+    description: Environment
+    required: true
+outputs:
+  filename:
+    description: Filename
+    value: .latest-deployment-${{ inputs.env }}
+runs:
+  using: "composite"
+  steps:
+    - id: tag
+      shell: bash
+      run: |
+        echo -e "${{ inputs.versions }}" > .latest-deployment-${{ inputs.env }}

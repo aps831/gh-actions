@@ -1,0 +1,25 @@
+---
+name: Action Latest Deployment File Read
+description: Read latest deployment file
+inputs:
+  name:
+    description: Deployment name
+    required: true
+  env:
+    description: Environment
+    required: true
+outputs:
+  tag:
+    description: Release tag
+    value: ${{ steps.tag.outputs.tag }}
+runs:
+  using: "composite"
+  steps:
+    - id: tag
+      shell: bash
+      run: |
+        if [ -f .latest-deployment-${{ inputs.env }} ]; then
+          echo "tag=$(cat .latest-deployment-${{ inputs.env }} | grep ${{ inputs.name }} | awk -F= '{print $2}' )" >> $GITHUB_OUTPUT
+        else
+          echo "tag=" >> $GITHUB_OUTPUT
+        fi

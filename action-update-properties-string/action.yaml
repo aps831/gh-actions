@@ -1,0 +1,55 @@
+---
+name: Action Update Properties String
+description: Update properties string
+inputs:
+  properties-string:
+    description: Properties string
+    required: true
+  properties-filename:
+    description: Properties filename
+    required: true
+outputs:
+  properties-string:
+    description: Properties string
+    value: ${{ steps.properties-string.outputs.properties-string }}
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: echo "TEMP_RAW_FILE=$(mktemp)" >> $GITHUB_ENV
+
+    - shell: bash
+      run: echo "TEMP_UPDATED_FILE=$(mktemp)" >> $GITHUB_ENV
+
+    - shell: bash
+      run: echo -e "${{ inputs.properties-string }}" > ${{ env.TEMP_RAW_FILE }}
+
+    - shell: bash
+      run: |
+        awk -F= '
+        NR==FNR {
+          Value[$1] = $2;
+          next;
+        }
+        {
+          text=$0;
+          out = "";
+          while ( pos=index(text, "<") ) {
+              out  = out substr(text, 1, pos-1);
+              text = substr(text, pos+1)
+              pos  = index(text, ">");
+              prop = substr(text, 1, pos-1);
+              out  = out Value[prop]
+              text = substr(text, pos+1);
+          }
+          out = out text;
+          print out;
+        }
+        ' ${{ inputs.properties-filename }} ${{ env.TEMP_RAW_FILE }} > ${{ env.TEMP_UPDATED_FILE }}
+
+    - shell: bash
+      id: properties-string
+      run: |
+        echo 'properties-string<<EOF' >> $GITHUB_OUTPUT
+        cat ${{ env.TEMP_UPDATED_FILE }} >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT

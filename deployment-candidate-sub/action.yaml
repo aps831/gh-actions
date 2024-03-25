@@ -5,6 +5,9 @@ inputs:
   tag:
     description: Tag
     required: true
+  versions:
+    description: Deployment versions in properties file format
+    required: true
   env:
     description: Environment name
     required: true
@@ -14,8 +17,9 @@ inputs:
   tfvars-filename:
     description: Filename of tfvars files
     required: true
-  tfvars-update-values:
-    description: Newline separated list of pipe separated variable, value regex and value
+  tfvars-update-names:
+    description:
+      Newline separated list of pipe separated variable, value regex and version property name
     required: true
   branch-update-base:
     description: Base name of temporary branch to use for creating update
@@ -51,12 +55,26 @@ runs:
           ${{ inputs.branch-update-base }}-${{ inputs.env }}${{ inputs.env != '' && '-' || '' }}${{
           steps.timestamp.outputs.timestamp }}
 
+    # update-latest-deployment-file
+    - uses: aps831/gh-actions/update-latest-deployment-file@feat/latest-deployment
+      id: deployment-file
+      with:
+        versions: ${{ inputs.versions }}
+        env: ${{ inputs.env }}
+
+    # action-update-properties-string
+    - uses: aps831/gh-actions/action-update-properties-string@feat/latest-deployment
+      id: properties
+      with:
+        properties-string: ${{ inputs.tfvars-update-names }}
+        properties-filename: ${{ steps.deployment-file.outputs.filename }}
+
     # update-terraform-vars
     - uses: aps831/gh-actions/update-terraform-vars@master
       with:
         working-directory: ${{ inputs.working-directory }}/${{ inputs.env }}
         tfvars-filename: ${{ inputs.tfvars-filename }}
-        tfvars-update-values: ${{ inputs.tfvars-update-values }}
+        tfvars-update-values: ${{ steps.properties.outputs.properties-string }}
 
     # git-commit
     - uses: aps831/gh-actions/git-commit@master
