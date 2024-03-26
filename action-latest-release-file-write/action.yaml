@@ -5,13 +5,14 @@ inputs:
   tag:
     description: Release tag
     required: true
+outputs:
   filename:
-    description: Filename to write to
-    required: true
+    description: Filename
+    value: ".latest-release"
 runs:
   using: "composite"
   steps:
     - id: tag
       shell: bash
       run: |
-        echo ${{ inputs.tag }} > ${{ inputs.filename }}
+        echo ${{ inputs.tag }} > ".latest-release"

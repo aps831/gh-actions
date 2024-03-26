@@ -9,10 +9,10 @@ runs:
   using: "composite"
   steps:
     - uses: aps831/gh-actions/action-latest-release-file-write@master
+      id: file
       with:
         tag: ${{ inputs.tag }}
-        filename: ".latest-release"
 
     - uses: aps831/gh-actions/git-add-file@master
       with:
-        files: ".latest-release"
+        files: ${{ steps.file.outputs.filename }}
