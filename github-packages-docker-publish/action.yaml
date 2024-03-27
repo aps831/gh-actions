@@ -17,6 +17,10 @@ inputs:
   COSIGN_PASSWORD:
     description: Cosign password
     required: true
+outputs:
+  name:
+    description: Name of Docker image
+    value: ${{ steps.tags.outputs.version }}
 runs:
   using: "composite"
   steps:
