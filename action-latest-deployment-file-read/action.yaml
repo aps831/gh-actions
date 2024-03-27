@@ -2,16 +2,13 @@
 name: Action Latest Deployment File Read
 description: Read latest deployment file
 inputs:
-  name:
-    description: Deployment name
-    required: true
   env:
     description: Environment
     required: true
 outputs:
-  tag:
-    description: Release tag
-    value: ${{ steps.tag.outputs.tag }}
+  versions:
+    description: Versions
+    value: # TODO
 runs:
   using: "composite"
   steps:
@@ -23,3 +20,7 @@ runs:
         else
           echo "tag=" >> $GITHUB_OUTPUT
         fi
+
+# TODO
+# https://gist.github.com/emmanuelnk/13f418d1c1a7eb08ee72ef60a71ca041
+# https://stackoverflow.com/questions/1521462/looping-through-the-content-of-a-file-in-bash
