@@ -4,7 +4,10 @@ description: Pull Tag and Push Docker image
 inputs:
   image-from-ghcr:
     description: Docker image on Github container registry name
-    required: true
+    required: false
+  image-from:
+    description: Docker image name
+    required: false
   image-to:
     description: Docker image name to
     required: true
@@ -14,18 +17,27 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - shell: bash
+      id: image-from
+      run: |
+        if [[ "${{ inputs.image-from-ghcr }}" != "" ]]; then
+          echo "image-from=ghcr.io/${{ inputs.image-from-ghcr }}" >> $GITHUB_OUTPUT
+        else
+          echo "image-from=${{ inputs.image-from }}" >> $GITHUB_OUTPUT
+        fi
+
     - uses: aps831/gh-actions/docker-pull@master
       with:
-        image: "ghcr.io/${{ inputs.image-from-ghcr }}"
+        image: "${{ steps.image-from.outputs.image-from }}"
 
     - uses: aps831/gh-actions/docker-cosign-verify@master
       with:
-        image: "ghcr.io/${{ inputs.image-from-ghcr }}"
+        image: "${{ steps.image-from.outputs.image-from }}"
         COSIGN_PUBLIC_KEY: ${{ inputs.COSIGN_PUBLIC_KEY }}
 
     - uses: aps831/gh-actions/docker-tag@master
       with:
-        image-from: "ghcr.io/${{ inputs.image-from-ghcr }}"
+        image-from: "${{ steps.image-from.outputs.image-from }}"
         image-to: ${{ inputs.image-to }}
 
     - uses: aps831/gh-actions/docker-push@master
