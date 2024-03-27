@@ -12,7 +12,7 @@ runs:
       with:
         tool: sarif-fmt
 
-    - uses: anchore/scan-action@c35e932c2a7c572bfdb1c3dbcdadb2d4fc62418d # pin@v3
+    - uses: anchore/scan-action@3343887d815d7b07465f6fdcd395bd66508d486a # pin@v3
       id: scan
       with:
         image: "${{ inputs.name }}"
