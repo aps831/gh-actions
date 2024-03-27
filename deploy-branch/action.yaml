@@ -24,6 +24,9 @@ outputs:
   environment:
     description: Environment to deploy to
     value: ${{ steps.branch-deploy.outputs.environment }}
+  environment-uppercase:
+    description: Environment to deploy to in uppercase
+    value: ${{ steps.uppercase.outputs.environment }}
 runs:
   using: "composite"
   steps:
@@ -41,3 +44,9 @@ runs:
         environment_targets: "${{ inputs.environment-targets }}"
         skip_ci: "${{ inputs.environment-targets }}"
         stable_branch: "${{ steps.branch-default.outputs.branch-default }}"
+
+    - shell: bash
+      id: uppercase
+      run: |
+        environment=${{ steps.branch-deploy.outputs.environment }}
+        echo "environment=${environment@U}" >> $GITHUB_OUTPUT
