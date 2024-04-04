@@ -5,6 +5,9 @@ outputs:
   timestamp:
     description: Timestamp
     value: ${{ steps.timestamp.outputs.timestamp }}
+  print:
+    description: Printed date and time
+    value: ${{ steps.timestamp.outputs.print }}
 runs:
   using: "composite"
   steps:
@@ -12,3 +15,4 @@ runs:
       shell: bash
       run: |
         echo "timestamp=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_OUTPUT
+        echo "print=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_OUTPUT
