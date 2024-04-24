@@ -2,14 +2,20 @@
 name: Update Terraform Vars
 description: Update Terraform vars
 inputs:
+  tag:
+    description: Tag
+    required: true
   working-directory:
     description: Working directory
     required: true
   tfvars-filename:
     description: Filename of tfvars files
     required: true
-  tfvars-update-values:
-    description: Newline separated list of pipe separated variable, value regex and value
+  tfvars-tag-var:
+    description: Variable name in tfvars file for tag
+    required: true
+  tfvars-tag-regex:
+    description: Regex of value of tag in tfvars file
     required: true
 runs:
   using: "composite"
@@ -27,7 +33,9 @@ runs:
       if: ${{ inputs.tfvars-filename != '' && inputs.tfvars-update-values != '' }}
       with:
         paths: ${{ steps.files.outputs.files }}
-        update-values: ${{ inputs.tfvars-update-values }}
+        tag: ${{ inputs.tag }}
+        tag-var: ${{ inputs.tfvars-tag-var }}
+        tag-regex: ${{ inputs.tfvars-tag-regex }}
 
     # git-add-file
     - uses: aps831/gh-actions/git-add-file@master

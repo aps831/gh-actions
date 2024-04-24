@@ -35,8 +35,11 @@ inputs:
   tfvars-filename:
     description: Filename of tfvars files
     required: true
-  tfvars-update-values:
-    description: Newline separated list of pipe separated variable, value regex and value
+  tfvars-tag-var:
+    description: Variable name in tfvars file for tag
+    required: true
+  tfvars-tag-regex:
+    description: Regex of value of tag in tfvars file
     required: true
   ACCESS_TOKEN:
     description: Access token
@@ -68,9 +71,11 @@ runs:
     # update-terraform-vars
     - uses: aps831/gh-actions/update-terraform-vars@master
       with:
+        tag: ${{ inputs.tag }}
         working-directory: ${{ inputs.working-directory-terraform }}
         tfvars-filename: ${{ inputs.tfvars-filename }}
-        tfvars-update-values: ${{ inputs.tfvars-update-values }}
+        tfvars-tag-var: ${{ inputs.tfvars-tag-var }}
+        tfvars-tag-regex: ${{ inputs.tfvars-tag-regex }}
 
     # update-change-log
     - uses: aps831/gh-actions/update-change-log@master

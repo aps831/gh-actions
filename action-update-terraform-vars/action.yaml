@@ -8,8 +8,14 @@ inputs:
   paths:
     description: Paths of tfvars files
     required: true
-  update-values:
-    description: Newline separated list of pipe separated variable, value regex and value
+  tag:
+    description: Tag
+    required: true
+  tag-var:
+    description: Variable name in tfvars file for tag
+    required: true
+  tag-regex:
+    description: Regex of value of tag in tfvars file
     required: true
 runs:
   using: "composite"
@@ -18,15 +24,11 @@ runs:
       shell: bash
       run: |
         paths="${{ inputs.paths }}"
-        updates="${{ inputs.update-values }}"
+        variable="${{ inputs.tag-var }}"
+        regex="${{ inputs.tag-regex }}"
+        value=${{ inputs.tag }}
         while IFS= read -r path || [ -n "$path" ]; do
           if [[ -f "$path" ]]; then
-            while IFS= read -r update || [ -n "$update" ]; do
-              IFS='|' read -r -a array <<< "$update"
-              variable="${array[0]}"
-              regex="${array[1]}"
-              value="${array[2]}"
-              sed -i -r "s/^($variable\s+= \")$regex(\")\$/\1$value\2/" "$path"
-            done <<< "$updates"
+            sed -i -r "s/^($variable\s+= \")$regex(\")\$/\1$value\2/" "$path"
           fi
         done <<< "$paths"

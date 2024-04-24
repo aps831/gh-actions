@@ -14,8 +14,11 @@ inputs:
   tfvars-filename:
     description: Filename of tfvars files
     required: true
-  tfvars-update-values:
-    description: Newline separated list of pipe separated variable, value regex and value
+  tfvars-tag-var:
+    description: Variable name in tfvars file for tag
+    required: true
+  tfvars-tag-regex:
+    description: Regex of value of tag in tfvars file
     required: true
   branch-update-base:
     description: Base name of temporary branch to use for creating update
@@ -54,9 +57,11 @@ runs:
     # update-terraform-vars
     - uses: aps831/gh-actions/update-terraform-vars@master
       with:
+        tag: ${{ inputs.tag }}
         working-directory: ${{ inputs.working-directory }}/${{ inputs.env }}
         tfvars-filename: ${{ inputs.tfvars-filename }}
-        tfvars-update-values: ${{ inputs.tfvars-update-values }}
+        tfvars-tag-var: ${{ inputs.tfvars-tag-var }}
+        tfvars-tag-regex: ${{ inputs.tfvars-tag-regex }}
 
     # git-commit
     - uses: aps831/gh-actions/git-commit@master
