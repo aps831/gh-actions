@@ -1,0 +1,26 @@
+---
+name: GCP Secret Get
+description: GCP Secret get
+inputs:
+  gcp-project:
+    description: GCP Project
+    required: true
+  secret-id:
+    description: Secret ID
+    required: true
+outputs:
+  value:
+    description: Secret value
+    value: ${{ steps.value.outputs.value }}
+runs:
+  using: "composite"
+  steps:
+    # set-up-gcloud
+    - uses: aps831/gh-actions/set-up-gcloud@master
+
+    # registry
+    - shell: bash
+      id: value
+      run: |
+        value=$(gcloud secrets versions access latest --secret=${{ inputs.secret-id }} --project=${{ inputs.gcp-project }} --quiet)
+        echo "value=$value" >> $GITHUB_OUTPUT
