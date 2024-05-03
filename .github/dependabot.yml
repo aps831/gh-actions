@@ -338,22 +338,6 @@ updates:
           - "minor"
           - "patch"
   - package-ecosystem: "github-actions"
-    directory: "deployment-record-pub/"
-    schedule:
-      interval: "weekly"
-    assignees:
-      - "aps831"
-    labels:
-      - "github_actions"
-      - "no_ci_cd_run"
-    commit-message:
-      prefix: "ci"
-    groups:
-      patch-minor-dependencies:
-        update-types:
-          - "minor"
-          - "patch"
-  - package-ecosystem: "github-actions"
     directory: "deployment-terraform/"
     schedule:
       interval: "weekly"
