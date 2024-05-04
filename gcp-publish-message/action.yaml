@@ -1,0 +1,22 @@
+---
+name: GCP Publish Message
+description: GCP publish message
+inputs:
+  gcp-project:
+    description: GCP Project
+    required: true
+  topic:
+    description: Topic
+    required: true
+  message:
+    description: Message
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: aps831/gh-actions/set-up-gcloud@master
+
+    - shell: bash
+      run:
+        gcloud pubsub topics publish ${{ inputs.topic }} --message="${{ inputs.message }}"
+        --project=${{ inputs.gcp-project }}
