@@ -12,7 +12,7 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: aps831/gh-actions/install-xmlstartlet@master
+    - uses: aps831/gh-actions/install-xmlstarlet@master
 
     - id: package-name
       shell: bash

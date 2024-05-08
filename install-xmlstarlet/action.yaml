@@ -1,6 +1,6 @@
 ---
-name: Install xmlstartlet
-description: Install xmlstartlet
+name: Install xmlstarlet
+description: Install xmlstarlet
 runs:
   using: "composite"
   steps:

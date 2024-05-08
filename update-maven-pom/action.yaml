@@ -14,8 +14,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # install-xmlstartlet
-    - uses: aps831/gh-actions/install-xmlstartlet@master
+    # install-xmlstarlet
+    - uses: aps831/gh-actions/install-xmlstarlet@master
 
     # find-files
     - uses: aps831/gh-actions/action-find-files@master
