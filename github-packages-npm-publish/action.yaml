@@ -1,0 +1,22 @@
+---
+name: Github Publish NPM Package
+description: Github publish NPM package
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # set up nodejs
+    - uses: aps831/gh-actions/set-up-nodejs@master
+
+    # publish
+    - shell: bash
+      run: npm publish
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.ACCESS_TOKEN}}
