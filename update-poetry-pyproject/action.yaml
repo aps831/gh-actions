@@ -1,0 +1,30 @@
+---
+name: Update Poetry pyproject
+description: Update Poetry pyproject
+inputs:
+  version:
+    description: Version to use in pyproject.toml
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # find-files
+    - uses: aps831/gh-actions/action-find-files@master
+      id: files
+      with:
+        filename: pyproject.toml
+        working-directory: ${{ inputs.working-directory }}
+
+    # update-poetry-pyproject
+    - uses: aps831/gh-actions/action-update-poetry-pyproject@master
+      with:
+        files: ${{ steps.files.outputs.files }}
+        version: ${{ inputs.version }}
+
+    # git-add-file
+    - uses: aps831/gh-actions/git-add-file@master
+      with:
+        files: ${{ steps.files.outputs.files }}

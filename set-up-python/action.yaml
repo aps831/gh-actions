@@ -1,0 +1,21 @@
+---
+name: Set Up Python
+description: Set up Python and Poetry
+inputs:
+  python-version:
+    description: Python version
+    required: false
+    default: latest
+  poetry-version:
+    description: Poetry version
+    required: false
+    default: latest
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # pin@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - shell: bash
+      run: pip install poetry==${{ inputs.poetry-version }}

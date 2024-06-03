@@ -1,0 +1,22 @@
+---
+name: Action Update Poetry pyproject
+description: Update Poetry pyproject
+inputs:
+  files:
+    description: Newline separated list of files
+    required: true
+  version:
+    description: Version to use in pyproject.toml
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: update version
+      shell: bash
+      run: |
+        files="${{ inputs.files }}"
+        while IFS= read -r file || [ -n "$file" ]; do
+          if [[ -f "$file" ]]; then
+            sed -i "/version = \"[[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\"/c\version = \"${{ inputs.version }}\"" $file
+          fi
+        done <<< "$files"
