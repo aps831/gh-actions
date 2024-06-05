@@ -80,16 +80,18 @@ runs:
     - uses: aps831/gh-actions/action-output-junit-test-summary@master
       if: ${{ always() && inputs.stage-output != '' }}
       with:
+        working-directory: ${{ inputs.working-directory }}
         component-name: ${{ inputs.image-name }}
-        test-result-files: ${{ inputs.working-directory }}/${{ inputs.test-result-files }}
+        test-result-files: ${{ inputs.test-result-files }}
 
     # upload-test-results
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: ${{ always() && inputs.stage-output != '' }}
       with:
         type: unit
+        working-directory: ${{ inputs.working-directory }}
         component-name: ${{ inputs.image-name }}
-        test-result-files: ${{ inputs.working-directory }}/${{ inputs.test-result-files }}
+        test-result-files: ${{ inputs.test-result-files }}
 
     # release-artifacts-upload
     - uses: aps831/gh-actions/action-release-artifacts-upload@master

@@ -59,14 +59,20 @@ runs:
     - uses: aps831/gh-actions/action-output-junit-test-summary@master
       if: always()
       with:
-        test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: |
+          target/surefire-reports/TEST-*.xml
+          target/failsafe-reports/TEST-*.xml
 
     # upload-test-results
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: always()
       with:
-        type: unit
-        test-result-files: ${{ inputs.working-directory }}/target/surefire-reports/*.xml
+        type: all-tests
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: |
+          target/surefire-reports/TEST-*.xml
+          target/failsafe-reports/TEST-*.xml
 
     # release-artifacts-upload
     - uses: aps831/gh-actions/action-release-artifacts-upload@master

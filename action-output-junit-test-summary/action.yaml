@@ -2,6 +2,9 @@
 name: Action Output Junit Test Summary
 description: Output Junit test summary
 inputs:
+  working-directory:
+    description: Working directory
+    required: true
   test-result-files:
     description: Test result files
     required: true
@@ -20,7 +23,30 @@ runs:
           echo "**Test Summary on $RUNNER_OS**" >> $GITHUB_STEP_SUMMARY
         fi
 
+    - shell: bash
+      id: test-result-files
+      run: echo "test-result-files=$(mktemp)" >> $GITHUB_OUTPUT
+
+    - shell: bash
+      run:
+        echo "${{ inputs.test-result-files }}" > ${{
+        steps.test-result-files.outputs.test-result-files }}
+
+    - shell: bash
+      run: |
+        sed -i -e 's|^.|${{ inputs.working-directory }}/&|' ${{ steps.test-result-files.outputs.test-result-files }}
+        sed -i -e 's|^${{ inputs.working-directory }}/!|\!${{ inputs.working-directory }}/|g' ${{ steps.test-result-files.outputs.test-result-files }}
+
+    - shell: bash
+      id: working-directory-test-result-files
+      run: |
+        echo 'working-directory-test-result-files<<EOF' >> $GITHUB_OUTPUT
+        cat ${{ steps.test-result-files.outputs.test-result-files }} >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
+
     - name: Test summary
       uses: test-summary/action@fee35d7df20790255fe6aa92cf0f6d28092ecf2f # pin@v2
       with:
-        paths: "${{ inputs.test-result-files }}"
+        paths:
+          "${{ steps.working-directory-test-result-files.outputs.working-directory-test-result-files
+          }}"

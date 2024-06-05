@@ -67,38 +67,40 @@ runs:
     - uses: aps831/gh-actions/action-output-junit-test-summary@master
       if: ${{ always() && inputs.output-unit-tests-directory != '' }}
       with:
-        test-result-files:
-          ${{ inputs.working-directory }}/${{ inputs.output-unit-tests-directory }}/*.xml
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-unit-tests-directory }}/*.xml
 
     # upload-test-results checks
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: ${{ always() && inputs.output-checks-directory != '' }}
       with:
         type: checks
-        test-result-files: ${{ inputs.working-directory }}/${{ inputs.output-checks-directory }}/*
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-checks-directory }}/*
 
     # upload-test-results unit
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: ${{ always() && inputs.output-unit-tests-directory != '' }}
       with:
         type: unit
-        test-result-files:
-          ${{ inputs.working-directory }}/${{ inputs.output-unit-tests-directory }}/*
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-unit-tests-directory }}/*
 
     # upload-test-results coverage
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: ${{ always() && inputs.output-coverage-directory != '' }}
       with:
         type: coverage
-        test-result-files: ${{ inputs.working-directory }}/${{ inputs.output-coverage-directory }}/*
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-coverage-directory }}/*
 
     # upload-test-results integration
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: ${{ always() && inputs.output-integration-tests-directory != '' }}
       with:
         type: integration
-        test-result-files:
-          ${{ inputs.working-directory }}/${{ inputs.output-integration-tests-directory }}/*
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-integration-tests-directory }}/*
 
     # zip artifact folder
     - name: zip artifact folder

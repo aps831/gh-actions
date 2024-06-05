@@ -5,6 +5,9 @@ inputs:
   type:
     description: Type of test results
     required: true
+  working-directory:
+    description: Working directory
+    required: true
   test-result-files:
     description: Test result files
     required: true
@@ -22,11 +25,34 @@ runs:
       with:
         name: ${{ inputs.component-name }}
 
+    - shell: bash
+      id: test-result-files
+      run: echo "test-result-files=$(mktemp)" >> $GITHUB_OUTPUT
+
+    - shell: bash
+      run:
+        echo "${{ inputs.test-result-files }}" > ${{
+        steps.test-result-files.outputs.test-result-files }}
+
+    - shell: bash
+      run: |
+        sed -i -e 's|^.|${{ inputs.working-directory }}/&|' ${{ steps.test-result-files.outputs.test-result-files }}
+        sed -i -e 's|^${{ inputs.working-directory }}/!|\!${{ inputs.working-directory }}/|g' ${{ steps.test-result-files.outputs.test-result-files }}
+
+    - shell: bash
+      id: working-directory-test-result-files
+      run: |
+        echo 'working-directory-test-result-files<<EOF' >> $GITHUB_OUTPUT
+        cat ${{ steps.test-result-files.outputs.test-result-files }} >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
+
     - uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # pin@v3
       with:
         name: >
           test-reports-type-${{ inputs.type }}${{ inputs.os-name != '' && '-on-' || '' }}${{
           inputs.os-name }}${{ steps.component-name.outputs.name != '' && '-for-' || '' }}${{
           steps.component-name.outputs.name }}
-        path: ${{ inputs.test-result-files }}
+        path:
+          ${{ steps.working-directory-test-result-files.outputs.working-directory-test-result-files
+          }}
         retention-days: 3

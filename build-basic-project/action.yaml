@@ -46,5 +46,5 @@ runs:
       if: ${{ always() && inputs.tap-test-results-directory != '' }}
       with:
         type: tap
-        test-result-files:
-          ${{ inputs.working-directory }}/${{ inputs.tap-test-results-directory }}/*.tap
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.tap-test-results-directory }}/*.tap
