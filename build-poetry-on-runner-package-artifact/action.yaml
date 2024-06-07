@@ -1,0 +1,108 @@
+---
+name: Build Poetry on Runner Package Artifact
+description: Build Poetry on runner package artifact
+inputs:
+  branch-build:
+    description: Branch used for build
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  python-version:
+    description: Python version
+    required: true
+  poetry-version:
+    description: Poetry version
+    required: true
+  build-script:
+    description: Build script
+    required: true
+  output-sbom-directory:
+    description: Output directory of sbom
+    required: true
+  output-checks-directory:
+    description: Output directory of checks
+    required: true
+  output-unit-tests-directory:
+    description: Output directory of unit tests
+    required: true
+  output-coverage-directory:
+    description: Output directory of coverage
+    required: true
+  output-integration-tests-directory:
+    description: Output directory of integration tests
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  build-artifacts-release-upload-name:
+    description: Name of release build artifacts upload
+    value: ${{ steps.upload.outputs.name }}
+runs:
+  using: "composite"
+  steps:
+    # git-checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-build }}
+
+    # set up python
+    - uses: aps831/gh-actions/set-up-python@master
+      with:
+        python-version: ${{ inputs.python-version }}
+        poetry-version: ${{ inputs.poetry-version }}
+
+    # run build script
+    - shell: bash
+      run: ${{ inputs.build-script }}
+      working-directory: ${{ inputs.working-directory }}
+
+    # output-junit-test-summary
+    - uses: aps831/gh-actions/action-output-junit-test-summary@master
+      if: ${{ always() && inputs.output-unit-tests-directory != '' }}
+      with:
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: |
+          ${{ inputs.output-unit-tests-directory }}/*.xml
+          ${{ inputs.output-integration-tests-directory }}/*.xml
+
+    # upload-test-results checks
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-checks-directory != '' }}
+      with:
+        type: checks
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-checks-directory }}/*
+
+    # upload-test-results unit
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-unit-tests-directory != '' }}
+      with:
+        type: unit
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-unit-tests-directory }}/*
+
+    # upload-test-results coverage
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-coverage-directory != '' }}
+      with:
+        type: coverage
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-coverage-directory }}/*
+
+    # upload-test-results integration
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-integration-tests-directory != '' }}
+      with:
+        type: integration
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-integration-tests-directory }}/*
+
+    # release-artifacts-upload
+    - uses: aps831/gh-actions/action-release-artifacts-upload@master
+      id: upload
+      with:
+        description: cyclonedx-artifact
+        working-directory: ${{ inputs.working-directory }}
+        build-files: ${{ inputs.output-sbom-directory }}/cyclonedx.json
