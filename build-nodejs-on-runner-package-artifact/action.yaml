@@ -11,8 +11,8 @@ inputs:
   node-version:
     description: Node version
     required: true
-  build-script-name:
-    description: Name of build script
+  build-script:
+    description: Build script
     required: true
   output-sbom-directory:
     description: Output directory of sbom
@@ -51,7 +51,7 @@ runs:
 
     # run build script
     - shell: bash
-      run: npm run-script ${{ inputs.build-script-name }}
+      run: ${{ inputs.build-script }}
       working-directory: ${{ inputs.working-directory }}
 
     # output-test-summary
