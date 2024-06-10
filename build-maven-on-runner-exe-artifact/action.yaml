@@ -68,8 +68,8 @@ runs:
         settings-file: ${{ inputs.settings-file }}
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
 
-    # output-junit-test-summary
-    - uses: aps831/gh-actions/action-output-junit-test-summary@master
+    # output-test-summary
+    - uses: aps831/gh-actions/action-output-test-summary@master
       if: always()
       with:
         working-directory: ${{ inputs.working-directory }}

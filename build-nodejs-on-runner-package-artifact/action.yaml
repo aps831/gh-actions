@@ -54,8 +54,8 @@ runs:
       run: npm run-script ${{ inputs.build-script-name }}
       working-directory: ${{ inputs.working-directory }}
 
-    # output-junit-test-summary
-    - uses: aps831/gh-actions/action-output-junit-test-summary@master
+    # output-test-summary
+    - uses: aps831/gh-actions/action-output-test-summary@master
       if: ${{ always() && inputs.output-unit-tests-directory != '' }}
       with:
         working-directory: ${{ inputs.working-directory }}
