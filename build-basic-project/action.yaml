@@ -11,8 +11,8 @@ inputs:
   working-directory:
     description: Working directory
     required: true
-  tap-test-results-directory:
-    description: Tap test results directory
+  test-results-directory:
+    description: Test results directory
     required: true
 runs:
   using: "composite"
@@ -24,9 +24,9 @@ runs:
 
     # create test results directory
     - name: create test results directory
-      if: ${{ inputs.tap-test-results-directory != '' }}
+      if: ${{ inputs.test-results-directory != '' }}
       shell: bash
-      run: mkdir -p ${{ inputs.working-directory }}/${{ inputs.tap-test-results-directory }}
+      run: mkdir -p ${{ inputs.working-directory }}/${{ inputs.test-results-directory }}
 
     # build
     - name: build
@@ -34,17 +34,16 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: ${{ inputs.build-script }}
 
-    # output-tap-test-summary
-    - uses: aps831/gh-actions/action-output-tap-test-summary@master
-      if: ${{ always() && inputs.tap-test-results-directory != '' }}
+    # output-test-summary
+    - uses: aps831/gh-actions/action-output-test-summary@master
+      if: ${{ always() && inputs.test-results-directory != '' }}
       with:
-        tap-test-result-files:
-          ${{ inputs.working-directory }}/${{ inputs.tap-test-results-directory }}/*.tap
+        test-result-files: ${{ inputs.working-directory }}/${{ inputs.test-results-directory }}/*
 
     # upload-test-results
     - uses: aps831/gh-actions/action-upload-test-results@master
-      if: ${{ always() && inputs.tap-test-results-directory != '' }}
+      if: ${{ always() && inputs.test-results-directory != '' }}
       with:
         type: tap
         working-directory: ${{ inputs.working-directory }}
-        test-result-files: ${{ inputs.tap-test-results-directory }}/*.tap
+        test-result-files: ${{ inputs.test-results-directory }}/*

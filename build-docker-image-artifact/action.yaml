@@ -76,8 +76,8 @@ runs:
         stage-output: ${{ inputs.stage-output }}
         stage-status: ${{ inputs.stage-status }}
 
-    # output-junit-test-summary
-    - uses: aps831/gh-actions/action-output-junit-test-summary@master
+    # output-test-summary
+    - uses: aps831/gh-actions/action-output-test-summary@master
       if: ${{ always() && inputs.stage-output != '' }}
       with:
         working-directory: ${{ inputs.working-directory }}

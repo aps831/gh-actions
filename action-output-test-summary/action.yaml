@@ -1,6 +1,6 @@
 ---
-name: Action Output Junit Test Summary
-description: Output Junit test summary
+name: Action Output Test Summary
+description: Output test summary
 inputs:
   working-directory:
     description: Working directory
