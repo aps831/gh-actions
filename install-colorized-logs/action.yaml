@@ -1,0 +1,11 @@
+---
+name: Install colorized-logs
+description: Install colorized-logs
+runs:
+  using: "composite"
+  steps:
+    - id: install-colorized-logs
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install colorized-logs
