@@ -87,8 +87,8 @@ runs:
         terraform-version: ${{ inputs.terraform-version }}
         output: ${{ inputs.terraform-s3-bucket-name-output }}
 
-    # action-sync-aws-s3-bucket
-    - uses: aps831/gh-actions/action-sync-aws-s3-bucket@master
+    # aws-sync-s3-bucket
+    - uses: aps831/gh-actions/aws-sync-s3-bucket@master
       with:
         local-folder-path: ${{ steps.artifact-dir.outputs.artifact-dir }}
         remote-bucket-name: ${{ steps.bucket.outputs.value }}

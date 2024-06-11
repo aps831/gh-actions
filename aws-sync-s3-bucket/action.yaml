@@ -1,6 +1,6 @@
 ---
-name: Action Sync AWS S3 bucket
-description: Sync AWS S3 bucket
+name: AWS Sync S3 bucket
+description: AWS Sync S3 bucket
 inputs:
   local-folder-path:
     description: Path to local folder
