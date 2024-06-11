@@ -1,0 +1,22 @@
+---
+name: AWS Secret Get
+description: AWS Secret Get
+inputs:
+  secret-name:
+    description: Name of AWS secret in parameter store
+    required: true
+  region:
+    description: AWS region
+    required: true
+outputs:
+  value:
+    description: Value of the secret
+    value: ${{ steps.value.outputs.value }}
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      id: value
+      run: |
+        value=$(aws ssm get-parameter  --with-decryption --name ${{ inputs.secret-name }} --region ${{ inputs.region }} | jq -r '.Parameter.Value')
+        echo "value=$value" >> $GITHUB_OUTPUT

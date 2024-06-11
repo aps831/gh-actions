@@ -23,8 +23,11 @@ inputs:
   terraform-nodejs-post-script:
     description: Script to run after deployment
     required: true
-  terraform-s3-bucket-name-output:
-    description: Variable name of terraform output for AWS S3 bucket name
+  s3-bucket-secret-name:
+    description: Name of secret containing AWS S3 bucket name
+    required: true
+  aws-region:
+    description: AWS region
     required: true
   ACCESS_TOKEN:
     description: Access token
@@ -79,13 +82,12 @@ runs:
         terraform-version: ${{ inputs.terraform-version }}
         script: ${{ steps.pre-script.outputs.script }}
 
-    # terraform-value
-    - uses: aps831/gh-actions/terraform-value@master
+    # aws-secret-get
+    - uses: aps831/gh-actions/aws-secret-get@master
       id: bucket
       with:
-        working-directory: ${{ inputs.working-directory-terraform }}
-        terraform-version: ${{ inputs.terraform-version }}
-        output: ${{ inputs.terraform-s3-bucket-name-output }}
+        region: ${{ inputs.aws-region }}
+        secret-name: ${{ inputs.s3-bucket-secret-name }}
 
     # aws-sync-s3-bucket
     - uses: aps831/gh-actions/aws-sync-s3-bucket@master
