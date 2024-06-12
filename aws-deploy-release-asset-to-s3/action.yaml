@@ -1,6 +1,6 @@
 ---
-name: Transfer Release Asset to AWS S3
-description: Transfer release asset to AWS S3
+name: AWS Deploy Release Asset to S3
+description: AWS deploy release asset to S3
 inputs:
   artifact-name:
     description: Artifact name
@@ -8,19 +8,13 @@ inputs:
   release-tag:
     description: Release tag
     required: true
-  working-directory-terraform:
-    description: Working directory for Terraform
+  working-directory:
+    description: Working directory
     required: true
-  working-directory-nodejs:
-    description: Working directory for Nodejs
-    required: true
-  terraform-version:
-    description: Terraform version
-    required: true
-  terraform-nodejs-pre-script:
+  pre-script:
     description: Script to run prior to deployment
     required: true
-  terraform-nodejs-post-script:
+  post-script:
     description: Script to run after deployment
     required: true
   s3-bucket-secret-name:
@@ -64,23 +58,21 @@ runs:
         artifact_dir="$directory/${filename%.zip}"
         echo "artifact-dir=$artifact_dir" >> $GITHUB_OUTPUT
 
-    # inject terraform and artifact directory values into script
+    # inject artifact directory value into script
     - id: pre-script
       shell: bash
       run: |
-        script="${{ inputs.terraform-nodejs-pre-script }}"
-        script=${script/\%TERRAFORM_DIR/"${{ inputs.working-directory-terraform }}"}
+        script="${{ inputs.pre-script }}"
         script=${script/\%ARTIFACT_DIR/"${{ steps.artifact-dir.outputs.artifact-dir }}"}
-        echo "Updated script with Terraform and artifact directories: $script"
-        echo "script=$script" >> $GITHUB_OUTPUT
+        echo 'script<<EOF' >> $GITHUB_OUTPUT
+        echo "$script" >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
 
-    # terraform-nodejs-script
-    - uses: aps831/gh-actions/terraform-nodejs-script@master
-      with:
-        working-directory-terraform: ${{ inputs.working-directory-terraform }}
-        working-directory-nodejs: ${{ inputs.working-directory-nodejs }}
-        terraform-version: ${{ inputs.terraform-version }}
-        script: ${{ steps.pre-script.outputs.script }}
+    # run pre-script
+    - shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        ${{ steps.pre-script.outputs.script }}
 
     # aws-secret-get
     - uses: aps831/gh-actions/aws-secret-get@master
@@ -95,20 +87,18 @@ runs:
         local-folder-path: ${{ steps.artifact-dir.outputs.artifact-dir }}
         remote-bucket-name: ${{ steps.bucket.outputs.value }}
 
-    # inject terraform and artifact directory values into script
+    # inject artifact directory value into script
     - id: post-script
       shell: bash
       run: |
-        script="${{ inputs.terraform-nodejs-post-script }}"
-        script=${script/\%TERRAFORM_DIR/"${{ inputs.working-directory-terraform }}"}
+        script="${{ inputs.post-script }}"
         script=${script/\%ARTIFACT_DIR/"${{ steps.artifact-dir.outputs.artifact-dir }}"}
-        echo "Updated script with Terraform and artifact directories: $script"
-        echo "script=$script" >> $GITHUB_OUTPUT
+        echo 'script<<EOF' >> $GITHUB_OUTPUT
+        echo "$script" >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
 
-    # terraform-nodejs-script
-    - uses: aps831/gh-actions/terraform-nodejs-script@master
-      with:
-        working-directory-terraform: ${{ inputs.working-directory-terraform }}
-        working-directory-nodejs: ${{ inputs.working-directory-nodejs }}
-        terraform-version: ${{ inputs.terraform-version }}
-        script: ${{ steps.post-script.outputs.script }}
+    # run post-script
+    - shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        ${{ steps.post-script.outputs.script }}
