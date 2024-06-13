@@ -1,0 +1,23 @@
+---
+name: Action Convert tgz to zip
+description: Convert tgz to zip
+inputs:
+  filename-tgz:
+    description: Filename of tgz archive
+    required: true
+outputs:
+  filename-zip:
+    description: Filename of zip archive
+    value: ${{ steps.filename-zip.outputs.filename-zip }}
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      id: filename-zip
+      run: |
+        FILENAME_TAR=${{ inputs.filename-tgz }}
+        tar zxvf $FILENAME_TAR --strip-components=1
+        rm $FILENAME_TAR
+        FILENAME_ZIP="${FILENAME_TAR%.tgz}.zip"
+        zip $FILENAME_ZIP *
+        echo "filename-zip=$FILENAME_ZIP" >> $GITHUB_OUTPUT

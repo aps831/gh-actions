@@ -1,0 +1,51 @@
+---
+name: Transfer Node Package GH to GCP GCS
+description: Transfer Node package GH to GCP GCS
+inputs:
+  package-name:
+    description: Name of package
+    required: true
+  package-version:
+    description: Version of package
+    required: true
+  gcp-project:
+    description: GCP Project
+    required: true
+  secret-id-remote-bucket:
+    description: Secret ID of secret containing bucket name
+    required: true
+  ACCESS_TOKEN:
+    description: "Access token"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # set up nodejs
+    - uses: aps831/gh-actions/set-up-nodejs@master
+
+    # action-download-npm-package
+    - uses: aps831/gh-actions/action-download-npm-package@master
+      id: package
+      with:
+        package-name: ${{ inputs.package-name }}
+        package-version: ${{ inputs.package-version }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # action-convert-tgz-to-zip
+    - uses: aps831/gh-actions/action-convert-tgz-to-zip@master
+      id: zip
+      with:
+        filename-tgz: ${{ steps.package.outputs.filename-tgz }}
+
+    # gcp-secret-get
+    - uses: aps831/gh-actions/gcp-secret-get@master
+      id: bucket
+      with:
+        gcp-project: ${{ inputs.gcp-project }}
+        secret-id: ${{ inputs.secret-id-remote-bucket }}
+
+    # gcp-cp-gcs-bucket
+    - uses: aps831/gh-actions/gcp-cp-gcs-bucket@master
+      with:
+        local-path: ${{ steps.zip.outputs.filename-zip }}
+        remote-bucket-name: ${{ steps.bucket.outputs.value }}

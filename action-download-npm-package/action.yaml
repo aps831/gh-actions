@@ -1,0 +1,33 @@
+---
+name: Download NPM Package
+description: Download NPM package
+inputs:
+  package-name:
+    description: Name of package
+    required: true
+  package-version:
+    description: Version of package
+    required: true
+  ACCESS_TOKEN:
+    description: "Access token"
+    required: true
+outputs:
+  filename-tgz:
+    description: Filename of tgz archive
+    value: ${{ steps.filename-tgz.outputs.filename-tgz }}
+runs:
+  using: "composite"
+  steps:
+    - id: filename-tgz
+      shell: bash
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+      run: |
+        PACKAGE=${{ inputs.package-name }}
+        VERSION=${{ inputs.package-version }}
+        TMP_DIR=$(mktemp -d)
+        cd ${TMP_DIR}
+        npm pack --pack-destination ${TMP_DIR} ${PACKAGE}@${VERSION}
+        FILES=(*)
+        FILENAME_TAR="${FILES[0]}"
+        echo "filename-tgz=$TMP_DIR/$FILENAME_TAR" >> $GITHUB_OUTPUT

@@ -1,0 +1,16 @@
+---
+name: GCP Copy to GCS Bucket
+description: GCP copy to GCS bucket
+inputs:
+  local-path:
+    description: Local path
+    required: true
+  remote-bucket-name:
+    description: Bucket name
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        gcloud storage cp ${{ inputs.local-path }} gs://${{ inputs.remote-bucket-name }}
