@@ -2,12 +2,21 @@
 name: Set Up SSH
 description: Set up SSH
 inputs:
-  SSH_PRIVATE_KEY:
-    description: SSH private key
-    required: true
+  SSH_PRIVATE_KEYS:
+    description: SSH private keys
+    required: false
 runs:
   using: "composite"
   steps:
+    - shell: bash
+      id: length
+      run: |
+        SSH_PRIVATE_KEYS="${{ inputs.SSH_PRIVATE_KEYS }}"
+        LENGTH=${#SSH_PRIVATE_KEYS}
+        echo "length=$LENGTH" >> $GITHUB_OUTPUT
+
     - uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387 # pin@v0.9.0
+      if: ${{ steps.length.outputs.length != '0' && steps.length.outputs.length != '1' }}
       with:
-        ssh-private-key: ${{ inputs.SSH_PRIVATE_KEY }}
+        ssh-private-key: |
+          ${{ inputs.SSH_PRIVATE_KEYS }}
