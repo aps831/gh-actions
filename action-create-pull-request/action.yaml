@@ -28,14 +28,32 @@ runs:
       id: result
       with:
         script: |
-          const { data: pull } = await github.rest.pulls.create({
+          const { data: pulls } = await github.rest.pulls.list({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            head: "${{ inputs.update-branch }}",
-            base: "${{ inputs.base-branch }}",
-            title: "${{ inputs.title }}",
-            body: "${{ inputs.body }}",
+            head: context.repo.owner.concat(":${{ inputs.update-branch }}")
           });
-          return pull.number
+          const pullRequest = pulls.find(p => p.state === 'open');
+          if (pulls.length === 0 || pullRequest == null) {
+            const { data: pull } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: "${{ inputs.update-branch }}",
+              base: "${{ inputs.base-branch }}",
+              title: "${{ inputs.title }}",
+              body: "${{ inputs.body }}",
+            });
+            return pull.number;
+          } else {
+            const { number: prNumber } = pullRequest;
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              title: "${{ inputs.title }}",
+              body: "${{ inputs.body }}",
+            });
+            return prNumber;
+          }
         result-encoding: string
         github-token: ${{ inputs.ACCESS_TOKEN }}

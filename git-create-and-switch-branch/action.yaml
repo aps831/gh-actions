@@ -8,10 +8,17 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: checkout and switch branch
-      shell: bash
-      run: git checkout -b ${{ inputs.branch }}
-
-    - name: push branch to remote
-      shell: bash
-      run: git push --set-upstream origin ${{ inputs.branch }}
+    - shell: bash
+      run: |
+        set +e
+        git ls-remote --exit-code --heads origin ${{ inputs.branch }} >/dev/null 2>&1
+        EXIT_CODE=$?
+        if [[ $EXIT_CODE == '0' ]]; then
+          echo "Git branch '${{ inputs.branch }}' exists in the remote repository"
+          git fetch
+          git switch ${{ inputs.branch }}
+        elif [[ $EXIT_CODE == '2' ]]; then
+          echo "Git branch '${{ inputs.branch }}' does not exist in the remote repository"
+          git checkout -b ${{ inputs.branch }}
+          git push --set-upstream origin ${{ inputs.branch }}
+        fi
