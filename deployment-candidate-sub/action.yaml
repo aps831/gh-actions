@@ -26,6 +26,10 @@ inputs:
   branch-update-base:
     description: Base name of temporary branch to use for creating update
     required: true
+  timestamp:
+    description: Timestamp temporary branch to use for creating update
+    required: false
+    default: "false"
   ACCESS_TOKEN:
     description: Access token
     required: true
@@ -54,7 +58,11 @@ runs:
     - shell: bash
       id: branch
       run: |
-        branch=${{ inputs.branch-update-base }}-${{ inputs.component }}-${{ inputs.env }}${{ inputs.env != '' && '-' || '' }}${{ steps.timestamp.outputs.timestamp }}
+        if [[ "${{ inputs.timestamp }}" == "false" ]]; then
+          branch=${{ inputs.branch-update-base }}-${{ inputs.component }}-${{ inputs.env }}
+        else
+          branch=${{ inputs.branch-update-base }}-${{ inputs.component }}-${{ inputs.env }}${{ inputs.env != '' && '-' || '' }}${{ steps.timestamp.outputs.timestamp }}
+        fi
         echo "branch=$branch" >> $GITHUB_OUTPUT
 
     # message
