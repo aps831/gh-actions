@@ -2,8 +2,8 @@
 name: Action Latest Deployment File Write
 description: Write latest deployment file
 inputs:
-  tag:
-    description: Tag
+  version-identifier:
+    description: Version identifier
     required: true
   component:
     description: Component
@@ -18,8 +18,7 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - id: tag
-      shell: bash
+    - shell: bash
       run: |
         mkdir -p .latest-deployment/${{ inputs.env }}
-        echo "${{ inputs.tag }}" > .latest-deployment/${{ inputs.env }}/${{ inputs.component }}
+        echo "${{ inputs.version-identifier }}" > .latest-deployment/${{ inputs.env }}/${{ inputs.component }}

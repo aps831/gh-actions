@@ -29,11 +29,11 @@ inputs:
   tfvars-filename:
     description: Filename of tfvars files
     required: true
-  tfvars-tag-var:
-    description: Variable name in tfvars file for tag
+  tfvars-var:
+    description: Variable name in tfvars file
     required: true
-  tfvars-tag-regex:
-    description: Regex of value of tag in tfvars file
+  tfvars-regex:
+    description: Regex of value in tfvars file
     required: true
   ACCESS_TOKEN:
     description: Access token
@@ -76,11 +76,11 @@ runs:
     # update-terraform-vars
     - uses: aps831/gh-actions/update-terraform-vars@master
       with:
-        tag: ${{ inputs.tag }}
+        version-identifier: ${{ inputs.tag }}
         working-directory: ${{ inputs.working-directory-terraform }}
         tfvars-filename: ${{ inputs.tfvars-filename }}
-        tfvars-tag-var: ${{ inputs.tfvars-tag-var }}
-        tfvars-tag-regex: ${{ inputs.tfvars-tag-regex }}
+        tfvars-var: ${{ inputs.tfvars-var }}
+        tfvars-regex: ${{ inputs.tfvars-regex }}
 
     # update-nodejs-package-json
     - uses: aps831/gh-actions/update-nodejs-package-json@master

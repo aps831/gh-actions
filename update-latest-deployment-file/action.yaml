@@ -2,8 +2,8 @@
 name: Update Latest Deployment File
 description: Update latest deployment file
 inputs:
-  tag:
-    description: Tag
+  version-identifier:
+    description: Version identifier
     required: true
   component:
     description: Component
@@ -21,7 +21,7 @@ runs:
     - uses: aps831/gh-actions/action-latest-deployment-file-write@master
       id: file
       with:
-        tag: ${{ inputs.tag }}
+        version-identifier: ${{ inputs.version-identifier }}
         component: ${{ inputs.component }}
         env: ${{ inputs.env }}
 

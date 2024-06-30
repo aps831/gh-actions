@@ -2,8 +2,8 @@
 name: Deployment Candidate Subscribe
 description: Subscribe to deployment candidate
 inputs:
-  tag:
-    description: Tag
+  version-identifier:
+    description: Version identifier of deployment candidate
     required: true
   component:
     description: Component
@@ -17,11 +17,11 @@ inputs:
   tfvars-filename:
     description: Filename of tfvars files
     required: true
-  tfvars-tag-var:
-    description: Variable name in tfvars file for tag
+  tfvars-var:
+    description: Variable name in tfvars file
     required: true
-  tfvars-tag-regex:
-    description: Regex of value of tag in tfvars file
+  tfvars-regex:
+    description: Regex of value in tfvars file
     required: true
   branch-update-base:
     description: Base name of temporary branch to use for creating update
@@ -61,14 +61,14 @@ runs:
     - shell: bash
       id: message
       run: |
-        message="chore: update tfvars for ${{ inputs.tag }} release of '${{ inputs.component }}'${{ inputs.env != '' && ' to ' || '' }}${{ inputs.env }}"
+        message="chore: update tfvars for ${{ inputs.version-identifier }} release of '${{ inputs.component }}'${{ inputs.env != '' && ' to ' || '' }}${{ inputs.env }}"
         echo "message=$message" >> $GITHUB_OUTPUT
 
     # prrequest
     - shell: bash
       id: prrequest
       run: |
-        prrequest="Deploy ${{ inputs.tag }} of '${{ inputs.component }}'${{ inputs.env != '' && ' to ' || '' }}${{ inputs.env }}"
+        prrequest="Deploy ${{ inputs.version-identifier }} of '${{ inputs.component }}'${{ inputs.env != '' && ' to ' || '' }}${{ inputs.env }}"
         echo "prrequest=$prrequest" >> $GITHUB_OUTPUT
 
     # git-create-and-switch-branch
@@ -80,18 +80,18 @@ runs:
     - uses: aps831/gh-actions/update-latest-deployment-file@master
       id: deployment-file
       with:
-        tag: ${{ inputs.tag }}
+        version-identifier: ${{ inputs.version-identifier }}
         component: ${{ inputs.component }}
         env: ${{ inputs.env }}
 
     # update-terraform-vars
     - uses: aps831/gh-actions/update-terraform-vars@master
       with:
-        tag: ${{ inputs.tag }}
+        version-identifier: ${{ inputs.version-identifier }}
         working-directory: ${{ inputs.working-directory }}/${{ inputs.env }}
         tfvars-filename: ${{ inputs.tfvars-filename }}
-        tfvars-tag-var: ${{ inputs.tfvars-tag-var }}
-        tfvars-tag-regex: ${{ inputs.tfvars-tag-regex }}
+        tfvars-var: ${{ inputs.tfvars-var }}
+        tfvars-regex: ${{ inputs.tfvars-regex }}
 
     # git-commit
     - uses: aps831/gh-actions/git-commit@master

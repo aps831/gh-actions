@@ -14,8 +14,8 @@ inputs:
   target-branch:
     description: Target branch
     required: true
-  tag:
-    description: Tag
+  version-identifier:
+    description: Version identifier of deployment candidate
     required: true
   component:
     description: Component
@@ -37,7 +37,7 @@ runs:
             workflow_id: "${{ inputs.target-workflow }}",
             ref: "${{ inputs.target-branch }}",
             inputs: {
-              tag: "${{ inputs.tag }}",
+              "version-identifier": "${{ inputs.version-identifier }}",
               component: process.env.COMPONENT
             }
           });

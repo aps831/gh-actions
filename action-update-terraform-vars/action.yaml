@@ -8,14 +8,14 @@ inputs:
   paths:
     description: Paths of tfvars files
     required: true
-  tag:
-    description: Tag
+  version-identifier:
+    description: Version identifier
     required: true
-  tag-var:
-    description: Variable name in tfvars file for tag
+  var:
+    description: Variable name in tfvars file
     required: true
-  tag-regex:
-    description: Regex of value of tag in tfvars file
+  regex:
+    description: Regex of value in tfvars file
     required: true
 runs:
   using: "composite"
@@ -24,9 +24,9 @@ runs:
       shell: bash
       run: |
         paths="${{ inputs.paths }}"
-        variable="${{ inputs.tag-var }}"
-        regex="${{ inputs.tag-regex }}"
-        value=${{ inputs.tag }}
+        variable="${{ inputs.var }}"
+        regex="${{ inputs.regex }}"
+        value=${{ inputs.version-identifier }}
         while IFS= read -r path || [ -n "$path" ]; do
           if [[ -f "$path" ]]; then
             sed -i -r "s/^($variable\s+= \")$regex(\")\$/\1$value\2/" "$path"
