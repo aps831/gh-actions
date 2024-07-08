@@ -49,7 +49,7 @@ runs:
       id: hash
 
     # build
-    - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
+    - uses: docker/build-push-action@1a162644f9a7e87d8f4b053101d1d9a712edc18c # pin@v3
       if: ${{ inputs.stage-build != '' }}
       with:
         context: ${{ inputs.docker-context }}
@@ -69,7 +69,7 @@ runs:
       shell: bash
       run: rm -rf ${{ inputs.output-directory }}
 
-    - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
+    - uses: docker/build-push-action@1a162644f9a7e87d8f4b053101d1d9a712edc18c # pin@v3
       if: ${{ inputs.stage-output != '' }}
       with:
         context: ${{ inputs.docker-context }}
@@ -85,7 +85,7 @@ runs:
         target: ${{ inputs.stage-output }}
 
     # status
-    - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
+    - uses: docker/build-push-action@1a162644f9a7e87d8f4b053101d1d9a712edc18c # pin@v3
       if: ${{ inputs.stage-status != '' }}
       with:
         context: ${{ inputs.docker-context }}
@@ -105,7 +105,7 @@ runs:
       shell: bash
 
     # image
-    - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
+    - uses: docker/build-push-action@1a162644f9a7e87d8f4b053101d1d9a712edc18c # pin@v3
       with:
         context: ${{ inputs.docker-context }}
         file: ${{ inputs.dockerfile }}
