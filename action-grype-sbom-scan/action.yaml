@@ -12,7 +12,7 @@ runs:
       with:
         tool: sarif-fmt
 
-    - uses: anchore/scan-action@3343887d815d7b07465f6fdcd395bd66508d486a # pin@v3
+    - uses: anchore/scan-action@d43cc1dfea6a99ed123bf8f3133f1797c9b44492 # pin@v3
       id: scan
       with:
         sbom: "${{ inputs.path }}"
