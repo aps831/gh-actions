@@ -18,16 +18,18 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - id: tmpdir
+      shell: bash
+      run: |
+        echo "tmpdir=$(mktemp -d)" >> $GITHUB_OUTPUT
+
     - id: filename-tgz
       shell: bash
+      working-directory: ${{ steps.tmpdir.outputs.tmpdir }}
       env:
         NODE_AUTH_TOKEN: ${{ inputs.ACCESS_TOKEN }}
       run: |
-        PACKAGE=${{ inputs.package-name }}
-        VERSION=${{ inputs.package-version }}
-        TMP_DIR=$(mktemp -d)
-        cd ${TMP_DIR}
-        npm pack --pack-destination ${TMP_DIR} ${PACKAGE}@${VERSION}
+        npm pack --pack-destination . ${{ inputs.package-name }}@${{ inputs.package-version }}
         FILES=(*)
         FILENAME_TAR="${FILES[0]}"
-        echo "filename-tgz=$TMP_DIR/$FILENAME_TAR" >> $GITHUB_OUTPUT
+        echo "filename-tgz=${{ steps.tmpdir.outputs.tmpdir }}/$FILENAME_TAR" >> $GITHUB_OUTPUT

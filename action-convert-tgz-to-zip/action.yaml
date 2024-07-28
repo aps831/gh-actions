@@ -5,6 +5,9 @@ inputs:
   filename-tgz:
     description: Filename of tgz archive
     required: true
+  strip-components:
+    description: Number of components to strip
+    required: true
 outputs:
   filename-zip:
     description: Filename of zip archive
@@ -12,12 +15,22 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - shell: bash
-      id: filename-zip
+    - id: tmpdir
+      shell: bash
       run: |
-        FILENAME_TAR=${{ inputs.filename-tgz }}
-        tar zxvf $FILENAME_TAR --strip-components=1
-        rm $FILENAME_TAR
+        echo "tmpdir=$(mktemp -d)" >> $GITHUB_OUTPUT
+
+    - shell: bash
+      working-directory: ${{ steps.tmpdir.outputs.tmpdir }}
+      run: |
+        tar zxvf ${{ inputs.filename-tgz }} --strip-components=${{ inputs.strip-components }}
+        rm ${{ inputs.filename-tgz }}
+
+    - id: filename-zip
+      shell: bash
+      working-directory: ${{ steps.tmpdir.outputs.tmpdir }}
+      run: |
+        FILENAME_TAR=$(basename "${{ inputs.filename-tgz }}")
         FILENAME_ZIP="${FILENAME_TAR%.tgz}.zip"
         zip $FILENAME_ZIP *
-        echo "filename-zip=$FILENAME_ZIP" >> $GITHUB_OUTPUT
+        echo "filename-zip= ${{ steps.tmpdir.outputs.tmpdir }}/$FILENAME_ZIP" >> $GITHUB_OUTPUT

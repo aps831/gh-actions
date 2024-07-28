@@ -36,6 +36,7 @@ runs:
       id: zip
       with:
         filename-tgz: ${{ steps.package.outputs.filename-tgz }}
+        strip-components: 1
 
     # gcp-secret-get
     - uses: aps831/gh-actions/gcp-secret-get@master
