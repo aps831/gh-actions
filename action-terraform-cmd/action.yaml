@@ -23,11 +23,17 @@ runs:
         set +e
         stdout=$(mktemp)
         echo "**terraform init**" |& tee $stdout
+        echo "" |& tee -a $stdout
+        echo '```text' |& tee -a $stdout
         terraform init -no-color |& tee -a $stdout
+        echo '```' |& tee -a $stdout
         echo "" |& tee -a $stdout
         echo "**terraform ${{ inputs.cmd }}**" |& tee -a $stdout
+        echo "" |& tee -a $stdout
+        echo '```text' |& tee -a $stdout
         terraform ${{ inputs.cmd }} -no-color |& tee -a $stdout
         exit_value=$?
+        echo '```' |& tee -a $stdout
         cat $stdout
         echo 'stdout<<EOF' >> $GITHUB_OUTPUT
         cat "$stdout" >> $GITHUB_OUTPUT
