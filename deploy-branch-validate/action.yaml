@@ -24,9 +24,9 @@ outputs:
   changes:
     description: Flag to indicate that branch has changes
     value: ${{ steps.changes.outputs.changes }}
-  exit-code:
-    description: Exit code
-    value: ${{ steps.exit-code.outputs.exit-code }}
+  valid:
+    description: Flag to indicate if deploy branch is valid
+    value: ${{ steps.valid.outputs.valid }}
 runs:
   using: "composite"
   steps:
@@ -50,15 +50,29 @@ runs:
         branch-check-against: ${{ inputs.branch-check-against }}
         path: ${{ inputs.path }}
 
-    - id: exit-code
+    - shell: bash
+      run: |
+        echo "**Deploy Branch Validate**" >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "***Comparing branch '${{ inputs.branch }}' against '${{ inputs.branch-check-against }}'***" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "| Key          | Value                                          |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------ | ---------------------------------------------- |" >> $GITHUB_STEP_SUMMARY
+        echo "| not-behind   | ${{ steps.not-behind.outputs.not-behind }}     |" >> $GITHUB_STEP_SUMMARY
+        echo "| not-ahead-by | ${{ steps.not-ahead-by.outputs.not-ahead-by }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| changes      | ${{ steps.changes.outputs.changes }}           |" >> $GITHUB_STEP_SUMMARY
+
+    - id: valid
       shell: bash
       run: |
         if [[ "${{ steps.not-behind.outputs.not-behind }}" == "false" ]]; then
-          echo "exit-code=1" >> $GITHUB_OUTPUT
+          echo "valid=false" >> $GITHUB_OUTPUT
         elif [[ "${{ steps.not-ahead-by.outputs.not-ahead-by }}" == "false" ]]; then
-          echo "exit-code=1" >> $GITHUB_OUTPUT
+          echo "valid=false" >> $GITHUB_OUTPUT
         elif [[ "${{ steps.changes.outputs.changes }}" == "false" ]]; then
-          echo "exit-code=1" >> $GITHUB_OUTPUT
+          echo "valid=false" >> $GITHUB_OUTPUT
         else
-          echo "exit-code=0" >> $GITHUB_OUTPUT
+          echo "valid=true" >> $GITHUB_OUTPUT
         fi
