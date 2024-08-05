@@ -25,7 +25,7 @@ runs:
   using: "composite"
   steps:
     # cosign-installer
-    - uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 # pin@v3.4.0
+    - uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 # pin@v3.5.0
 
     # build-artifacts-download
     - uses: aps831/gh-actions/action-publish-artifacts-download@master
