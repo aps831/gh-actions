@@ -1,0 +1,31 @@
+---
+name: Git Branch Changes on Path
+description: Check for changes on Git branch
+inputs:
+  branch:
+    description: Branch to check
+    required: true
+  branch-check-against:
+    description: Branch to check against
+    required: true
+  path:
+    description: Path to test for changes
+    required: true
+outputs:
+  changes:
+    description: Flag to indicate that branch has changes
+    value: ${{ steps.changes.outputs.changes }}
+runs:
+  using: "composite"
+  steps:
+    - name: git add tag
+      id: changes
+      shell: bash
+      run: |
+        set +e
+        git diff --exit-code ${{ inputs.branch-check-against }}..${{ inputs.branch }} -- ${{ inputs.path }}
+        if [[ "$?" == "0" ]]; then
+          echo "changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "changes=true" >> $GITHUB_OUTPUT
+        fi

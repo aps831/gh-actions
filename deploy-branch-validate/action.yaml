@@ -1,0 +1,64 @@
+---
+name: Deploy Branch Validate
+description: Deploy branch validate
+inputs:
+  branch:
+    description: Branch to check
+    required: true
+  branch-check-against:
+    description: Branch to check against
+    required: true
+  max-no-commits:
+    description: Maximum number of commits ahead allowed
+    required: true
+  path:
+    description: Path to test for changes
+    required: true
+outputs:
+  not-behind:
+    description: Flag to indicate that branch is not behind
+    value: ${{ steps.not-behind.outputs.not-behind }}
+  not-ahead-by:
+    description: Flag to indicate that branch is not ahead by
+    value: ${{ steps.not-ahead-by.outputs.not-ahead-by }}
+  changes:
+    description: Flag to indicate that branch has changes
+    value: ${{ steps.changes.outputs.changes }}
+  exit-code:
+    description: Exit code
+    value: ${{ steps.exit-code.outputs.exit-code }}
+runs:
+  using: "composite"
+  steps:
+    - id: not-behind
+      uses: aps831/gh-actions/git-branch-not-behind@master
+      with:
+        branch: ${{ inputs.branch }}
+        branch-check-against: ${{ inputs.branch-check-against }}
+
+    - id: not-ahead-by
+      uses: aps831/gh-actions/git-branch-not-ahead-by@master
+      with:
+        branch: ${{ inputs.branch }}
+        branch-check-against: ${{ inputs.branch-check-against }}
+        max-no-commits: ${{ inputs.max-no-commits }}
+
+    - id: changes
+      uses: aps831/gh-actions/git-branch-changes-on-path@master
+      with:
+        branch: ${{ inputs.branch }}
+        branch-check-against: ${{ inputs.branch-check-against }}
+        path: ${{ inputs.path }}
+
+    - id: exit-code
+      shell: bash
+      run: |
+        if [[ "${{ steps.not-behind.outputs.not-behind }}" == "false" ]]; then
+          echo "exit-code=1" >> $GITHUB_OUTPUT
+        elif [[ "${{ steps.not-ahead-by.outputs.not-ahead-by }}" == "false" ]]; then
+          echo "exit-code=1" >> $GITHUB_OUTPUT
+        elif [[ "${{ steps.changes.outputs.changes }}" == "false" ]]; then
+          echo "exit-code=1" >> $GITHUB_OUTPUT
+        else
+          echo "exit-code=0" >> $GITHUB_OUTPUT
+        fi

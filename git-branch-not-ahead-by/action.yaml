@@ -1,0 +1,29 @@
+---
+name: Git Branch Not Ahead By
+description: Check for Git branch not ahead by
+inputs:
+  branch:
+    description: Branch to check
+    required: true
+  branch-check-against:
+    description: Branch to check against
+    required: true
+  max-no-commits:
+    description: Maximum number of commits ahead allowed
+    required: true
+outputs:
+  not-ahead-by:
+    description: Flag to indicate that branch is not ahead by
+    value: ${{ steps.not-ahead-by.outputs.not-ahead-by }}
+runs:
+  using: "composite"
+  steps:
+    - name: git add tag
+      id: not-ahead-by
+      shell: bash
+      run: |
+        if [ "$(git rev-list ${{ inputs.branch }} --not ${{ inputs.branch-check-against }} | wc -l)" -gt "${{ inputs.max-no-commits }}" ]; then
+          echo "not-ahead-by=false" >> $GITHUB_OUTPUT
+        else
+          echo "not-ahead-by=true" >> $GITHUB_OUTPUT
+        fi
