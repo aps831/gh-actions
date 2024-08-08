@@ -1,0 +1,24 @@
+---
+name: Git Branch Squash
+description: Git branch squash
+inputs:
+  branch-base:
+    description: Branch to squash relative to
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        if [ -z "$(git status --porcelain)" ]; then
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          COMMITS=$(git rev-list $BRANCH --not ${{ inputs.branch-base }} | wc -l)
+          COMMITS_MINUS=$((COMMITS - 1))
+          MESSAGE=$(git log --format=%B -n 1 HEAD~${COMMITS_MINUS})
+          git reset --soft HEAD~${COMMITS}
+          git add --all
+          git commit -m "${MESSAGE}"
+        else
+          echo "::error ::Refusing to squash commits as working directory is not clean"
+          exit 1
+        fi

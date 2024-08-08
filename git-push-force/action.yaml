@@ -1,0 +1,8 @@
+---
+name: Git Push Force
+description: Git push force
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: git push --force || true

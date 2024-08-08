@@ -1,0 +1,18 @@
+---
+name: Git Branch Rebase
+description: Git branch rebase
+inputs:
+  branch-base:
+    description: Branch to rebase on
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        set +e
+        git rebase ${{ inputs.branch-base }}
+        if [[ "$?" != "0" ]]; then
+          echo "::error ::Unable to rebase"
+          exit 1
+        fi
