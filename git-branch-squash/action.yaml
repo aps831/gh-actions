@@ -13,8 +13,7 @@ runs:
         if [ -z "$(git status --porcelain)" ]; then
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
           COMMITS=$(git rev-list $BRANCH --not ${{ inputs.branch-base }} | wc -l)
-          COMMITS_MINUS=$((COMMITS - 1))
-          MESSAGE=$(git log --format=%B -n 1 HEAD~${COMMITS_MINUS})
+          MESSAGE=$(git log --format=%B -n 1 HEAD)
           git reset --soft HEAD~${COMMITS}
           git add --all
           git commit -m "${MESSAGE}"
