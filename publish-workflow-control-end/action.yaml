@@ -1,0 +1,115 @@
+---
+name: Publish Workflow Control End
+description: Publish workflow control end
+inputs:
+  release-on-default-branch:
+    description: Create releases on default branch
+    required: true
+  build:
+    description: Flag to indicate to build action in progress
+    required: true
+  publish:
+    description: Flag to indicate to publish action in progress
+    required: true
+  finalize:
+    description: Flag to indicate to finalize action in progress
+    required: true
+  unpublish:
+    description: Flag to indicate to unpublish action in progress
+    required: true
+  ACCESS_TOKEN:
+    description: "Access token"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # issue
+    - id: issue
+      uses: aps831/gh-actions/github-issue-for-commit@master
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # build
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && job.status == 'success' &&
+        inputs.release-on-default-branch != 'true' && inputs.build == 'true' && inputs.publish !=
+        'true' }}
+      with:
+        comment: |
+          Build completed successfully. Comment with `.publish` to create a draft release or prerelease.
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && job.status == 'failure' &&
+        inputs.release-on-default-branch != 'true' && inputs.build == 'true' && inputs.publish !=
+        'true' }}
+      with:
+        comment: Build failed.
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # publish
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && job.status == 'success' &&
+        inputs.release-on-default-branch != 'true' && inputs.publish == 'true' }}
+      with:
+        comment: |
+          Publish completed successfully. Comment with `.unpublish` to delete the draft release or with `.finalize` to convert the draft to a final release or prerelease.
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && job.status == 'failure' &&
+        inputs.release-on-default-branch != 'true' && inputs.publish == 'true' }}
+      with:
+        comment: |
+          Publish failed.
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # finalize
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && job.status == 'success' &&
+        inputs.release-on-default-branch != 'true' && inputs.finalize == 'true' }}
+      with:
+        comment: |
+          Finalize completed successfully.
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && job.status == 'failure' &&
+        inputs.release-on-default-branch != 'true' && inputs.finalize == 'true' }}
+      with:
+        comment: |
+          Finalize failed.
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # unpublish
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && job.status == 'success' &&
+        inputs.release-on-default-branch != 'true' && inputs.unpublish == 'true' }}
+      with:
+        comment: |
+          Unpublish completed successfully.
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && job.status == 'failure' &&
+        inputs.release-on-default-branch != 'true' && inputs.unpublish == 'true' }}
+      with:
+        comment: |
+          Unpublish failed.
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
