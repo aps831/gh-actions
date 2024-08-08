@@ -1,0 +1,74 @@
+---
+name: Publish Workflow Control Start
+description: Publish workflow control start
+inputs:
+  release-on-default-branch:
+    description: Create releases on default branch
+    required: true
+  build:
+    description: Flag to indicate to build action in progress
+    required: true
+  publish:
+    description: Flag to indicate to publish action in progress
+    required: true
+  finalize:
+    description: Flag to indicate to finalize action in progress
+    required: true
+  unpublish:
+    description: Flag to indicate to unpublish action in progress
+    required: true
+  ACCESS_TOKEN:
+    description: "Access token"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # issue
+    - id: issue
+      uses: aps831/gh-actions/github-issue-for-commit@master
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # build
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && inputs.release-on-default-branch != 'true' &&
+        inputs.build == 'true' && inputs.publish != 'true' }}
+      with:
+        comment: |
+          Build started. View progress [here.](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # publish
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && inputs.release-on-default-branch != 'true' &&
+        inputs.publish == 'true' }}
+      with:
+        comment: |
+          Publish started. View progress [here.](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # unpublish
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && inputs.release-on-default-branch != 'true' &&
+        inputs.unpublish == 'true' }}
+      with:
+        comment: |
+          Unpublish started. View progress [here.](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # finalize
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if:
+        ${{ steps.issue.outputs.issue-number && inputs.release-on-default-branch != 'true' &&
+        inputs.finalize == 'true' }}
+      with:
+        comment: |
+          Finalize started. View progress [here.](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
