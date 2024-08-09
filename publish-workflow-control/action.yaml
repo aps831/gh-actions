@@ -475,6 +475,39 @@ runs:
         fi
 
     #
+    # Response
+    #
+    # response-publish
+    - id: response-publish
+      shell: bash
+      run: |
+        if [[ "${{ inputs.release-on-default-branch }}" != "true" && "${{ steps.publish-manual.outputs.publish-manual }}" == "true" && "${{ steps.release.outputs.release }}" == "false" && "${{ steps.prerelease.outputs.prerelease }}" == "false" ]]; then
+          echo "response-publish=false" >> $GITHUB_OUTPUT
+        else
+          echo "response-publish=true" >> $GITHUB_OUTPUT
+        fi
+
+    # response-unpublish
+    - id: response-unpublish
+      shell: bash
+      run: |
+        if [[ "${{ inputs.release-on-default-branch }}" != "true" && "${{ steps.unpublish-manual.outputs.unpublish-manual }}" == "true" && "${{ steps.unpublish.outputs.unpublish }}" == "false" ]]; then
+          echo "response-unpublish=false" >> $GITHUB_OUTPUT
+        else
+          echo "response-unpublish=true" >> $GITHUB_OUTPUT
+        fi
+
+    # response-finalize
+    - id: response-finalize
+      shell: bash
+      run: |
+        if [[ "${{ inputs.release-on-default-branch }}" != "true" && "${{ steps.finalize-manual.outputs.finalize-manual }}" == "true" && "${{ steps.finalize.outputs.finalize }}" == "false" ]]; then
+          echo "response-finalize=false" >> $GITHUB_OUTPUT
+        else
+          echo "response-finalize=true" >> $GITHUB_OUTPUT
+        fi
+
+    #
     # Control
     #
     - name: Update flag
@@ -491,7 +524,9 @@ runs:
       id: build
       shell: bash
       run: |
-        if [[ "${{ steps.unpublish.outputs.unpublish }}" != "true" && "${{ steps.finalize.outputs.finalize }}" != "true" ]]; then
+        if [[ "${{ steps.response-publish.outputs.response-publish }}" == "false" || "${{ steps.response-unpublish.outputs.response-unpublish }}" == "false" || "${{ steps.response-finalize.outputs.response-finalize }}" == "false" ]]; then
+          echo "build=false" >> $GITHUB_OUTPUT
+        elif [[ "${{ steps.unpublish.outputs.unpublish }}" != "true" && "${{ steps.finalize.outputs.finalize }}" != "true" ]]; then
           echo "build=true" >> $GITHUB_OUTPUT
         else
           echo "build=false" >> $GITHUB_OUTPUT
@@ -581,8 +616,8 @@ runs:
         echo "" >> $GITHUB_STEP_SUMMARY
 
         echo "***Finalize Draft***" >> $GITHUB_STEP_SUMMARY
-        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                      | Value                                                                     |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------ | ------------------------------------------------------------------------- |" >> $GITHUB_STEP_SUMMARY
         echo "| finalize-manual          | ${{ steps.finalize-manual.outputs.finalize-manual }}                      |" >> $GITHUB_STEP_SUMMARY
         echo "| finalize-branch          | ${{ steps.finalize-branch.outputs.finalize-branch }}                      |" >> $GITHUB_STEP_SUMMARY
         echo "| finalize-draft           | ${{ steps.finalize-draft.outputs.is-draft }}                              |" >> $GITHUB_STEP_SUMMARY
@@ -603,6 +638,15 @@ runs:
 
         echo "" >> $GITHUB_STEP_SUMMARY
 
+        echo "***Response***" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| response-publish          | ${{ steps.response-publish.outputs.response-publish }}                   |" >> $GITHUB_STEP_SUMMARY
+        echo "| response-unpublish        | ${{ steps.response-unpublish.outputs.response-unpublish }}               |" >> $GITHUB_STEP_SUMMARY
+        echo "| response-finalize         | ${{ steps.response-finalize.outputs.response-finalize }}                 |" >> $GITHUB_STEP_SUMMARY
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+
         echo "***Control***" >> $GITHUB_STEP_SUMMARY
         echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
         echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
@@ -612,3 +656,53 @@ runs:
         echo "| draft                     | ${{ steps.draft.outputs.draft }}                                         |" >> $GITHUB_STEP_SUMMARY
         echo "| finalize                  | ${{ steps.finalize.outputs.finalize }}                                   |" >> $GITHUB_STEP_SUMMARY
         echo "| unpublish                 | ${{ steps.unpublish.outputs.unpublish }}                                 |" >> $GITHUB_STEP_SUMMARY
+
+    # issue
+    - id: issue
+      uses: aps831/gh-actions/github-issue-for-commit@master
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # comment
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if: ${{ steps.response-publish.outputs.response-publish == 'false' }}
+      with:
+        comment: |
+          Publish conditions were not met. View conditions [here.](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if: ${{ steps.response-unpublish.outputs.response-unpublish == 'false' }}
+      with:
+        comment: |
+          Unpublish conditions were not met. View conditions [here.](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      if: ${{ steps.response-finalize.outputs.response-finalize == 'false' }}
+      with:
+        comment: |
+          Finalize conditions were not met. View conditions [here.](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # exit
+    - shell: bash
+      if: ${{ steps.response-publish.outputs.response-publish == 'false' }}
+      run: |
+        echo "::error ::Publish conditions were not met"
+        exit 1
+
+    - shell: bash
+      if: ${{ steps.response-unpublish.outputs.response-unpublish == 'false' }}
+      run: |
+        echo "::error ::Unpublish conditions were not met"
+        exit 1
+
+    - shell: bash
+      if: ${{ steps.response-finalize.outputs.response-finalize == 'false' }}
+      run: |
+        echo "::error ::Finalize conditions were not met"
+        exit 1
