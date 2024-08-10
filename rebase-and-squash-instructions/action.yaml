@@ -1,0 +1,38 @@
+---
+name: Rebase and Squash Instructions
+description: Rebase and squash instructions
+inputs:
+  rebase-command:
+    description: Rebase command
+    required: true
+  rebase-and-squash-command:
+    description: Rebase and squash command
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # message
+    - id: message
+      shell: bash
+      run: |
+        echo 'message<<EOF' >> $GITHUB_OUTPUT
+        echo 'Available git commands are:' >> $GITHUB_OUTPUT
+        echo ' * `${{ inputs.rebase-command }}` to rebase' >> $GITHUB_OUTPUT
+        echo ' * `${{ inputs.rebase-and-squash-command }}` to rebase and squash' >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
+
+    # issue
+    - id: issue-number
+      uses: aps831/gh-actions/github-issue-for-commit@master
+      with:
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
+
+    # github-add-issue-comment
+    - uses: aps831/gh-actions/github-add-issue-comment@master
+      with:
+        issue-number: ${{ steps.issue-number.outputs.issue-number }}
+        comment: ${{ steps.message.outputs.message }}
+        ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
