@@ -28,7 +28,7 @@ runs:
         branch: ${{ inputs.branch-event }}
 
     # git-delete-branch
-    - uses: aps831/gh-actions/git-delete-branch@master
-      if: ${{ inputs.branch-event != inputs.branch-update }}
-      with:
-        branch: ${{ inputs.branch-update }}
+    # - uses: aps831/gh-actions/git-delete-branch@master
+    #   if: ${{ inputs.branch-event != inputs.branch-update }}
+    #   with:
+    #     branch: ${{ inputs.branch-update }}
