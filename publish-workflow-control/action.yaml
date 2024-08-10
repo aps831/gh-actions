@@ -127,11 +127,6 @@ runs:
         echo "DESC_CONTROL_FINALIZE=Flag to indicate that draft publication should be finalized" >> "${GITHUB_OUTPUT}"
         echo "DESC_CONTROL_UNPUBLISH=Flag to indicate that draft publication should be unpublished" >> "${GITHUB_OUTPUT}"
 
-    # install-rust-tool
-    - uses: aps831/gh-actions/install-rust-tool@master
-      with:
-        tool: conventional_commits_next_version@6.0.0 # HARDCODED
-
     #
     # Fixed Branches
     #
@@ -188,23 +183,18 @@ runs:
       id: tag-latest-release-file
 
     # version-next-conventional
-    - name: Get next conventional version
-      id: version-next-conventional
-      shell: bash
-      run: |
-        version_current=${{ steps.version-current.outputs.version-current }}
-        if [[ "$version_current" == "0.0.0"  ]]; then
-          echo "version-next-conventional=0.1.0" >> $GITHUB_OUTPUT
-        else
-          echo "version-next-conventional=$(conventional_commits_next_version --calculation-mode "Batch" --from-version $version_current --from-reference ${{ inputs.tag-prefix }}$version_current)" >> $GITHUB_OUTPUT
-        fi
+    - id: version-next-conventional
+      uses: aps831/conventional-commits-action@master
+      with:
+        from-version: ${{ steps.version-current.outputs.version-current }}
+        from-reference: ${{ inputs.tag-prefix }}${{ steps.version-current.outputs.version-current }}
 
     # tag-version-next-conventional
     - name: Get tag next conventional version
       id: tag-version-next-conventional
       shell: bash
       run: |
-        echo "tag-version-next-conventional=${{ inputs.tag-prefix }}${{ steps.version-next-conventional.outputs.version-next-conventional }}" >> $GITHUB_OUTPUT
+        echo "tag-version-next-conventional=${{ inputs.tag-prefix }}${{ steps.version-next-conventional.outputs.next-version }}" >> $GITHUB_OUTPUT
 
     # version-next-patch
     - name: Get next patch version
@@ -251,7 +241,7 @@ runs:
       shell: bash
       run: |
         version_current=${{ steps.version-current.outputs.version-current }}
-        version_next=${{ steps.version-next-conventional.outputs.version-next-conventional }}
+        version_next=${{ steps.version-next-conventional.outputs.next-version }}
         if [[ "$version_current" != "$version_next" && "${{ inputs.release-on-default-branch }}" == "true" ]]; then
           echo "release-auto=true" >> $GITHUB_OUTPUT
         else
@@ -483,7 +473,7 @@ runs:
         if [[ "${{ steps.prerelease-branch.outputs.prerelease-branch }}" == "true" ]]; then
           echo "version-next=${{ steps.version-next-patch.outputs.version-next-patch }}" >> $GITHUB_OUTPUT
         else
-          echo "version-next=${{ steps.version-next-conventional.outputs.version-next-conventional }}" >> $GITHUB_OUTPUT
+          echo "version-next=${{ steps.version-next-conventional.outputs.next-version }}" >> $GITHUB_OUTPUT
         fi
 
     # tag-version-next
@@ -618,12 +608,12 @@ runs:
         echo "" >> $GITHUB_STEP_SUMMARY
 
         echo "***Versions***" >> $GITHUB_STEP_SUMMARY
-        echo "| Key                       | Description                                              | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| ------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
-        echo "| version-current           | ${{ steps.constants.outputs.DESC_VERSION_GOOD_CURRENT }} | ${{ steps.version-current.outputs.version-current }}                     |" >> $GITHUB_STEP_SUMMARY
-        echo "| version-next-conventional | ${{ steps.constants.outputs.DESC_VERSION_NEXT_CONV }}    | ${{ steps.version-next-conventional.outputs.version-next-conventional }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| version-next-patch        | ${{ steps.constants.outputs.DESC_VERSION_NEXT_PATCH }}   | ${{ steps.version-next-patch.outputs.version-next-patch }}               |" >> $GITHUB_STEP_SUMMARY
-        echo "| **version-next**          | ${{ steps.constants.outputs.DESC_VERSION_NEXT }}         | ${{ steps.version-next.outputs.version-next }}                           |" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Description                                              | Value                                                       |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | -------------------------------------------------------- | ----------------------------------------------------------- |" >> $GITHUB_STEP_SUMMARY
+        echo "| version-current           | ${{ steps.constants.outputs.DESC_VERSION_GOOD_CURRENT }} | ${{ steps.version-current.outputs.version-current }}        |" >> $GITHUB_STEP_SUMMARY
+        echo "| version-next-conventional | ${{ steps.constants.outputs.DESC_VERSION_NEXT_CONV }}    | ${{ steps.version-next-conventional.outputs.next-version }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| version-next-patch        | ${{ steps.constants.outputs.DESC_VERSION_NEXT_PATCH }}   | ${{ steps.version-next-patch.outputs.version-next-patch }}  |" >> $GITHUB_STEP_SUMMARY
+        echo "| **version-next**          | ${{ steps.constants.outputs.DESC_VERSION_NEXT }}         | ${{ steps.version-next.outputs.version-next }}              |" >> $GITHUB_STEP_SUMMARY
 
         echo "" >> $GITHUB_STEP_SUMMARY
 
