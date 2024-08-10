@@ -26,7 +26,7 @@ runs:
 
     # issue
     - id: issue-number
-      uses: aps831/gh-actions/github-issue-for-commit@feat/instructions
+      uses: aps831/gh-actions/github-issue-for-commit@master
       with:
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
 
