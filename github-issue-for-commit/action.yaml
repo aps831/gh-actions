@@ -19,13 +19,12 @@ runs:
           if (context.issue.number) {
             return context.issue.number;
           } else {
-            return (
-              await github.rest.repos.listPullRequestsAssociatedWithCommit({
+            const pulls = await github.rest.repos.listPullRequestsAssociatedWithCommit({
                 commit_sha: context.sha,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
               })
-            ).data[0]?.number;
+            return pulls.data[0]?.number;
           }
         result-encoding: string
         github-token: ${{ inputs.ACCESS_TOKEN }}
