@@ -70,6 +70,63 @@ outputs:
 runs:
   using: "composite"
   steps:
+    # set constants
+    - id: constants
+      shell: bash
+      run: |
+        echo "DESC_VERSION_GOOD_CURRENT=Version of latest release excluding drafts" >> "${GITHUB_OUTPUT}"
+        echo "DESC_VERSION_NEXT_CONV=Version for next release if using conventional commits" >> "${GITHUB_OUTPUT}"
+        echo "DESC_VERSION_NEXT_PATCH=Version for next release if using patch release" >> "${GITHUB_OUTPUT}"
+        echo "DESC_VERSION_NEXT=Version for next release according to release or prerelease" >> "${GITHUB_OUTPUT}"
+
+        echo "DESC_TAG_VERSION_GOOD_CURRENT=Tag of latest release excluding drafts" >> "${GITHUB_OUTPUT}"
+        echo "DESC_TAG_VERSION_DRAFT=Tag of draft release" >> "${GITHUB_OUTPUT}"
+        echo "DESC_TAG_VERSION_RELEASE=Tag of latest release" >> "${GITHUB_OUTPUT}"
+        echo "DESC_TAG_NEXT=Tag for next release" >> "${GITHUB_OUTPUT}"
+
+        echo "DESC_PUBLISH_MANUAL=Test for manual publication request" >> "${GITHUB_OUTPUT}"
+        echo "DESC_RELEASE_AUTO=Test for automatic release via incremented next version and branch" >> "${GITHUB_OUTPUT}"
+        echo "DESC_RELEASE_BRANCH=Test for branch permitted for releases but not prereleases" >> "${GITHUB_OUTPUT}"
+        echo "DESC_RELEASE_NOT_BEHIND=Test that event branch is not behind default branch" >> "${GITHUB_OUTPUT}"
+        echo "DESC_RELEASE_NO_DRAFTS=Test for no draft release" >> "${GITHUB_OUTPUT}"
+        echo "DESC_RELEASE_TAG_NEXT=Test that release tag does not already exist" >> "${GITHUB_OUTPUT}"
+        echo "DESC_RELEASE_FLAG=Flag to indicate that conditions for release met" >> "${GITHUB_OUTPUT}"
+
+        echo "DESC_PRERELEASE_AUTO=Test for automatic prerelease via incremented next version and branch" >> "${GITHUB_OUTPUT}"
+        echo "DESC_PRERELEASE_BRANCH=Test for branch permitted for prereleases but not releases" >> "${GITHUB_OUTPUT}"
+        echo "DESC_PRERELEASE_NOT_BEHIND=Test that event branch is not behind default branch" >> "${GITHUB_OUTPUT}"
+        echo "DESC_PRERELEASE_FLAG=Flag to indicate that conditions for prerelease met" >> "${GITHUB_OUTPUT}"
+
+        echo "DESC_UNPUBLISH_MANUAL=Test for manual unpublication request" >> "${GITHUB_OUTPUT}"
+        echo "DESC_UNPUBLISH_BRANCH=Test for branch permitted for releases but not prereleases" >> "${GITHUB_OUTPUT}"
+        echo "DESC_UNPUBLISH_DRAFT=Test latest release is draft" >> "${GITHUB_OUTPUT}"
+        echo "DESC_UNPUBLISH_RELEASE=Test latest release tag equals latest draft release tag" >> "${GITHUB_OUTPUT}"
+        echo "DESC_UNPUBLISH_FLAG=Flag to indicate that conditions for unpublish met" >> "${GITHUB_OUTPUT}"
+
+        echo "DESC_FINALIZE_MANUAL=Test for manual finalize request" >> "${GITHUB_OUTPUT}"
+        echo "DESC_FINALIZE_BRANCH=Test for branch permitted for releases but not prereleases" >> "${GITHUB_OUTPUT}"
+        echo "DESC_FINALIZE_DRAFT=Test latest release is draft" >> "${GITHUB_OUTPUT}"
+        echo "DESC_FINALIZE_RELEASE=Test latest release tag equals latest draft release tag" >> "${GITHUB_OUTPUT}"
+        echo "DESC_FINALIZE_FLAG=Flag to indicate that conditions for finalize met" >> "${GITHUB_OUTPUT}"
+
+        echo "DESC_RELEASE_ON_DEFAULT_BRANCH=Flag to indicate if release should take place on default branch" >> "${GITHUB_OUTPUT}"
+        echo "DESC_BRANCH_DEFAULT=Branch name of default branch" >> "${GITHUB_OUTPUT}"
+        echo "DESC_BRANCH_EVENT=Branch name of Github event branch" >> "${GITHUB_OUTPUT}"
+        echo "DESC_BRANCH_BUILD=Branch name of build branch" >> "${GITHUB_OUTPUT}"
+        echo "DESC_BRANCH_PUBLISH=Branch name of publish branch" >> "${GITHUB_OUTPUT}"
+        echo "DESC_BRANCH_UPDATE=Branch name of update branch" >> "${GITHUB_OUTPUT}"
+
+        echo "DESC_RESPONSE_PUBLISH=Flag to indicate if no publication request made or conditions for publication request were met" >> "${GITHUB_OUTPUT}"
+        echo "DESC_RESPONSE_UNPUBLISH=Flag to indicate if no unpublication request made or conditions for unpublication request were met" >> "${GITHUB_OUTPUT}"
+        echo "DESC_RESPONSE_FINALIZE=Flag to indicate if no finalize request made or conditions for finalize request were met" >> "${GITHUB_OUTPUT}"
+
+        echo "DESC_CONTROL_UPDATE=Flag to indicate source files should be updated" >> "${GITHUB_OUTPUT}"
+        echo "DESC_CONTROL_BUILD=Flag to indicate that a build should occur" >> "${GITHUB_OUTPUT}"
+        echo "DESC_CONTROL_PUBLISH=Flag to indicate that publication should occur" >> "${GITHUB_OUTPUT}"
+        echo "DESC_CONTROL_DRAFT=Flag to indicate that publication should be a draft" >> "${GITHUB_OUTPUT}"
+        echo "DESC_CONTROL_FINALIZE=Flag to indicate that draft publication should be finalized" >> "${GITHUB_OUTPUT}"
+        echo "DESC_CONTROL_UNPUBLISH=Flag to indicate that draft publication should be unpublished" >> "${GITHUB_OUTPUT}"
+
     # install-rust-tool
     - uses: aps831/gh-actions/install-rust-tool@master
       with:
@@ -561,101 +618,100 @@ runs:
         echo "" >> $GITHUB_STEP_SUMMARY
 
         echo "***Versions***" >> $GITHUB_STEP_SUMMARY
-        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
-        echo "| version-current           | ${{ steps.version-current.outputs.version-current }}                     |" >> $GITHUB_STEP_SUMMARY
-        echo "| version-next-conventional | ${{ steps.version-next-conventional.outputs.version-next-conventional }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| version-next-patch        | ${{ steps.version-next-patch.outputs.version-next-patch }}               |" >> $GITHUB_STEP_SUMMARY
-        echo "| **version-next**          | ${{ steps.version-next.outputs.version-next }}                           |" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Description                                              | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| version-current           | ${{ steps.constants.outputs.DESC_VERSION_GOOD_CURRENT }} | ${{ steps.version-current.outputs.version-current }}                     |" >> $GITHUB_STEP_SUMMARY
+        echo "| version-next-conventional | ${{ steps.constants.outputs.DESC_VERSION_NEXT_CONV }}    | ${{ steps.version-next-conventional.outputs.version-next-conventional }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| version-next-patch        | ${{ steps.constants.outputs.DESC_VERSION_NEXT_PATCH }}   | ${{ steps.version-next-patch.outputs.version-next-patch }}               |" >> $GITHUB_STEP_SUMMARY
+        echo "| **version-next**          | ${{ steps.constants.outputs.DESC_VERSION_NEXT }}         | ${{ steps.version-next.outputs.version-next }}                           |" >> $GITHUB_STEP_SUMMARY
 
         echo "" >> $GITHUB_STEP_SUMMARY
 
         echo "***Tags***" >> $GITHUB_STEP_SUMMARY
-        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
-        echo "| tag-version-current       | ${{ steps.tag-version-current.outputs.tag }}                             |" >> $GITHUB_STEP_SUMMARY
-        echo "| tag-version-draft         | ${{ steps.tag-version-draft.outputs.tag }}                               |" >> $GITHUB_STEP_SUMMARY
-        echo "| tag-latest-release-file   | ${{ steps.tag-latest-release-file.outputs.tag }}                         |" >> $GITHUB_STEP_SUMMARY
-        echo "| **tag-version-next**      | ${{ steps.tag-version-next.outputs.tag-version-next }}                   |" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Description                                                   | Value                                                  |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------------- | ------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| tag-version-current       | ${{ steps.constants.outputs.DESC_TAG_VERSION_GOOD_CURRENT  }} | ${{ steps.tag-version-current.outputs.tag }}           |" >> $GITHUB_STEP_SUMMARY
+        echo "| tag-version-draft         | ${{ steps.constants.outputs.DESC_TAG_VERSION_DRAFT }}         | ${{ steps.tag-version-draft.outputs.tag }}             |" >> $GITHUB_STEP_SUMMARY
+        echo "| tag-latest-release-file   | ${{ steps.constants.outputs.DESC_TAG_VERSION_RELEASE }}       | ${{ steps.tag-latest-release-file.outputs.tag }}       |" >> $GITHUB_STEP_SUMMARY
+        echo "| **tag-version-next**      | ${{ steps.constants.outputs.DESC_TAG_NEXT }}                  | ${{ steps.tag-version-next.outputs.tag-version-next }} |" >> $GITHUB_STEP_SUMMARY
 
         echo "" >> $GITHUB_STEP_SUMMARY
 
         echo "***Release***" >> $GITHUB_STEP_SUMMARY
-        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
-        echo "| publish-manual            | ${{ steps.publish-manual.outputs.publish-manual }}                       |" >> $GITHUB_STEP_SUMMARY
-        echo "| release-auto              | ${{ steps.release-auto.outputs.release-auto }}                           |" >> $GITHUB_STEP_SUMMARY
-        echo "| release-branch            | ${{ steps.release-branch.outputs.release-branch }}                       |" >> $GITHUB_STEP_SUMMARY
-        echo "| release-not-behind        | ${{ steps.release-not-behind.outputs.not-behind }}                       |" >> $GITHUB_STEP_SUMMARY
-        echo "| release-no-drafts         | ${{ steps.release-no-drafts.outputs.no-drafts }}                         |" >> $GITHUB_STEP_SUMMARY
-        echo "| release-tag-next          | ${{ steps.release-tag-next.outputs.release-tag-next }}                   |" >> $GITHUB_STEP_SUMMARY
-        echo "| **release**               | ${{ steps.release.outputs.release }}                                     |" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Description                                            | Value                                                   |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------ | ------------------------------------------------------- |" >> $GITHUB_STEP_SUMMARY
+        echo "| publish-manual            | ${{ steps.constants.outputs.DESC_PUBLISH_MANUAL }}     | ${{ steps.publish-manual.outputs.publish-manual }}      |" >> $GITHUB_STEP_SUMMARY
+        echo "| release-auto              | ${{ steps.constants.outputs.DESC_RELEASE_AUTO }}       | ${{ steps.release-auto.outputs.release-auto }}          |" >> $GITHUB_STEP_SUMMARY
+        echo "| release-branch            | ${{ steps.constants.outputs.DESC_RELEASE_BRANCH }}     | ${{ steps.release-branch.outputs.release-branch }}      |" >> $GITHUB_STEP_SUMMARY
+        echo "| release-not-behind        | ${{ steps.constants.outputs.DESC_RELEASE_NOT_BEHIND }} | ${{ steps.release-not-behind.outputs.not-behind }}      |" >> $GITHUB_STEP_SUMMARY
+        echo "| release-no-drafts         | ${{ steps.constants.outputs.DESC_RELEASE_NO_DRAFTS }}  | ${{ steps.release-no-drafts.outputs.no-drafts }}        |" >> $GITHUB_STEP_SUMMARY
+        echo "| release-tag-next          | ${{ steps.constants.outputs.DESC_RELEASE_TAG_NEXT }}   | ${{ steps.release-tag-next.outputs.release-tag-next }}  |" >> $GITHUB_STEP_SUMMARY
+        echo "| **release**               | ${{ steps.constants.outputs.DESC_RELEASE_FLAG }}       | ${{ steps.release.outputs.release }}                    |" >> $GITHUB_STEP_SUMMARY
 
         echo "" >> $GITHUB_STEP_SUMMARY
 
         echo "***Prerelease***" >> $GITHUB_STEP_SUMMARY
-        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
-        echo "| publish-manual            | ${{ steps.publish-manual.outputs.publish-manual }}                       |" >> $GITHUB_STEP_SUMMARY
-        echo "| prerelease-auto           | ${{ steps.prerelease-auto.outputs.prerelease-auto }}                     |" >> $GITHUB_STEP_SUMMARY
-        echo "| prerelease-branch         | ${{ steps.prerelease-branch.outputs.prerelease-branch }}                 |" >> $GITHUB_STEP_SUMMARY
-        echo "| prerelease-not-behind     | ${{ steps.prerelease-not-behind.outputs.not-behind }}                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| **prerelease**            | ${{ steps.prerelease.outputs.prerelease }}                               |" >> $GITHUB_STEP_SUMMARY
-
+        echo "| Key                       | Description                                               | Value                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | --------------------------------------------------------- | -------------------------------------------------------- |" >> $GITHUB_STEP_SUMMARY
+        echo "| publish-manual            | ${{ steps.constants.outputs.DESC_PUBLISH_MANUAL }}        | ${{ steps.publish-manual.outputs.publish-manual }}       |" >> $GITHUB_STEP_SUMMARY
+        echo "| prerelease-auto           | ${{ steps.constants.outputs.DESC_PRERELEASE_AUTO }}       | ${{ steps.prerelease-auto.outputs.prerelease-auto }}     |" >> $GITHUB_STEP_SUMMARY
+        echo "| prerelease-branch         | ${{ steps.constants.outputs.DESC_PRERELEASE_BRANCH }}     | ${{ steps.prerelease-branch.outputs.prerelease-branch }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| prerelease-not-behind     | ${{ steps.constants.outputs.DESC_PRERELEASE_NOT_BEHIND }} | ${{ steps.prerelease-not-behind.outputs.not-behind }}    |" >> $GITHUB_STEP_SUMMARY
+        echo "| **prerelease**            | ${{ steps.constants.outputs.DESC_PRERELEASE_FLAG }}       | ${{ steps.prerelease.outputs.prerelease }}               |" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
 
         echo "***Unpublish Draft***" >> $GITHUB_STEP_SUMMARY
-        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
-        echo "| unpublish-manual          | ${{ steps.unpublish-manual.outputs.unpublish-manual }}                   |" >> $GITHUB_STEP_SUMMARY
-        echo "| unpublish-branch          | ${{ steps.unpublish-branch.outputs.unpublish-branch }}                   |" >> $GITHUB_STEP_SUMMARY
-        echo "| unpublish-draft           | ${{ steps.unpublish-draft.outputs.is-draft }}                            |" >> $GITHUB_STEP_SUMMARY
-        echo "| unpublish-release         | ${{ steps.unpublish-release.outputs.unpublish-release }}                 |" >> $GITHUB_STEP_SUMMARY
-        echo "| **unpublish**             | ${{ steps.unpublish.outputs.unpublish }}                                 |" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Description                                           | Value                                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ----------------------------------------------------- | -------------------------------------------------------- |" >> $GITHUB_STEP_SUMMARY
+        echo "| unpublish-manual          | ${{ steps.constants.outputs.DESC_UNPUBLISH_MANUAL }}  | ${{ steps.unpublish-manual.outputs.unpublish-manual }}   |" >> $GITHUB_STEP_SUMMARY
+        echo "| unpublish-branch          | ${{ steps.constants.outputs.DESC_UNPUBLISH_BRANCH }}  | ${{ steps.unpublish-branch.outputs.unpublish-branch }}   |" >> $GITHUB_STEP_SUMMARY
+        echo "| unpublish-draft           | ${{ steps.constants.outputs.DESC_UNPUBLISH_DRAFT }}   | ${{ steps.unpublish-draft.outputs.is-draft }}            |" >> $GITHUB_STEP_SUMMARY
+        echo "| unpublish-release         | ${{ steps.constants.outputs.DESC_UNPUBLISH_RELEASE }} | ${{ steps.unpublish-release.outputs.unpublish-release }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| **unpublish**             | ${{ steps.constants.outputs.DESC_UNPUBLISH_FLAG }}    | ${{ steps.unpublish.outputs.unpublish }}                 |" >> $GITHUB_STEP_SUMMARY
 
         echo "" >> $GITHUB_STEP_SUMMARY
 
         echo "***Finalize Draft***" >> $GITHUB_STEP_SUMMARY
-        echo "| Key                      | Value                                                                     |" >> $GITHUB_STEP_SUMMARY
-        echo "| ------------------------ | ------------------------------------------------------------------------- |" >> $GITHUB_STEP_SUMMARY
-        echo "| finalize-manual          | ${{ steps.finalize-manual.outputs.finalize-manual }}                      |" >> $GITHUB_STEP_SUMMARY
-        echo "| finalize-branch          | ${{ steps.finalize-branch.outputs.finalize-branch }}                      |" >> $GITHUB_STEP_SUMMARY
-        echo "| finalize-draft           | ${{ steps.finalize-draft.outputs.is-draft }}                              |" >> $GITHUB_STEP_SUMMARY
-        echo "| finalize-release         | ${{ steps.finalize-release.outputs.finalize-release }}                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| **finalize**             | ${{ steps.finalize.outputs.finalize }}                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                      | Description                                          | Value                                                  |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------ | ---------------------------------------------------- | ------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
+        echo "| finalize-manual          | ${{ steps.constants.outputs.DESC_FINALIZE_MANUAL }}  | ${{ steps.finalize-manual.outputs.finalize-manual }}   |" >> $GITHUB_STEP_SUMMARY
+        echo "| finalize-branch          | ${{ steps.constants.outputs.DESC_FINALIZE_BRANCH }}  | ${{ steps.finalize-branch.outputs.finalize-branch }}   |" >> $GITHUB_STEP_SUMMARY
+        echo "| finalize-draft           | ${{ steps.constants.outputs.DESC_FINALIZE_DRAFT }}   | ${{ steps.finalize-draft.outputs.is-draft }}           |" >> $GITHUB_STEP_SUMMARY
+        echo "| finalize-release         | ${{ steps.constants.outputs.DESC_FINALIZE_RELEASE }} | ${{ steps.finalize-release.outputs.finalize-release }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| **finalize**             | ${{ steps.constants.outputs.DESC_FINALIZE_FLAG }}    | ${{ steps.finalize.outputs.finalize }}                 |" >> $GITHUB_STEP_SUMMARY
 
         echo "" >> $GITHUB_STEP_SUMMARY
 
         echo "***Branches***" >> $GITHUB_STEP_SUMMARY
-        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
-        echo "| release on default branch | ${{ inputs.release-on-default-branch }}                                  |" >> $GITHUB_STEP_SUMMARY
-        echo "| branch-default            | ${{ steps.branch-default.outputs.branch-default }}                       |" >> $GITHUB_STEP_SUMMARY
-        echo "| branch-event              | ${{ steps.branch-event.outputs.branch-event }}                           |" >> $GITHUB_STEP_SUMMARY
-        echo "| branch-build              | ${{ steps.branch-build.outputs.branch-build }}                           |" >> $GITHUB_STEP_SUMMARY
-        echo "| branch-publish            | ${{ steps.branch-publish.outputs.branch-publish }}                       |" >> $GITHUB_STEP_SUMMARY
-        echo "| branch-update             | ${{ steps.branch-update.outputs.branch-update }}                         |" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Description                                                   | Value                                              |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------------- | -------------------------------------------------- |" >> $GITHUB_STEP_SUMMARY
+        echo "| release on default branch | ${{ steps.constants.outputs.DESC_RELEASE_ON_DEFAULT_BRANCH }} | ${{ inputs.release-on-default-branch }}            |" >> $GITHUB_STEP_SUMMARY
+        echo "| branch-default            | ${{ steps.constants.outputs.DESC_BRANCH_DEFAULT }}            | ${{ steps.branch-default.outputs.branch-default }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| branch-event              | ${{ steps.constants.outputs.DESC_BRANCH_EVENT }}              | ${{ steps.branch-event.outputs.branch-event }}     |" >> $GITHUB_STEP_SUMMARY
+        echo "| branch-build              | ${{ steps.constants.outputs.DESC_BRANCH_BUILD }}              | ${{ steps.branch-build.outputs.branch-build }}     |" >> $GITHUB_STEP_SUMMARY
+        echo "| branch-publish            | ${{ steps.constants.outputs.DESC_BRANCH_PUBLISH }}            | ${{ steps.branch-publish.outputs.branch-publish }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| branch-update             | ${{ steps.constants.outputs.DESC_BRANCH_UPDATE }}             | ${{ steps.branch-update.outputs.branch-update }}   |" >> $GITHUB_STEP_SUMMARY
 
         echo "" >> $GITHUB_STEP_SUMMARY
 
         echo "***Response***" >> $GITHUB_STEP_SUMMARY
-        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
-        echo "| response-publish          | ${{ steps.response-publish.outputs.response-publish }}                   |" >> $GITHUB_STEP_SUMMARY
-        echo "| response-unpublish        | ${{ steps.response-unpublish.outputs.response-unpublish }}               |" >> $GITHUB_STEP_SUMMARY
-        echo "| response-finalize         | ${{ steps.response-finalize.outputs.response-finalize }}                 |" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Description                                            | Value                                                      |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ------------------------------------------------------ | ---------------------------------------------------------- |" >> $GITHUB_STEP_SUMMARY
+        echo "| response-publish          | ${{ steps.constants.outputs.DESC_RESPONSE_PUBLISH }}   | ${{ steps.response-publish.outputs.response-publish }}     |" >> $GITHUB_STEP_SUMMARY
+        echo "| response-unpublish        | ${{ steps.constants.outputs.DESC_RESPONSE_UNPUBLISH }} | ${{ steps.response-unpublish.outputs.response-unpublish }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| response-finalize         | ${{ steps.constants.outputs.DESC_RESPONSE_FINALIZE }}  | ${{ steps.response-finalize.outputs.response-finalize }}   |" >> $GITHUB_STEP_SUMMARY
 
         echo "" >> $GITHUB_STEP_SUMMARY
 
         echo "***Control***" >> $GITHUB_STEP_SUMMARY
-        echo "| Key                       | Value                                                                    |" >> $GITHUB_STEP_SUMMARY
-        echo "| ------------------------- | ------------------------------------------------------------------------ |" >> $GITHUB_STEP_SUMMARY
-        echo "| update                    | ${{ steps.update.outputs.update }}                                       |" >> $GITHUB_STEP_SUMMARY
-        echo "| build                     | ${{ steps.build.outputs.build }}                                         |" >> $GITHUB_STEP_SUMMARY
-        echo "| publish                   | ${{ steps.publish.outputs.publish }}                                     |" >> $GITHUB_STEP_SUMMARY
-        echo "| draft                     | ${{ steps.draft.outputs.draft }}                                         |" >> $GITHUB_STEP_SUMMARY
-        echo "| finalize                  | ${{ steps.finalize.outputs.finalize }}                                   |" >> $GITHUB_STEP_SUMMARY
-        echo "| unpublish                 | ${{ steps.unpublish.outputs.unpublish }}                                 |" >> $GITHUB_STEP_SUMMARY
+        echo "| Key                       | Description                                           | Value                                    |" >> $GITHUB_STEP_SUMMARY
+        echo "| ------------------------- | ----------------------------------------------------- | ---------------------------------------- |" >> $GITHUB_STEP_SUMMARY
+        echo "| update                    | ${{ steps.constants.outputs.DESC_CONTROL_UPDATE }}    | ${{ steps.update.outputs.update }}       |" >> $GITHUB_STEP_SUMMARY
+        echo "| build                     | ${{ steps.constants.outputs.DESC_CONTROL_BUILD }}     | ${{ steps.build.outputs.build }}         |" >> $GITHUB_STEP_SUMMARY
+        echo "| publish                   | ${{ steps.constants.outputs.DESC_CONTROL_PUBLISH }}   | ${{ steps.publish.outputs.publish }}     |" >> $GITHUB_STEP_SUMMARY
+        echo "| draft                     | ${{ steps.constants.outputs.DESC_CONTROL_DRAFT }}     | ${{ steps.draft.outputs.draft }}         |" >> $GITHUB_STEP_SUMMARY
+        echo "| finalize                  | ${{ steps.constants.outputs.DESC_CONTROL_FINALIZE }}  | ${{ steps.finalize.outputs.finalize }}   |" >> $GITHUB_STEP_SUMMARY
+        echo "| unpublish                 | ${{ steps.constants.outputs.DESC_CONTROL_UNPUBLISH }} | ${{ steps.unpublish.outputs.unpublish }} |" >> $GITHUB_STEP_SUMMARY
 
     # issue
     - id: issue
