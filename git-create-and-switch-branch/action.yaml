@@ -20,5 +20,4 @@ runs:
         elif [[ $EXIT_CODE == '2' ]]; then
           echo "Git branch '${{ inputs.branch }}' does not exist in the remote repository"
           git checkout -b ${{ inputs.branch }}
-          git push --set-upstream origin ${{ inputs.branch }}
         fi
