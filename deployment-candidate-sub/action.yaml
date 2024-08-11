@@ -23,8 +23,8 @@ inputs:
   tfvars-regex:
     description: Regex of value in tfvars file
     required: true
-  branch-update-base:
-    description: Base name of temporary branch to use for creating update
+  branch-deployment-base:
+    description: Base name of branch to use for deployment
     required: true
   timestamp:
     description: Timestamp temporary branch to use for creating update
@@ -59,9 +59,9 @@ runs:
       id: branch
       run: |
         if [[ "${{ inputs.timestamp }}" == "false" ]]; then
-          branch=${{ inputs.branch-update-base }}-${{ inputs.component }}-${{ inputs.env }}
+          branch=${{ inputs.branch-deployment-base }}-${{ inputs.component }}-${{ inputs.env }}
         else
-          branch=${{ inputs.branch-update-base }}-${{ inputs.component }}-${{ inputs.env }}${{ inputs.env != '' && '-' || '' }}${{ steps.timestamp.outputs.timestamp }}
+          branch=${{ inputs.branch-deployment-base }}-${{ inputs.component }}-${{ inputs.env }}${{ inputs.env != '' && '-' || '' }}${{ steps.timestamp.outputs.timestamp }}
         fi
         echo "branch=$branch" >> $GITHUB_OUTPUT
 
