@@ -32,13 +32,13 @@ runs:
         branch: ${{ inputs.branch-event }}
 
     # git-create-and-switch-branch
-    - uses: aps831/gh-actions/git-create-and-switch-branch@master
+    - uses: aps831/gh-actions/git-create-and-switch-branch@fix/avoid-git-push
       if: ${{ inputs.branch-event != inputs.branch-update }}
       with:
         branch: ${{ inputs.branch-update }}
 
     # git-configure
-    - uses: aps831/gh-actions/git-configure@master
+    - uses: aps831/gh-actions/git-configure@fix/avoid-git-push
 
     # update-templated-docs
     - uses: aps831/gh-actions/update-templated-docs@master
