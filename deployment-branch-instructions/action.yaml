@@ -18,8 +18,10 @@ runs:
         environments="${{ inputs.environments }}"
         message="Available deployment commands are:\n"
         while IFS= read -r environment || [ -n "$environment" ]; do
-          message=$message" - \`.noop to $environment\` for a noop deployment\n"
-          message=$message" - \`.deploy to $environment\` for an actual deployment\n"
+          if [[ "$environment" != "" ]]; then
+            message=$message" - \`.noop to $environment\` for a noop deployment\n"
+            message=$message" - \`.deploy to $environment\` for an actual deployment\n"
+          fi
         done <<< "$environments"
         echo 'message<<EOF' >> $GITHUB_OUTPUT
         echo -e $message >> $GITHUB_OUTPUT
