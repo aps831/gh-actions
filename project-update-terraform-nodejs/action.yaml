@@ -75,6 +75,8 @@ runs:
 
     # update-terraform-vars
     - uses: aps831/gh-actions/update-terraform-vars@master
+      if:
+        ${{ inputs.tfvars-filename != '' && inputs.tfvars-var != '' && inputs.tfvars-regex != '' }}
       with:
         version-identifier: ${{ inputs.tag }}
         working-directory: ${{ inputs.working-directory-terraform }}
