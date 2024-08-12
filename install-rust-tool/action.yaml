@@ -8,6 +8,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: taiki-e/install-action@5be08121a64dab5197b48a185ea5e0aedb0ccbb5 # pin@v2
+    - uses: taiki-e/install-action@8efaa9bb37d22aefc9d331dfbd45e2d230acfc33 # pin@v2
       with:
         tool: ${{ inputs.tool }}
