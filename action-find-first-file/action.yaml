@@ -1,0 +1,23 @@
+---
+name: Action Find First File
+description: Find first file
+inputs:
+  filename:
+    description: Filename to search
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+outputs:
+  file:
+    description: Path to first file
+    value: ${{ steps.file.outputs.file }}
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      id: file
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        FILE=$(find -name "${{ inputs.filename }}" -printf "${{ inputs.working-directory }}/%p\n" | head -n 1 | tr -d '\n')
+        echo "file=$FILE" >> $GITHUB_OUTPUT

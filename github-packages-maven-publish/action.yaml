@@ -23,23 +23,6 @@ runs:
       with:
         pattern: ${{ inputs.build-artifacts-upload-name }}
 
-    # make target directory
-    - name: make target directory
-      working-directory: ${{ steps.artifacts-folder.outputs.artifacts-folder }}
-      shell: bash
-      run: mkdir target
-
-    # move artifacts into target
-    - name: make target directory
-      working-directory: ${{ steps.artifacts-folder.outputs.artifacts-folder }}
-      shell: bash
-      run: |
-        for file in *; do
-          if [ ! -d "$file" ]; then
-            mv "$file" target/
-          fi
-        done
-
     # Publish
     - name: Publish package
       working-directory: ${{ steps.artifacts-folder.outputs.artifacts-folder }}
@@ -55,3 +38,32 @@ runs:
       env:
         GITHUB_USER_REF: ${{ github.actor }}
         GITHUB_TOKEN_REF: ${{ inputs.ACCESS_TOKEN }}
+
+    # generate artifact attestation
+    - name: Generate artifact attestation
+      if: ${{ github.event.repository.visibility == 'public' }}
+      uses: actions/attest-build-provenance@310b0a4a3b0b78ef57ecda988ee04b132db73ef8 # pin@v1
+      with:
+        subject-path:
+          ${{ steps.artifacts-folder.outputs.artifacts-folder }}/${{
+          inputs.build-artifacts-upload-name }}/*.jar
+
+    # find-first-file
+    - uses: aps831/gh-actions/action-find-first-file@master
+      id: json-file
+      if: ${{ github.event.repository.visibility == 'public' }}
+      with:
+        filename: "*cyclonedx*.json"
+        working-directory:
+          ${{ steps.artifacts-folder.outputs.artifacts-folder }}/${{
+          inputs.build-artifacts-upload-name }}
+
+    # generate sbom attestation
+    - name: Generate SBOM attestation
+      if: ${{ github.event.repository.visibility == 'public' }}
+      uses: actions/attest-sbom@f19ab44411e02574a74181cec8eb584319d0f779 # pin@v1
+      with:
+        subject-path:
+          ${{ steps.artifacts-folder.outputs.artifacts-folder }}/${{
+          inputs.build-artifacts-upload-name }}/*.jar
+        sbom-path: ${{ steps.json-file.outputs.file }}
