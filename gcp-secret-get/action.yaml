@@ -23,4 +23,5 @@ runs:
       id: value
       run: |
         value=$(gcloud secrets versions access latest --secret=${{ inputs.secret-id }} --project=${{ inputs.gcp-project }} --quiet)
+        echo "::add-mask::$value"
         echo "value=$value" >> $GITHUB_OUTPUT
