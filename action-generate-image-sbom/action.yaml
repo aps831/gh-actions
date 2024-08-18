@@ -1,0 +1,17 @@
+---
+name: Action Generate Image SBOM
+description: Generate image SBOM
+inputs:
+  image-tar-path:
+    description: Path to tar file of image
+    required: true
+  sbom-path:
+    description: Path to save SBOM to
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        npm install -g @cyclonedx/cdxgen
+        cdxgen ${{ inputs.image-tar-path }} -o ${{ inputs.sbom-path }} -t docker
