@@ -28,13 +28,13 @@ runs:
     - uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 # pin@v3.4.0
 
     # build-artifacts-download
-    - uses: aps831/gh-actions/action-publish-artifacts-download@master
+    - uses: aps831/gh-actions/action-publish-artifacts-download@f7725b1c8150b68dbbd0198403733b889940a05f # pin@master
       id: artifacts-folder
       with:
         pattern: ${{ inputs.build-artifacts-upload-name }}
 
     # git-short-hash
-    - uses: aps831/gh-actions/git-short-hash@master
+    - uses: aps831/gh-actions/git-short-hash@f7725b1c8150b68dbbd0198403733b889940a05f # pin@master
       id: hash
 
     # load docker image
@@ -43,7 +43,7 @@ runs:
         ${{ steps.artifacts-folder.outputs.artifacts-folder }}/${{
         inputs.build-artifacts-upload-name }}
       run: |
-        for file in *; do
+        for file in *.tar; do
           docker load --input $file
         done
 
@@ -83,16 +83,45 @@ runs:
       run: |
         digest=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ steps.base.outputs.base }})
         digest="${digest##*@}"
-        echo "digest=${{ steps.base.outputs.base }}@$digest" >> $GITHUB_OUTPUT
+        echo "digest=$digest" >> $GITHUB_OUTPUT
 
     # sign image
     - name: Sign image with a key
       shell: bash
       run: |
-        cosign sign --yes --key env://COSIGN_PRIVATE_KEY "${{ steps.digest.outputs.digest }}"
+        cosign sign --yes --key env://COSIGN_PRIVATE_KEY "${{ steps.base.outputs.base }}@${{ steps.digest.outputs.digest }}"
       env:
         COSIGN_PRIVATE_KEY: ${{ inputs.COSIGN_PRIVATE_KEY }}
         COSIGN_PASSWORD: ${{ inputs.COSIGN_PASSWORD }}
+
+    # generate artifact attestation
+    - name: Generate artifact attestation
+      if: ${{ github.event.repository.visibility == 'public' }}
+      uses: actions/attest-build-provenance@310b0a4a3b0b78ef57ecda988ee04b132db73ef8 # pin@v1
+      with:
+        subject-name: ${{ steps.base.outputs.base }}
+        subject-digest: ${{ steps.digest.outputs.digest }}
+        push-to-registry: true
+
+    # find-first-file
+    - uses: aps831/gh-actions/action-find-first-file@master
+      id: json-file
+      if: ${{ github.event.repository.visibility == 'public' }}
+      with:
+        filename: "*cyclonedx*.json"
+        working-directory:
+          ${{ steps.artifacts-folder.outputs.artifacts-folder }}/${{
+          inputs.build-artifacts-upload-name }}
+
+    # generate sbom attestation
+    - name: Generate SBOM attestation
+      if: ${{ github.event.repository.visibility == 'public' }}
+      uses: actions/attest-sbom@f19ab44411e02574a74181cec8eb584319d0f779 # pin@v1
+      with:
+        subject-name: ${{ steps.base.outputs.base }}
+        subject-digest: ${{ steps.digest.outputs.digest }}
+        sbom-path: ${{ steps.json-file.outputs.file }}
+        push-to-registry: true
 
     # delete downloaded artifacts
     - shell: bash
