@@ -37,7 +37,7 @@ inputs:
 outputs:
   build-artifacts-publish-upload-name:
     description: Name of publication build image upload
-    value: ${{ steps.release-artifacts-upload.outputs.name }}
+    value: ${{ steps.publish-artifacts-upload.outputs.name }}
 runs:
   using: "composite"
   steps:
@@ -134,7 +134,7 @@ runs:
     # publish-artifacts-upload
     - uses: aps831/gh-actions/action-publish-artifacts-upload@master
       if: ${{ inputs.upload-image == 'true' }}
-      id: release-artifacts-upload
+      id: publish-artifacts-upload
       with:
         description: ${{ inputs.image-name }}-image
         working-directory: ${{ env.TEMP_DIR }}
