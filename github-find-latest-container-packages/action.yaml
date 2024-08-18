@@ -40,7 +40,7 @@ runs:
               package_name: container.name
             });
 
-            const packageVersion = packageVersions.filter(pv => !pv.metadata.container.tags.some(tag => tag.startsWith("sha256-")))[0]
+            const packageVersion = packageVersions.filter(pv => !pv.metadata.container.tags.some(tag => tag.startsWith("sha256-") || tag === "" ))[0]
 
             if (packageVersion != undefined) {
               images.push({
