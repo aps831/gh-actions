@@ -35,19 +35,15 @@ inputs:
   test-result-files:
     description: Test result files relative to working directory
     required: true
-  release-artifacts-name-prefix:
-    description: Prefix for release artifacts name
-    required: true
-  release-artifacts-files:
-    description: Release artifact files relative to working directory
-    required: true
   ACCESS_TOKEN:
     description: Access token
     required: true
 outputs:
   build-artifacts-release-upload-name:
     description: Name of release build artifacts upload
-    value: ${{ inputs.stage-output != '' && steps.release-artifacts-upload.outputs.name || '' }}
+    value:
+      ${{ inputs.stage-output != '' && steps.image.outputs.build-artifacts-release-upload-name || ''
+      }}
   build-artifacts-publish-upload-name:
     description: Name of publication build image upload
     value: ${{ steps.image.outputs.build-artifacts-publish-upload-name }}
@@ -92,12 +88,3 @@ runs:
         working-directory: ${{ inputs.working-directory }}
         component-name: ${{ inputs.image-name }}
         test-result-files: ${{ inputs.test-result-files }}
-
-    # release-artifacts-upload
-    - uses: aps831/gh-actions/action-release-artifacts-upload@master
-      id: release-artifacts-upload
-      if: ${{ inputs.stage-output != '' }}
-      with:
-        description: ${{ inputs.release-artifacts-name-prefix }}-${{ inputs.image-name }}
-        working-directory: ${{ inputs.working-directory }}
-        build-files: ${{ inputs.release-artifacts-files }}
