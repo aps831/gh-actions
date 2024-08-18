@@ -19,4 +19,5 @@ runs:
       id: value
       run: |
         value=$(aws ssm get-parameter  --with-decryption --name ${{ inputs.secret-name }} --region ${{ inputs.region }} | jq -r '.Parameter.Value')
+        echo "::add-mask::$value"
         echo "value=$value" >> $GITHUB_OUTPUT
