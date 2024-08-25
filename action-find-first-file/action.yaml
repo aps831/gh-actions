@@ -21,3 +21,10 @@ runs:
       run: |
         FILE=$(find -name "${{ inputs.filename }}" -printf "${{ inputs.working-directory }}/%p\n" | head -n 1 | tr -d '\n')
         echo "file=$FILE" >> $GITHUB_OUTPUT
+
+    - shell: bash
+      run: |
+        if [[ "${{ steps.file.outputs.file }}" == "" ]]; then
+          echo "::error ::No file found when searching for '${{ inputs.filename }}' in '${{ inputs.working-directory }}'"
+          exit 1
+        fi
