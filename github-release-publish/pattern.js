@@ -1,13 +1,5 @@
 let strings = process.argv[2].split("\n");
 
-String.prototype.strstr = function (search) {
-  var position = this.indexOf(search);
-  if (position == -1) {
-    return "";
-  }
-  return this.slice(position);
-};
-
 function downloadPattern(strings) {
   const nonEmptyStrings = strings.filter((s) => s.length > 0);
   if (nonEmptyStrings.length == 0) {
