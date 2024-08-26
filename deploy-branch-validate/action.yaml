@@ -24,9 +24,6 @@ outputs:
   changes:
     description: Flag to indicate that branch has changes
     value: ${{ steps.changes.outputs.changes }}
-  valid:
-    description: Flag to indicate if deploy branch is valid
-    value: ${{ steps.valid.outputs.valid }}
 runs:
   using: "composite"
   steps:
@@ -64,15 +61,7 @@ runs:
         echo "| not-ahead-by | ${{ steps.not-ahead-by.outputs.not-ahead-by }} |" >> $GITHUB_STEP_SUMMARY
         echo "| changes      | ${{ steps.changes.outputs.changes }}           |" >> $GITHUB_STEP_SUMMARY
 
-    - id: valid
-      shell: bash
+    - shell: bash
       run: |
-        if [[ "${{ steps.not-behind.outputs.not-behind }}" == "false" ]]; then
-          echo "valid=false" >> $GITHUB_OUTPUT
-        elif [[ "${{ steps.not-ahead-by.outputs.not-ahead-by }}" == "false" ]]; then
-          echo "valid=false" >> $GITHUB_OUTPUT
-        elif [[ "${{ steps.changes.outputs.changes }}" == "false" ]]; then
-          echo "valid=false" >> $GITHUB_OUTPUT
-        else
-          echo "valid=true" >> $GITHUB_OUTPUT
-        fi
+        echo "::error ::branch validation failed"
+        exit 1
