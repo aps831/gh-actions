@@ -14,9 +14,26 @@ runs:
     # set up nodejs
     - uses: aps831/gh-actions/set-up-nodejs@master
 
+    # create temp dir
+    - id: tmpdir
+      shell: bash
+      run: |
+        echo "tmpdir=$(mktemp -d)" >> $GITHUB_OUTPUT
+
+    # pack
+    - shell: bash
+      run: npm pack --pack-destination ${{ steps.tmpdir.outputs.tmpdir }}
+      working-directory: ${{ inputs.working-directory }}
+
+    # find-first-file
+    - uses: aps831/gh-actions/action-find-first-file@master
+      id: package
+      with:
+        filename: "*.tgz"
+        working-directory: ${{ steps.tmpdir.outputs.tmpdir }}
+
     # publish
     - shell: bash
-      run: npm publish
-      working-directory: ${{ inputs.working-directory }}
+      run: npm publish ${{ steps.package.outputs.file }}
       env:
         NODE_AUTH_TOKEN: ${{ inputs.ACCESS_TOKEN}}
