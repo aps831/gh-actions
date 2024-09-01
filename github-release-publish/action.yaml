@@ -39,13 +39,10 @@ runs:
         tag: ${{ inputs.tag }}
 
     # calculate pattern from build-artifacts-upload-name
-    - shell: bash
+    - uses: aps831/gh-actions/action-find-longest-common-pattern@master
       id: pattern
-      run: |
-        pattern=$(node ${{ github.action_path }}/pattern.js $'${{ inputs.build-artifacts-upload-name }}')
-        echo 'pattern<<EOF' >> $GITHUB_OUTPUT
-        echo $pattern >> $GITHUB_OUTPUT
-        echo 'EOF' >> $GITHUB_OUTPUT
+      with:
+        names: ${{ inputs.build-artifacts-upload-name }}
 
     # release-artifacts-download
     - uses: aps831/gh-actions/action-release-artifacts-download@master
