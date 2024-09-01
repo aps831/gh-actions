@@ -20,7 +20,11 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: |
         FILE=$(find -name "${{ inputs.filename }}" -printf "${{ inputs.working-directory }}/%p\n" | head -n 1 | tr -d '\n')
-        echo "file=$FILE" >> $GITHUB_OUTPUT
+        if [[ "$FILE" != "" ]]; then
+          echo "file=$(realpath $FILE)" >> $GITHUB_OUTPUT
+        else
+          echo "file=" >> $GITHUB_OUTPUT
+        fi
 
     - shell: bash
       run: |
