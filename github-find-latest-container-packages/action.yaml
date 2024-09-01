@@ -28,7 +28,7 @@ runs:
             visibility: "public"
           });
 
-          const containers = private_packages.concat(public_packages).filter(p => p.repository.name == context.repo.repo);
+          const containers = private_packages.concat(public_packages).filter(p => p.repository?.name == context.repo.repo);
 
           var images = [];
 
