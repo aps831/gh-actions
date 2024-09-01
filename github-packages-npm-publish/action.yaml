@@ -5,6 +5,9 @@ inputs:
   working-directory:
     description: Working directory
     required: true
+  build-artifacts-upload-name:
+    description: Newline separated list of names of build artifacts upload
+    required: true
   ACCESS_TOKEN:
     description: Access token
     required: true
@@ -31,6 +34,41 @@ runs:
       with:
         filename: "*.tgz"
         working-directory: ${{ steps.tmpdir.outputs.tmpdir }}
+
+    # generate artifact attestation
+    - name: Generate artifact attestation
+      if: ${{ github.event.repository.visibility == 'public' }}
+      uses: actions/attest-build-provenance@310b0a4a3b0b78ef57ecda988ee04b132db73ef8 # pin@v1
+      with:
+        subject-path: ${{ steps.package.outputs.file }}
+
+    # calculate pattern from build-artifacts-upload-name
+    - uses: aps831/gh-actions/action-find-longest-common-pattern@master
+      id: pattern
+      with:
+        names: ${{ inputs.build-artifacts-upload-name }}
+
+    # release-artifacts-download
+    - uses: aps831/gh-actions/action-release-artifacts-download@master
+      id: artifacts-folder
+      with:
+        pattern: ${{ steps.pattern.outputs.pattern }}
+
+    # find-first-file
+    - uses: aps831/gh-actions/action-find-first-file@master
+      id: json-file
+      if: ${{ github.event.repository.visibility == 'public' }}
+      with:
+        filename: "*cyclonedx*.json"
+        working-directory: ${{ steps.artifacts-folder.outputs.artifacts-folder }}
+
+    # generate sbom attestation
+    - name: Generate SBOM attestation
+      if: ${{ github.event.repository.visibility == 'public' }}
+      uses: actions/attest-sbom@f19ab44411e02574a74181cec8eb584319d0f779 # pin@v1
+      with:
+        subject-path: ${{ steps.package.outputs.file }}
+        sbom-path: ${{ steps.json-file.outputs.file }}
 
     # publish
     - shell: bash
