@@ -1,0 +1,21 @@
+---
+name: Action Find Longest Common Pattern
+description: Find longest common pattern
+inputs:
+  names:
+    description: Newline separated list of names
+    required: true
+outputs:
+  pattern:
+    description: Longest common pattern
+    value: ${{ steps.pattern.outputs.pattern }}
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      id: pattern
+      run: |
+        pattern=$(node ${{ github.action_path }}/pattern.js $'${{ inputs.names }}')
+        echo 'pattern<<EOF' >> $GITHUB_OUTPUT
+        echo $pattern >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
