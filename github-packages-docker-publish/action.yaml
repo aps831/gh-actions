@@ -25,7 +25,7 @@ runs:
   using: "composite"
   steps:
     # cosign-installer
-    - uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 # pin@v3.4.0
+    - uses: sigstore/cosign-installer@4959ce089c160fddf62f7b42464195ba1a56d382 # pin@v3.6.0
 
     # build-artifacts-download
     - uses: aps831/gh-actions/action-publish-artifacts-download@f7725b1c8150b68dbbd0198403733b889940a05f # pin@master
@@ -97,7 +97,7 @@ runs:
     # generate artifact attestation
     - name: Generate artifact attestation
       if: ${{ github.event.repository.visibility == 'public' }}
-      uses: actions/attest-build-provenance@310b0a4a3b0b78ef57ecda988ee04b132db73ef8 # pin@v1
+      uses: actions/attest-build-provenance@6149ea5740be74af77f260b9db67e633f6b0a9a1 # pin@v1
       with:
         subject-name: ${{ steps.base.outputs.base }}
         subject-digest: ${{ steps.digest.outputs.digest }}
@@ -116,7 +116,7 @@ runs:
     # generate sbom attestation
     - name: Generate SBOM attestation
       if: ${{ github.event.repository.visibility == 'public' }}
-      uses: actions/attest-sbom@f19ab44411e02574a74181cec8eb584319d0f779 # pin@v1
+      uses: actions/attest-sbom@5026d3663739160db546203eeaffa6aa1c51a4d6 # pin@v1
       with:
         subject-name: ${{ steps.base.outputs.base }}
         subject-digest: ${{ steps.digest.outputs.digest }}
