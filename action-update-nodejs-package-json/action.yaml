@@ -2,8 +2,8 @@
 name: Action Update Nodejs Package Json
 description: Update Nodejs package json
 inputs:
-  files:
-    description: Newline separated list of files
+  working-directory:
+    description: Working directory
     required: true
   version:
     description: Version to use in package.json
@@ -13,12 +13,6 @@ runs:
   steps:
     - name: update version
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: |
-        files="${{ inputs.files }}"
-        while IFS= read -r file || [ -n "$file" ]; do
-          if [[ -f "$file" ]]; then
-            mv "$file" "$file"".bak"
-            jq '.version = "${{ inputs.version }}"' "$file"".bak" > "$file"
-            rm "$file"".bak"
-          fi
-        done <<< "$files"
+        npm version --commit-hooks false --git-tag-version false ${{ inputs.version }}

@@ -14,10 +14,12 @@ runs:
     # update-nodejs-package-json
     - uses: aps831/gh-actions/action-update-nodejs-package-json@master
       with:
-        files: ${{ inputs.working-directory}}/package.json
+        working-directory: ${{ inputs.working-directory}}
         version: ${{ inputs.version }}
 
     # git-add-file
     - uses: aps831/gh-actions/git-add-file@master
       with:
-        files: ${{ inputs.working-directory}}/package.json
+        files: |
+          ${{ inputs.working-directory}}/package.json
+          ${{ inputs.working-directory}}/package-lock.json
