@@ -10,7 +10,7 @@ runs:
   steps:
     - name: Render terraform docs
       id: render
-      uses: terraform-docs/gh-actions@f6d59f89a280fa0a3febf55ef68f146784b20ba0 # pin@v1.0.0
+      uses: terraform-docs/gh-actions@e47bfa196e79fa50987ef391be236d9d97b0c786 # pin@v1.2.0
       with:
         find-dir: ${{ inputs.working-directory }}
         output-file: TERRAFORM.md
