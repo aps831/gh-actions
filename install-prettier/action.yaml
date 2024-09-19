@@ -1,0 +1,8 @@
+---
+name: Install prettier
+description: Install prettier
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: npm install -g prettier@latest
