@@ -15,9 +15,18 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - uses: aps831/gh-actions/install-prettier@master
+
     - uses: orhun/git-cliff-action@b7913b664658dd091d9971658cb02a19047baa79 # pin@v2
       id: git-cliff
       with:
         args: ${{ inputs.start-tag }}..${{ inputs.current-tag }}
       env:
         OUTPUT: CHANGELOG.md
+
+    - shell: bash
+      run: prettier -w CHANGELOG.md
+
+    - shell: bash
+      run: |
+        sed -i '1s/^/<!-- markdownlint-disable MD024 -->\n\n/' CHANGELOG.md
