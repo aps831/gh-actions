@@ -62,6 +62,9 @@ runs:
         echo "| changes      | ${{ steps.changes.outputs.changes }}           |" >> $GITHUB_STEP_SUMMARY
 
     - shell: bash
+      if:
+        ${{ steps.not-behind.outputs.not-behind != 'true' || steps.not-ahead-by.outputs.not-ahead-by
+        != 'true' || steps.changes.outputs.changes != 'true' }}
       run: |
         echo "::error ::branch validation failed"
         exit 1
