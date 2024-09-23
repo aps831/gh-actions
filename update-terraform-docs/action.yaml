@@ -8,45 +8,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # install prettier
-    - uses: aps831/gh-actions/install-prettier@master
-
-    # create terraform docs
-    - uses: terraform-docs/gh-actions@f6d59f89a280fa0a3febf55ef68f146784b20ba0 # pin@v1.0.0
-      with:
-        find-dir: ${{ inputs.working-directory }}
-        output-file: TERRAFORM.md
-        output-method: replace
-        template: |
-          <!-- BEGIN_TF_DOCS -->
-          <!-- markdownlint-disable MD041 -->
-
-          {{ .Content }}
-          <!-- END_TF_DOCS -->
-
-    # fix ownership
-    - name: Fix .git owner
-      shell: bash
-      run: sudo chown runner:docker -R .git
-
-    # find-files
-    - uses: aps831/gh-actions/action-find-files@master
-      id: files
+    - uses: aps831/gh-actions/action-update-terraform-docs@master
+      id: update
       with:
         working-directory: ${{ inputs.working-directory }}
-        filename: TERRAFORM.md
 
-    # format
-    - shell: bash
-      run: |
-        files="${{ steps.files.outputs.files }}"
-        while IFS= read -r file || [ -n "$file" ]; do
-          if [[ -f "$file" ]]; then
-            prettier -w $file
-          fi
-        done <<< "$files"
-
-    # git-add-file
     - uses: aps831/gh-actions/git-add-file@master
       with:
-        files: ${{ steps.files.outputs.files }}
+        files: ${{ steps.update.outputs.files }}
