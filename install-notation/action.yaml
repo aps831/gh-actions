@@ -1,0 +1,8 @@
+---
+name: Install Notation
+description: Install Notation
+runs:
+  using: "composite"
+  steps:
+    - name: setup notation
+      uses: notaryproject/notation-action/setup@104aa999103172f827373af8ac14dde7aa6d28f1 # pin@v1

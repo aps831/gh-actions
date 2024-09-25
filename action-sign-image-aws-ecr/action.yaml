@@ -1,0 +1,27 @@
+---
+name: Action Sign Image AWS ECR
+description: Sign image on AWS ECR
+inputs:
+  image:
+    description: Image to sign
+    required: true
+  aws-signer-profile-arn:
+    description: ARN of AWS signer
+    required: true
+  aws-region:
+    description: AWS region
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # There is no URL pinned to a version.  The checksum is for v1.0.298
+    - uses: notaryproject/notation-action/sign@104aa999103172f827373af8ac14dde7aa6d28f1 # pin@v1
+      with:
+        plugin_name: com.amazonaws.signer.notation.plugin
+        plugin_url: https://d2hvyiie56hcat.cloudfront.net/linux/amd64/plugin/latest/notation-aws-signer-plugin.zip
+        plugin_checksum: cccfe8fdcdf853d83fd57ffc80524eddda75ad7ae9d9a257b087007230ec02f9
+        key_id: ${{ inputs.aws-signer-profile-arn }}
+        target_artifact_reference: ${{ inputs.image }}
+        plugin_config: |
+          aws-region=${{ inputs.aws-region }}
+        allow_referrers_api: false
