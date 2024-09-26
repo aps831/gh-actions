@@ -14,6 +14,10 @@ inputs:
   COSIGN_PUBLIC_KEY:
     description: Cosign public key
     required: true
+outputs:
+  image-to-with-digest:
+    description: Docker image with digest
+    value: ${{ steps.digest.outputs.image-to-with-digest }}
 runs:
   using: "composite"
   steps:
@@ -43,3 +47,14 @@ runs:
     - uses: aps831/gh-actions/docker-push@master
       with:
         image: ${{ inputs.image-to }}
+
+    - shell: bash
+      id: digest
+      run: |
+        DIGEST=$(docker manifest inspect --verbose ${{ inputs.image-to }} | \
+          jq -r 'if type=="object"
+            then .Descriptor.digest
+            else .[] | select(.Descriptor.platform.architecture=="amd64" and .Descriptor.platform.os=="linux") | .Descriptor.digest
+            end')
+        IMAGE=$(echo "${{ inputs.image-to }}" | sed 's/[^:]*$/@/' | sed 's/:@/@/')"$DIGEST"
+        echo "image-to-with-digest=$IMAGE" >> $GITHUB_OUTPUT
