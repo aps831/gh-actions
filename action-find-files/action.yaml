@@ -22,8 +22,8 @@ runs:
     - name: find files
       working-directory: ${{ inputs.working-directory }}
       run:
-        find -name ${{ inputs.filename }} -printf "$(realpath ${{ inputs.working-directory }}/%p)\n"
-        > ${{ env.TEMP_FILE }}
+        find -name ${{ inputs.filename }} -printf "$(realpath ${{ github.workspace }}/${{
+        inputs.working-directory }}/%p)\n" > ${{ env.TEMP_FILE }}
       shell: bash
 
     - name: output files
