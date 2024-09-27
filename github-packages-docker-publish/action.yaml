@@ -125,10 +125,5 @@ runs:
 
     # delete downloaded artifacts
     - shell: bash
-      working-directory:
-        ${{ steps.artifacts-folder.outputs.artifacts-folder }}/${{
-        inputs.build-artifacts-upload-name }}
       run: |
-        for file in *; do
-          rm $file
-        done
+        rm -rf ${{ steps.artifacts-folder.outputs.artifacts-folder }}/${{ inputs.build-artifacts-upload-name }}
