@@ -162,3 +162,7 @@ runs:
         build-files: |
           ${{ env.TEMP_FILENAME_IMAGE }}
           ${{ env.FILENAME_SBOM }}
+
+    # delete temporary files
+    - shell: bash
+      run: rm -rf ${{ env.TEMP_DIR }}
