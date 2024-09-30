@@ -45,7 +45,7 @@ runs:
         echo 'EOF' >> $GITHUB_OUTPUT
 
     - name: Test summary
-      uses: test-summary/action@032c8a9cec6aaa3c20228112cae6ca10a3b29336 # pin@v2
+      uses: test-summary/action@31493c76ec9e7aa675f1585d3ed6f1da69269a86 # pin@v2
       with:
         paths:
           "${{ steps.working-directory-test-result-files.outputs.working-directory-test-result-files
