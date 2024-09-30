@@ -15,7 +15,7 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: orhun/git-cliff-action@b7913b664658dd091d9971658cb02a19047baa79 # pin@v2
+    - uses: orhun/git-cliff-action@14bb67385aaac969efa2f146d137a42bb3b0aa87 # pin@v2
       id: git-cliff
       with:
         args: ${{ inputs.previous-tag }}..${{ inputs.current-tag }}
