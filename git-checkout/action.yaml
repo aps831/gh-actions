@@ -26,7 +26,7 @@ runs:
         git pull --ff-only
 
     - if: ${{ steps.check.outputs.isrepo == 'false' }}
-      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # pin@v4.1.1
+      uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # pin@v4.2.0
       with:
         ref: ${{ inputs.branch }}
         fetch-depth: 0
