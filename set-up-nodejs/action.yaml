@@ -9,7 +9,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # pin@v4.0.1
+    - uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # pin@v4.0.4
       with:
         registry-url: "https://npm.pkg.github.com"
         node-version: ${{ inputs.node-version }}
