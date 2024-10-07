@@ -14,14 +14,14 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: graalvm/setup-graalvm@b8dc5fccfbc65b21dd26e8341e7b21c86547f61b # pin@v1
+    - uses: graalvm/setup-graalvm@d3f9e14fc3771c0f5aaccb754e441b946b6703f9 # pin@v1
       with:
         version: "${{ inputs.graalvm-version }}"
         java-version: "${{ inputs.java-version }}"
         components: "native-image"
         github-token: ${{ inputs.ACCESS_TOKEN }}
 
-    - uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # pin@v3
+    - uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # pin@v3
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
