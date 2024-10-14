@@ -8,7 +8,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: aquasecurity/trivy-action@d43c1f16c00cfd3978dde6c07f4bbcf9eb6993ca # pin@v0.16.1
+    - uses: aquasecurity/trivy-action@5681af892cd0f4997658e2bacc62bd0a894cf564 # pin@v0.27.0
       with:
         image-ref: ${{ inputs.image }}
         format: "table"
