@@ -14,7 +14,7 @@ runs:
       run: |
         echo "plugin-cache-directory=${{ github.workspace }}/.terraform.d/plugin-cache" >> $GITHUB_OUTPUT
 
-    - uses: hashicorp/setup-terraform@a1502cd9e758c50496cc9ac5308c4843bcd56d36 # pin@v3.0.0
+    - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # pin@v3.1.2
       with:
         terraform_version: ${{ inputs.terraform-version }}
         terraform_wrapper: false
@@ -23,7 +23,7 @@ runs:
       shell: bash
       run: mkdir --parents ${{ steps.plugin.outputs.plugin-cache-directory }}
 
-    - uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # pin@v4.0.0
+    - uses: actions/cache@3624ceb22c1c5a301c8db4169662070a689d9ea8 # pin@v4.1.1
       with:
         path: ${{ steps.plugin.outputs.plugin-cache-directory }}
         key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
