@@ -17,7 +17,7 @@ runs:
   steps:
     - uses: aps831/gh-actions/install-prettier@master
 
-    - uses: orhun/git-cliff-action@b7913b664658dd091d9971658cb02a19047baa79 # pin@v2
+    - uses: orhun/git-cliff-action@d3e272c587198684dcdd13f328b4a84d396c8a70 # pin@v2
       id: git-cliff
       with:
         args: ${{ inputs.start-tag }}..${{ inputs.current-tag }}
