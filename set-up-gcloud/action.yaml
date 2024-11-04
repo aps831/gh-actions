@@ -4,4 +4,4 @@ description: Set Up Google Cloud
 runs:
   using: "composite"
   steps:
-    - uses: google-github-actions/setup-gcloud@98ddc00a17442e89a24bbf282954a3b65ce6d200 # pin@v2
+    - uses: google-github-actions/setup-gcloud@6189d56e4096ee891640bb02ac264be376592d6a # pin@v2
