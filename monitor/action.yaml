@@ -4,6 +4,6 @@ description: Monitor permissions of Github Workflows
 runs:
   using: "composite"
   steps:
-    - uses: GitHubSecurityLab/actions-permissions/monitor@e83639073897b68de235d81a783b2221cc13def7 # pin@v1
+    - uses: GitHubSecurityLab/actions-permissions/monitor@babd69bc8d78e6cdece903dfdcfb72d4e1a4f00d # pin@v1
       with:
         config: '{ "create_artifact": true, "enabled": true, "debug": false }'
