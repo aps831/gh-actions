@@ -24,7 +24,9 @@ runs:
             repo: context.repo.repo,
           });
           const release = releases.filter(r => r.draft == false && r.prerelease == false).map(r => r.tag_name)
-          if (${{ inputs.index }} >= release.length) {
+          if (release.length == 0) {
+            return ""
+          } else if (${{ inputs.index }} >= release.length) {
             return release[release.length - 1];
           } else {
             return release[${{ inputs.index }}];
