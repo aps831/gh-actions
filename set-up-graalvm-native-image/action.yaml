@@ -21,7 +21,7 @@ runs:
         components: "native-image"
         github-token: ${{ inputs.ACCESS_TOKEN }}
 
-    - uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # pin@v3
+    - uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # pin@v4
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
