@@ -16,7 +16,7 @@ runs:
     - uses: aps831/gh-actions/install-prettier@master
 
     # create terraform docs
-    - uses: terraform-docs/gh-actions@f6d59f89a280fa0a3febf55ef68f146784b20ba0 # pin@v1.0.0
+    - uses: terraform-docs/gh-actions@aeae0038ed47a547e0c0fca5c059d3335f48fb25 # pin@v1.3.0
       with:
         find-dir: ${{ inputs.working-directory }}
         output-file: TERRAFORM.md
