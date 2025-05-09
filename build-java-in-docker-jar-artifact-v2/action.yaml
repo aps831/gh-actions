@@ -1,0 +1,96 @@
+---
+name: Build Java in Docker Jar Artifact
+description: Build Java in Docker jar artifact
+inputs:
+  branch-build:
+    description: Branch used for build
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  dockerfile:
+    description: Dockerfile
+    required: true
+  volumes:
+    description: Newline separated list of volumes to attach to build container
+    required: false
+  env:
+    description: Newline separated list of environment variables to inject into build container
+    required: false
+  build-command:
+    description: Command to run inside build container
+    required: false
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  build-artifacts-release-upload-name:
+    description: Name of release build artifacts upload
+    value: ${{ steps.release-artifacts-upload.outputs.name }}
+  build-artifacts-publish-upload-name:
+    description: Name of publication build artifacts upload
+    value: ${{ steps.publish-artifacts-upload.outputs.name }}
+runs:
+  using: "composite"
+  steps:
+    # git-checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-build }}
+
+    # docker-build-builder-image
+    - uses: aps831/gh-actions/docker-build-builder-image@master
+      id: builder
+      with:
+        docker-context: ${{ inputs.working-directory }}
+        dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile }}
+
+    # docker-run-builder-image
+    - uses: aps831/gh-actions/docker-run-builder-image@master
+      with:
+        image-name: ${{ steps.builder.outputs.image-name }}
+        working-directory: ${{ inputs.working-directory }}
+        volumes: ${{ inputs.volumes }}
+        env: ${{ inputs.env }}
+        build-command: ${{ inputs.build-command }}
+
+    # output-test-summary
+    - uses: aps831/gh-actions/action-output-test-summary@master
+      if: always()
+      with:
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: |
+          target/surefire-reports/TEST-*.xml
+          target/failsafe-reports/TEST-*.xml
+
+    # upload-test-results
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: always()
+      with:
+        type: all-tests
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: |
+          target/surefire-reports/TEST-*.xml
+          target/failsafe-reports/TEST-*.xml
+
+    # release-artifacts-upload
+    - uses: aps831/gh-actions/action-release-artifacts-upload@master
+      id: release-artifacts-upload
+      with:
+        description: jar-cyclonedx
+        working-directory: ${{ inputs.working-directory }}
+        build-files: |
+          target/*.jar
+          target/*-cyclonedx.json
+          target/*-cyclonedx.xml
+
+    # publish-artifacts-upload
+    - uses: aps831/gh-actions/action-publish-artifacts-upload@master
+      id: publish-artifacts-upload
+      with:
+        description: jar
+        working-directory: ${{ inputs.working-directory }}
+        build-files: |
+          target/*.jar
+          target/*-cyclonedx.json
+          target/*-cyclonedx.xml

@@ -1,0 +1,109 @@
+---
+name: Docker Build Production Image
+description: Docker build production image
+inputs:
+  image-name:
+    description: Docker image name
+    required: true
+  upload-image:
+    description: Upload image as build artifact
+    required: true
+  docker-context:
+    description: Docker context
+    required: true
+  dockerfile:
+    description: Dockerfile
+    required: true
+outputs:
+  build-artifacts-publish-upload-name:
+    description: Name of publication build image upload
+    value: ${{ steps.publish-artifacts-upload.outputs.name }}
+  build-artifacts-release-upload-name:
+    description: Name of release build artifacts upload
+    value: ${{ steps.release-artifacts-upload.outputs.name }}
+runs:
+  using: "composite"
+  steps:
+    # set-up-docker
+    - uses: aps831/gh-actions/set-up-docker@master
+
+    # git-short-hash
+    - uses: aps831/gh-actions/git-short-hash@master
+      id: hash
+
+    # build
+    - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
+      with:
+        context: ${{ inputs.docker-context }}
+        file: ${{ inputs.dockerfile }}
+        pull: true
+        push: false
+        sbom: false
+        provenance: false
+        cache-from: type=gha,scope=build
+        cache-to: type=gha,scope=build,mode=max
+
+    # create temp dir
+    - shell: bash
+      run: |
+        TEMP_DIR="$(mktemp -d)"
+        echo "TEMP_DIR=$TEMP_DIR" >> $GITHUB_ENV
+
+    # create temp file for image
+    - shell: bash
+      run: |
+        TEMP_FILENAME_IMAGE="$(uuidgen).tar"
+        echo "TEMP_FILENAME_IMAGE=${TEMP_FILENAME_IMAGE}" >> $GITHUB_ENV
+
+    # create temp file for sbom
+    - shell: bash
+      run: |
+        FILENAME_SBOM="cyclonedx.json"
+        echo "FILENAME_SBOM=${FILENAME_SBOM}" >> $GITHUB_ENV
+
+    # image
+    - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
+      with:
+        context: ${{ inputs.docker-context }}
+        file: ${{ inputs.dockerfile }}
+        pull: false
+        push: false
+        sbom: false
+        provenance: false
+        build-args: ${{ inputs.build-args }}
+        secrets: ${{ inputs.secrets }}
+        cache-from: type=gha,scope=build
+        tags:
+          ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}:${{
+          steps.hash.outputs.hash }}
+        outputs: type=docker,dest=${{ env.TEMP_DIR }}/${{ env.TEMP_FILENAME_IMAGE }}
+
+    # generate-image-sbom
+    - uses: aps831/gh-actions/action-generate-image-sbom@master
+      with:
+        image-tar-path: ${{ env.TEMP_DIR }}/${{ env.TEMP_FILENAME_IMAGE }}
+        sbom-path: ${{ env.TEMP_DIR }}/${{ env.FILENAME_SBOM }}
+
+    # release-artifacts-upload
+    - uses: aps831/gh-actions/action-release-artifacts-upload@master
+      id: release-artifacts-upload
+      with:
+        description: ${{ inputs.image-name }}-cyclonedx
+        working-directory: ${{ env.TEMP_DIR }}
+        build-files: |
+          ${{ env.FILENAME_SBOM }}
+
+    # publish-artifacts-upload
+    - uses: aps831/gh-actions/action-publish-artifacts-upload@master
+      if: ${{ inputs.upload-image == 'true' }}
+      id: publish-artifacts-upload
+      with:
+        description: ${{ inputs.image-name }}-image
+        working-directory: ${{ env.TEMP_DIR }}
+        build-files: |
+          ${{ env.TEMP_FILENAME_IMAGE }}
+          ${{ env.FILENAME_SBOM }}
+
+    # delete temporary files
+    - shell: bash
+      run: rm -rf ${{ env.TEMP_DIR }}

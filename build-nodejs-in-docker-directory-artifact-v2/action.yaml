@@ -1,0 +1,135 @@
+---
+name: Build Nodejs in Docker Directory Artifact
+description: Build Nodejs in Docker directory artifact
+inputs:
+  branch-build:
+    description: Branch used for build
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  dockerfile:
+    description: Dockerfile
+    required: true
+  volumes:
+    description: Newline separated list of volumes to attach to build container
+    required: false
+  env:
+    description: Newline separated list of environment variables to inject into build container
+    required: false
+  build-command:
+    description: Command to run inside build container
+    required: false
+  output-artifact-directory:
+    description: Output directory of artifact
+    required: true
+  output-sbom-directory:
+    description: Output directory of sbom
+    required: true
+  output-checks-directory:
+    description: Output directory of checks
+    required: true
+  output-unit-tests-directory:
+    description: Output directory of unit tests
+    required: true
+  output-coverage-directory:
+    description: Output directory of coverage
+    required: true
+  output-integration-tests-directory:
+    description: Output directory of integration tests
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  build-artifacts-release-upload-name:
+    description: Name of release build artifacts upload
+    value: ${{ steps.upload.outputs.name }}
+runs:
+  using: "composite"
+  steps:
+    # git-checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-build }}
+
+    # docker-build-builder-image
+    - uses: aps831/gh-actions/docker-build-builder-image@master
+      id: builder
+      with:
+        docker-context: ${{ inputs.working-directory }}
+        dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile }}
+
+    # docker-run-builder-image
+    - uses: aps831/gh-actions/docker-run-builder-image@master
+      with:
+        image-name: ${{ steps.builder.outputs.image-name }}
+        working-directory: ${{ inputs.working-directory }}
+        volumes: ${{ inputs.volumes }}
+        env: ${{ inputs.env }}
+        build-command: ${{ inputs.build-command }}
+
+    # output-test-summary
+    - uses: aps831/gh-actions/action-output-test-summary@master
+      if: ${{ always() && inputs.output-unit-tests-directory != '' }}
+      with:
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: |
+          ${{ inputs.output-unit-tests-directory }}/*.xml
+          ${{ inputs.output-integration-tests-directory }}/*.xml
+
+    # upload-test-results checks
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-checks-directory != '' }}
+      with:
+        type: checks
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-checks-directory }}/*
+
+    # upload-test-results unit
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-unit-tests-directory != '' }}
+      with:
+        type: unit
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-unit-tests-directory }}/*
+
+    # upload-test-results coverage
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-coverage-directory != '' }}
+      with:
+        type: coverage
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-coverage-directory }}/*
+
+    # upload-test-results integration
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-integration-tests-directory != '' }}
+      with:
+        type: integration
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-integration-tests-directory }}/*
+
+    # zip artifact folder
+    - name: zip artifact folder
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: |
+        zip -r ${{ inputs.output-artifact-directory }}.zip ${{ inputs.output-artifact-directory }}/*
+
+    # release-artifacts-upload
+    - uses: aps831/gh-actions/action-release-artifacts-upload@master
+      id: upload
+      with:
+        description: directory-artifact
+        working-directory: ${{ inputs.working-directory }}
+        build-files: |
+          ${{ inputs.output-artifact-directory }}.zip
+          ${{ inputs.output-sbom-directory }}/cyclonedx.json
+
+    # delete zip file
+    - name: delete zip file
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: |
+        rm ${{ inputs.output-artifact-directory }}.zip

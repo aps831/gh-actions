@@ -17,5 +17,12 @@ runs:
       with:
         python-version: ${{ inputs.python-version }}
 
+    - uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # pin@v4
+      with:
+        path: .venv*
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
     - shell: bash
       run: pip install poetry==${{ inputs.poetry-version }}

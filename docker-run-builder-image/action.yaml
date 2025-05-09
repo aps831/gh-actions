@@ -1,0 +1,27 @@
+---
+name: Docker Run Builder Image
+description: Docker run builder image
+inputs:
+  image-name:
+    description: Docker image name
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  volumes:
+    description: Newline separated list of volumes to attach to build container
+    required: true
+  env:
+    description: Newline separated list of environment variables to inject into build container
+    required: true
+  build-command:
+    description: Command to run inside build container
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        volumes=$(node ${{ github.action_path }}/volumes.js ${{ github.workspace }} ${{ inputs.working-directory }} $'${{ inputs.volumes }}')
+        env=$(node ${{ github.action_path }}/env.js $'${{ inputs.env }}')
+        sudo docker run --user $(id -u):$(id -g) $volumes -v /var/run/docker.sock:/var/run/docker.sock $env ${{ inputs.image-name }} ${{ inputs.build-command }}

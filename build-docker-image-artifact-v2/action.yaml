@@ -1,0 +1,93 @@
+---
+name: Build Maven in Docker Image Artifact
+description: Build Maven in Docker image artifact
+inputs:
+  image-name:
+    description: Docker image name
+    required: true
+  upload-image:
+    description: Upload image as build artifact
+    required: true
+  branch-build:
+    description: Branch used for build
+    required: true
+  working-directory:
+    description: Working directory
+    required: true
+  dockerfile-build:
+    description: Name of Dockerfile for builder container
+    required: false
+  dockerfile-prod:
+    description: Name of Dockerfile for production container
+    required: false
+  volumes:
+    description: Newline separated list of volumes to attach to build container
+    required: false
+  env:
+    description: Newline separated list of environment variables to inject into build container
+    required: false
+  build-command:
+    description: Command to run inside build container
+    required: false
+  test-result-files:
+    description: Test result files relative to working directory
+    required: true
+  ACCESS_TOKEN:
+    description: Access token
+    required: true
+outputs:
+  build-artifacts-release-upload-name:
+    description: Name of release build artifacts upload
+    value: ${{ steps.image.outputs.build-artifacts-release-upload-name }}
+  build-artifacts-publish-upload-name:
+    description: Name of publication build image upload
+    value: ${{ steps.image.outputs.build-artifacts-publish-upload-name }}
+runs:
+  using: "composite"
+  steps:
+    # git-checkout
+    - uses: aps831/gh-actions/git-checkout@master
+      with:
+        branch: ${{ inputs.branch-build }}
+
+    # docker-build-builder-image
+    - uses: aps831/gh-actions/docker-build-builder-image@master
+      id: builder
+      with:
+        docker-context: ${{ inputs.working-directory }}
+        dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile-build }}
+
+    # docker-run-builder-image
+    - uses: aps831/gh-actions/docker-run-builder-image@master
+      with:
+        image-name: ${{ steps.builder.outputs.image-name }}
+        working-directory: ${{ inputs.working-directory }}
+        volumes: ${{ inputs.volumes }}
+        env: ${{ inputs.env }}
+        build-command: ${{ inputs.build-command }}
+
+    # docker-build-prod-image
+    - uses: aps831/gh-actions/docker-build-prod-image@master
+      id: image
+      with:
+        image-name: ${{ inputs.image-name }}
+        upload-image: ${{ inputs.upload-image }}
+        docker-context: ${{ inputs.working-directory }}
+        dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile-prod }}
+
+    # output-test-summary
+    - uses: aps831/gh-actions/action-output-test-summary@master
+      if: ${{ always() }}
+      with:
+        working-directory: ${{ inputs.working-directory }}
+        component-name: ${{ inputs.image-name }}
+        test-result-files: ${{ inputs.test-result-files }}
+
+    # upload-test-results
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() }}
+      with:
+        type: unit
+        working-directory: ${{ inputs.working-directory }}
+        component-name: ${{ inputs.image-name }}
+        test-result-files: ${{ inputs.test-result-files }}
