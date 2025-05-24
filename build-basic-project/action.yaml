@@ -33,18 +33,3 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: ${{ inputs.build-script }}
-
-    # output-test-summary
-    - uses: aps831/gh-actions/action-output-test-summary@master
-      if: ${{ always() && inputs.test-results-directory != '' }}
-      with:
-        working-directory: ${{ inputs.working-directory }}
-        test-result-files: ${{ inputs.test-results-directory }}/*
-
-    # upload-test-results
-    - uses: aps831/gh-actions/action-upload-test-results@master
-      if: ${{ always() && inputs.test-results-directory != '' }}
-      with:
-        type: all
-        working-directory: ${{ inputs.working-directory }}
-        test-result-files: ${{ inputs.test-results-directory }}/*

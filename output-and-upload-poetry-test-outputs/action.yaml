@@ -1,0 +1,77 @@
+---
+name: Output and Upload Poetry Test Outputs
+description: Output and upload poetry test outputs
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+  os-name:
+    description: Operating system name
+    required: false
+  component-name:
+    description: Component name
+    required: false
+  output-checks-directory:
+    description: Output directory of checks
+    required: true
+  output-unit-tests-directory:
+    description: Output directory of unit tests
+    required: true
+  output-coverage-directory:
+    description: Output directory of coverage
+    required: true
+  output-integration-tests-directory:
+    description: Output directory of integration tests
+    required: true
+runs:
+  using: "composite"
+  steps:
+    # output-test-summary
+    - uses: aps831/gh-actions/action-output-test-summary@master
+      if: ${{ always() && inputs.output-unit-tests-directory != '' }}
+      with:
+        working-directory: ${{ inputs.working-directory }}
+        component-name: ${{ inputs.component-name }}
+        test-result-files: |
+          ${{ inputs.output-unit-tests-directory }}/*.xml
+          ${{ inputs.output-integration-tests-directory }}/*.xml
+
+    # upload-test-results checks
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-checks-directory != '' }}
+      with:
+        type: checks
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-checks-directory }}/*
+        component-name: ${{ inputs.component-name }}
+        os-name: ${{ inputs.os-name }}
+
+    # upload-test-results unit
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-unit-tests-directory != '' }}
+      with:
+        type: unit
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-unit-tests-directory }}/*
+        component-name: ${{ inputs.component-name }}
+        os-name: ${{ inputs.os-name }}
+
+    # upload-test-results coverage
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-coverage-directory != '' }}
+      with:
+        type: coverage
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-coverage-directory }}/*
+        component-name: ${{ inputs.component-name }}
+        os-name: ${{ inputs.os-name }}
+
+    # upload-test-results integration
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-integration-tests-directory != '' }}
+      with:
+        type: integration
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-integration-tests-directory }}/*
+        component-name: ${{ inputs.component-name }}
+        os-name: ${{ inputs.os-name }}

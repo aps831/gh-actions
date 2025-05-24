@@ -1,0 +1,36 @@
+---
+name: Output and Upload Basic Test Outputs
+description: Output and upload basic test outputs
+inputs:
+  working-directory:
+    description: Working directory
+    required: true
+  test-results-directory:
+    description: Test results directory
+    required: true
+  os-name:
+    description: Operating system name
+    required: false
+  component-name:
+    description: Component name
+    required: false
+runs:
+  using: "composite"
+  steps:
+    # output-test-summary
+    - uses: aps831/gh-actions/action-output-test-summary@master
+      if: ${{ always() && inputs.test-results-directory != '' }}
+      with:
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.test-results-directory }}/*
+        component-name: ${{ inputs.component-name }}
+
+    # upload-test-results
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.test-results-directory != '' }}
+      with:
+        type: all
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.test-results-directory }}/*
+        component-name: ${{ inputs.component-name }}
+        os-name: ${{ inputs.os-name }}

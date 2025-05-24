@@ -26,18 +26,6 @@ inputs:
   output-sbom-directory:
     description: Output directory of sbom
     required: true
-  output-checks-directory:
-    description: Output directory of checks
-    required: true
-  output-unit-tests-directory:
-    description: Output directory of unit tests
-    required: true
-  output-coverage-directory:
-    description: Output directory of coverage
-    required: true
-  output-integration-tests-directory:
-    description: Output directory of integration tests
-    required: true
   ACCESS_TOKEN:
     description: Access token
     required: true
@@ -68,47 +56,6 @@ runs:
         stage-build: ${{ inputs.stage-build }}
         stage-output: ${{ inputs.stage-output }}
         stage-status: ${{ inputs.stage-status }}
-
-    # output-test-summary
-    - uses: aps831/gh-actions/action-output-test-summary@master
-      if: ${{ always() && inputs.output-unit-tests-directory != '' }}
-      with:
-        working-directory: ${{ inputs.working-directory }}
-        test-result-files: |
-          ${{ inputs.output-unit-tests-directory }}/*.xml
-          ${{ inputs.output-integration-tests-directory }}/*.xml
-
-    # upload-test-results checks
-    - uses: aps831/gh-actions/action-upload-test-results@master
-      if: ${{ always() && inputs.output-checks-directory != '' }}
-      with:
-        type: checks
-        working-directory: ${{ inputs.working-directory }}
-        test-result-files: ${{ inputs.output-checks-directory }}/*
-
-    # upload-test-results unit
-    - uses: aps831/gh-actions/action-upload-test-results@master
-      if: ${{ always() && inputs.output-unit-tests-directory != '' }}
-      with:
-        type: unit
-        working-directory: ${{ inputs.working-directory }}
-        test-result-files: ${{ inputs.output-unit-tests-directory }}/*
-
-    # upload-test-results coverage
-    - uses: aps831/gh-actions/action-upload-test-results@master
-      if: ${{ always() && inputs.output-coverage-directory != '' }}
-      with:
-        type: coverage
-        working-directory: ${{ inputs.working-directory }}
-        test-result-files: ${{ inputs.output-coverage-directory }}/*
-
-    # upload-test-results integration
-    - uses: aps831/gh-actions/action-upload-test-results@master
-      if: ${{ always() && inputs.output-integration-tests-directory != '' }}
-      with:
-        type: integration
-        working-directory: ${{ inputs.working-directory }}
-        test-result-files: ${{ inputs.output-integration-tests-directory }}/*
 
     # zip artifact folder
     - name: zip artifact folder

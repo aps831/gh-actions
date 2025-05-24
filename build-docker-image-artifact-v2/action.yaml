@@ -29,9 +29,6 @@ inputs:
   build-command:
     description: Command to run inside build container
     required: false
-  test-result-files:
-    description: Test result files relative to working directory
-    required: true
   ACCESS_TOKEN:
     description: Access token
     required: true
@@ -74,20 +71,3 @@ runs:
         upload-image: ${{ inputs.upload-image }}
         docker-context: ${{ inputs.working-directory }}
         dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile-prod }}
-
-    # output-test-summary
-    - uses: aps831/gh-actions/action-output-test-summary@master
-      if: ${{ always() }}
-      with:
-        working-directory: ${{ inputs.working-directory }}
-        component-name: ${{ inputs.image-name }}
-        test-result-files: ${{ inputs.test-result-files }}
-
-    # upload-test-results
-    - uses: aps831/gh-actions/action-upload-test-results@master
-      if: ${{ always() }}
-      with:
-        type: unit
-        working-directory: ${{ inputs.working-directory }}
-        component-name: ${{ inputs.image-name }}
-        test-result-files: ${{ inputs.test-result-files }}

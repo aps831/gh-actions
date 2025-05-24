@@ -61,25 +61,6 @@ runs:
         stage-output: ${{ inputs.stage-output }}
         stage-status: ${{ inputs.stage-status }}
 
-    # output-test-summary
-    - uses: aps831/gh-actions/action-output-test-summary@master
-      if: always()
-      with:
-        working-directory: ${{ inputs.working-directory }}
-        test-result-files: |
-          target/surefire-reports/TEST-*.xml
-          target/failsafe-reports/TEST-*.xml
-
-    # upload-test-results
-    - uses: aps831/gh-actions/action-upload-test-results@master
-      if: always()
-      with:
-        type: all-tests
-        working-directory: ${{ inputs.working-directory }}
-        test-result-files: |
-          target/surefire-reports/TEST-*.xml
-          target/failsafe-reports/TEST-*.xml
-
     # release-artifacts-upload
     - uses: aps831/gh-actions/action-release-artifacts-upload@master
       id: release-artifacts-upload
