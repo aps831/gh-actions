@@ -26,6 +26,7 @@ inputs:
   output-sbom-directory:
     description: Output directory of sbom
     required: true
+  # TODO delete
   output-checks-directory:
     description: Output directory of checks
     required: true
@@ -64,7 +65,8 @@ runs:
         stage-status: ${{ inputs.stage-status }}
 
     # output-test-summary
-    - uses: aps831/gh-actions/action-output-test-summary@master
+    # TODO delete
+    - uses: aps831/gh-actions/output-test-summary@master
       if: ${{ always() && inputs.output-unit-tests-directory != '' }}
       with:
         working-directory: ${{ inputs.working-directory }}
@@ -73,6 +75,7 @@ runs:
           ${{ inputs.output-integration-tests-directory }}/*.xml
 
     # upload-test-results checks
+    # TODO delete
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: ${{ always() && inputs.output-checks-directory != '' }}
       with:
@@ -81,6 +84,7 @@ runs:
         test-result-files: ${{ inputs.output-checks-directory }}/*
 
     # upload-test-results unit
+    # TODO delete
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: ${{ always() && inputs.output-unit-tests-directory != '' }}
       with:
@@ -89,6 +93,7 @@ runs:
         test-result-files: ${{ inputs.output-unit-tests-directory }}/*
 
     # upload-test-results coverage
+    # TODO delete
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: ${{ always() && inputs.output-coverage-directory != '' }}
       with:
@@ -97,6 +102,7 @@ runs:
         test-result-files: ${{ inputs.output-coverage-directory }}/*
 
     # upload-test-results integration
+    # TODO delete
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: ${{ always() && inputs.output-integration-tests-directory != '' }}
       with:

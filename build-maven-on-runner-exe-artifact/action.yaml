@@ -69,7 +69,8 @@ runs:
         ACCESS_TOKEN: ${{ inputs.ACCESS_TOKEN }}
 
     # output-test-summary
-    - uses: aps831/gh-actions/action-output-test-summary@master
+    # TODO delete
+    - uses: aps831/gh-actions/output-test-summary@master
       if: always()
       with:
         working-directory: ${{ inputs.working-directory }}
@@ -78,6 +79,7 @@ runs:
           target/failsafe-reports/TEST-*.xml
 
     # upload-test-results
+    # TODO delete
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: always()
       with:

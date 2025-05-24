@@ -32,6 +32,7 @@ inputs:
   build-args:
     description: Build args
     required: true
+  # TODO delete
   test-result-files:
     description: Test result files relative to working directory
     required: true
@@ -73,7 +74,8 @@ runs:
         stage-status: ${{ inputs.stage-status }}
 
     # output-test-summary
-    - uses: aps831/gh-actions/action-output-test-summary@master
+    # TODO delete
+    - uses: aps831/gh-actions/output-test-summary@master
       if: ${{ always() && inputs.stage-output != '' }}
       with:
         working-directory: ${{ inputs.working-directory }}
@@ -81,6 +83,7 @@ runs:
         test-result-files: ${{ inputs.test-result-files }}
 
     # upload-test-results
+    # TODO delete
     - uses: aps831/gh-actions/action-upload-test-results@master
       if: ${{ always() && inputs.stage-output != '' }}
       with:
