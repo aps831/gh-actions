@@ -44,6 +44,10 @@ outputs:
 runs:
   using: "composite"
   steps:
+    # deprecation warning
+    - shell: bash
+      run: echo "::warning file=docker-build-image,title=DEPRECATED::Update the workflow to use v2"
+
     # set-up-docker
     - uses: aps831/gh-actions/set-up-docker@master
 

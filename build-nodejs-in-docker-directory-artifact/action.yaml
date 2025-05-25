@@ -48,6 +48,12 @@ outputs:
 runs:
   using: "composite"
   steps:
+    # deprecation warning
+    - shell: bash
+      run:
+        echo "::warning file=build-nodejs-in-docker-directory-artifact,title=DEPRECATED::Update the
+        workflow to use v2"
+
     # git-checkout
     - uses: aps831/gh-actions/git-checkout@master
       with:
