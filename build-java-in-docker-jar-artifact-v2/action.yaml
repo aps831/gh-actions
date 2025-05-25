@@ -38,21 +38,21 @@ runs:
       with:
         branch: ${{ inputs.branch-build }}
 
-    # docker-build-builder-image
-    - uses: aps831/gh-actions/docker-build-builder-image@master
+    # docker-build-runner-image
+    - uses: aps831/gh-actions/docker-build-runner-image@master
       id: builder
       with:
         docker-context: ${{ inputs.working-directory }}
         dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile }}
 
-    # docker-run-builder-image
-    - uses: aps831/gh-actions/docker-run-builder-image@master
+    # docker-run-container
+    - uses: aps831/gh-actions/docker-run-container@master
       with:
         image-name: ${{ steps.builder.outputs.image-name }}
         working-directory: ${{ inputs.working-directory }}
         volumes: ${{ inputs.volumes }}
         env: ${{ inputs.env }}
-        build-command: ${{ inputs.build-command }}
+        command: ${{ inputs.build-command }}
 
     # output-test-summary
     - uses: aps831/gh-actions/action-output-test-summary@master

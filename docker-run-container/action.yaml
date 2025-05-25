@@ -1,6 +1,6 @@
 ---
-name: Docker Run Builder Image
-description: Docker run builder image
+name: Docker Run Container
+description: Docker run container
 inputs:
   image-name:
     description: Docker image name
@@ -14,7 +14,7 @@ inputs:
   env:
     description: Newline separated list of environment variables to inject into build container
     required: true
-  build-command:
+  command:
     description: Command to run inside build container
     required: true
 runs:
@@ -24,4 +24,4 @@ runs:
       run: |
         volumes=$(node ${{ github.action_path }}/volumes.js ${{ github.workspace }} ${{ inputs.working-directory }} $'${{ inputs.volumes }}')
         env=$(node ${{ github.action_path }}/env.js $'${{ inputs.env }}')
-        sudo docker run --user $(id -u):$(id -g) $volumes -v /var/run/docker.sock:/var/run/docker.sock $env ${{ inputs.image-name }} ${{ inputs.build-command }}
+        sudo docker run --user $(id -u):$(id -g) $volumes -v /var/run/docker.sock:/var/run/docker.sock $env ${{ inputs.image-name }} ${{ inputs.command }}
