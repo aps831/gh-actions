@@ -20,6 +20,9 @@ inputs:
   dockerfile-prod:
     description: Name of Dockerfile for production container
     required: false
+  dockerfile-test:
+    description: Name of Dockerfile for tester container
+    required: false
   volumes:
     description: Newline separated list of volumes to attach to build container
     required: false
@@ -28,6 +31,9 @@ inputs:
     required: false
   build-command:
     description: Command to run inside build container
+    required: false
+  test-command:
+    description: Command to run inside test container
     required: false
   ACCESS_TOKEN:
     description: Access token
@@ -71,3 +77,21 @@ runs:
         upload-image: ${{ inputs.upload-image }}
         docker-context: ${{ inputs.working-directory }}
         dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile-prod }}
+
+    # docker-build-runner-image
+    - uses: aps831/gh-actions/docker-build-runner-image@master
+      id: tester
+      with:
+        docker-context: ${{ inputs.working-directory }}
+        dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile-test }}
+
+    # docker-run-container
+    - uses: aps831/gh-actions/docker-run-container@master
+      with:
+        image-name: ${{ steps.tester.outputs.image-name }}
+        working-directory: ${{ inputs.working-directory }}
+        volumes: ${{ inputs.volumes }}
+        env: |
+          ${{ inputs.env }}
+          IMAGE_UNDER_TEST_NAME=${{ steps.image.outputs.image-name }}
+        command: ${{ inputs.test-command }}

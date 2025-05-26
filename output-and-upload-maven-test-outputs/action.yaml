@@ -23,6 +23,7 @@ runs:
         test-result-files: |
           target/surefire-reports/TEST-*.xml
           target/failsafe-reports/TEST-*.xml
+          target/surefire-e2e-reports/TEST-*.xml
 
     # upload-test-results
     - uses: aps831/gh-actions/action-upload-test-results@master
@@ -43,5 +44,16 @@ runs:
         working-directory: ${{ inputs.working-directory }}
         test-result-files: |
           target/failsafe-reports/TEST-*.xml
+        component-name: ${{ inputs.component-name }}
+        os-name: ${{ inputs.os-name }}
+
+    # upload-test-results
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: always()
+      with:
+        type: e2e
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: |
+          target/surefire-e2e-reports/TEST-*.xml
         component-name: ${{ inputs.component-name }}
         os-name: ${{ inputs.os-name }}

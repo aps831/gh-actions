@@ -23,18 +23,22 @@ inputs:
   output-integration-tests-directory:
     description: Output directory of integration tests
     required: true
+  output-e2e-tests-directory:
+    description: Output directory of e2e tests
+    required: true
 runs:
   using: "composite"
   steps:
     # output-test-summary
     - uses: aps831/gh-actions/action-output-test-summary@master
-      if: ${{ always() && inputs.output-unit-tests-directory != '' }}
+      if: ${{ always() }}
       with:
         working-directory: ${{ inputs.working-directory }}
         component-name: ${{ inputs.component-name }}
         test-result-files: |
           ${{ inputs.output-unit-tests-directory }}/*.xml
           ${{ inputs.output-integration-tests-directory }}/*.xml
+          ${{ inputs.output-e2e-tests-directory }}/*.xml
 
     # upload-test-results checks
     - uses: aps831/gh-actions/action-upload-test-results@master
@@ -73,5 +77,15 @@ runs:
         type: integration
         working-directory: ${{ inputs.working-directory }}
         test-result-files: ${{ inputs.output-integration-tests-directory }}/*
+        component-name: ${{ inputs.component-name }}
+        os-name: ${{ inputs.os-name }}
+
+    # upload-test-results e2e
+    - uses: aps831/gh-actions/action-upload-test-results@master
+      if: ${{ always() && inputs.output-e2e-tests-directory != '' }}
+      with:
+        type: e2e
+        working-directory: ${{ inputs.working-directory }}
+        test-result-files: ${{ inputs.output-e2e-tests-directory }}/*
         component-name: ${{ inputs.component-name }}
         os-name: ${{ inputs.os-name }}

@@ -21,6 +21,9 @@ outputs:
   build-artifacts-release-upload-name:
     description: Name of release build artifacts upload
     value: ${{ steps.release-artifacts-upload.outputs.name }}
+  image-name:
+    description: Name of image
+    value: ${{ steps.image-name.outputs.image-name }}
 runs:
   using: "composite"
   steps:
@@ -30,6 +33,13 @@ runs:
     # git-short-hash
     - uses: aps831/gh-actions/git-short-hash@master
       id: hash
+
+    # image name
+    - id: image-name
+      shell: bash
+      run: |
+        IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}:${{ steps.hash.outputs.hash }}
+        echo "image-name=$IMAGE_NAME" >> $GITHUB_OUTPUT
 
     # build
     - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
@@ -73,10 +83,17 @@ runs:
         build-args: ${{ inputs.build-args }}
         secrets: ${{ inputs.secrets }}
         cache-from: type=gha,scope=build
-        tags:
-          ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}:${{
-          steps.hash.outputs.hash }}
-        outputs: type=docker,dest=${{ env.TEMP_DIR }}/${{ env.TEMP_FILENAME_IMAGE }}
+        tags: ${{ steps.image-name.outputs.image-name }}
+        outputs: |
+          type=docker,dest=${{ env.TEMP_DIR }}/${{ env.TEMP_FILENAME_IMAGE }}
+
+    # load docker image
+    - shell: bash
+      working-directory: ${{ env.TEMP_DIR }}
+      run: |
+        for file in *.tar; do
+          docker load --input $file
+        done
 
     # generate-image-sbom
     - uses: aps831/gh-actions/action-generate-image-sbom@master
