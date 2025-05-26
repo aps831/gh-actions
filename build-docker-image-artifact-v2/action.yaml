@@ -20,6 +20,7 @@ inputs:
   dockerfile-prod:
     description: Name of Dockerfile for production container
     required: false
+  # TODO dockerfile-test
   volumes:
     description: Newline separated list of volumes to attach to build container
     required: false
@@ -29,6 +30,7 @@ inputs:
   build-command:
     description: Command to run inside build container
     required: false
+  # TODO test-command
   ACCESS_TOKEN:
     description: Access token
     required: true
@@ -71,3 +73,7 @@ runs:
         upload-image: ${{ inputs.upload-image }}
         docker-context: ${{ inputs.working-directory }}
         dockerfile: ${{ inputs.working-directory }}/${{ inputs.dockerfile-prod }}
+
+    # TODO docker-build-runner-image
+    # TODO docker-run-container
+    # env IMAGE_UNDER_TEST_NAME=${{ steps.image.outputs.image-name }}

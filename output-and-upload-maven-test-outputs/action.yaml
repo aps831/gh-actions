@@ -23,6 +23,7 @@ runs:
         test-result-files: |
           target/surefire-reports/TEST-*.xml
           target/failsafe-reports/TEST-*.xml
+          # TODO
 
     # upload-test-results
     - uses: aps831/gh-actions/action-upload-test-results@master
@@ -45,3 +46,5 @@ runs:
           target/failsafe-reports/TEST-*.xml
         component-name: ${{ inputs.component-name }}
         os-name: ${{ inputs.os-name }}
+
+    # TODO e2e

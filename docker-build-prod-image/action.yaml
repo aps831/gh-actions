@@ -21,6 +21,7 @@ outputs:
   build-artifacts-release-upload-name:
     description: Name of release build artifacts upload
     value: ${{ steps.release-artifacts-upload.outputs.name }}
+  # TODO image-name
 runs:
   using: "composite"
   steps:
@@ -30,6 +31,8 @@ runs:
     # git-short-hash
     - uses: aps831/gh-actions/git-short-hash@master
       id: hash
+
+    # TODO image-name
 
     # build
     - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
@@ -76,7 +79,9 @@ runs:
         tags:
           ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}:${{
           steps.hash.outputs.hash }}
-        outputs: type=docker,dest=${{ env.TEMP_DIR }}/${{ env.TEMP_FILENAME_IMAGE }}
+        outputs: |
+          # TODO type=image
+          type=docker,dest=${{ env.TEMP_DIR }}/${{ env.TEMP_FILENAME_IMAGE }}
 
     # generate-image-sbom
     - uses: aps831/gh-actions/action-generate-image-sbom@master

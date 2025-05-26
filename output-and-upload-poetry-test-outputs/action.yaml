@@ -23,6 +23,7 @@ inputs:
   output-integration-tests-directory:
     description: Output directory of integration tests
     required: true
+  # TODO output-e2e-tests-directory
 runs:
   using: "composite"
   steps:
@@ -35,6 +36,7 @@ runs:
         test-result-files: |
           ${{ inputs.output-unit-tests-directory }}/*.xml
           ${{ inputs.output-integration-tests-directory }}/*.xml
+          # TODO output-e2e-tests-directory
 
     # upload-test-results checks
     - uses: aps831/gh-actions/action-upload-test-results@master
@@ -75,3 +77,5 @@ runs:
         test-result-files: ${{ inputs.output-integration-tests-directory }}/*
         component-name: ${{ inputs.component-name }}
         os-name: ${{ inputs.os-name }}
+
+    # TODO upload-test-results e2e
