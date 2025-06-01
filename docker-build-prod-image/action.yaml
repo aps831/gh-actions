@@ -43,18 +43,6 @@ runs:
         IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}:${{ steps.hash.outputs.hash }}
         echo "image-name=$IMAGE_NAME" >> $GITHUB_OUTPUT
 
-    # build
-    - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
-      with:
-        context: ${{ inputs.docker-context }}
-        file: ${{ inputs.dockerfile }}
-        pull: true
-        push: false
-        sbom: false
-        provenance: false
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
     # create temp dir
     - shell: bash
       run: |
