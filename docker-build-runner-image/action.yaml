@@ -17,14 +17,61 @@ outputs:
 runs:
   using: "composite"
   steps:
+    # set-up-docker
+    - uses: aps831/gh-actions/set-up-docker@master
+
+    # create image name
     - shell: bash
       id: image-name
       run: |
         imageName="runner-image-$(date +"%Y%m%d%H%M%S")"
         echo "image-name=$imageName" >> $GITHUB_OUTPUT
 
+    # create temp dir
     - shell: bash
       run: |
+        TEMP_DIR="$(mktemp -d)"
+        echo "TEMP_DIR=$TEMP_DIR" >> $GITHUB_ENV
+
+    # create temp file for image
+    - shell: bash
+      run: |
+        TEMP_FILENAME_IMAGE="$(uuidgen).tar"
+        echo "TEMP_FILENAME_IMAGE=${TEMP_FILENAME_IMAGE}" >> $GITHUB_ENV
+
+    # get user id
+    - shell: bash
+      id: userid
+      run: |
         USER_ID=$(id -u)
+        echo "USER_ID=$USER_ID" >> $GITHUB_ENV
+
+    # get group id
+    - shell: bash
+      id: groupid
+      run: |
         GROUP_ID=$(getent group docker | cut -d: -f3)
-        docker build --build-arg USER_ID=$USER_ID --build-arg GROUP_ID=$GROUP_ID -f ${{ inputs.dockerfile }} ${{ inputs.docker-context }} --progress=plain --sbom=false --provenance=false --tag ${{ steps.image-name.outputs.image-name }}
+        echo "GROUP_ID=$GROUP_ID" >> $GITHUB_ENV
+
+    # image
+    - uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # pin@v3
+      with:
+        context: ${{ inputs.docker-context }}
+        file: ${{ inputs.dockerfile }}
+        pull: false
+        push: false
+        sbom: false
+        provenance: false
+        build-args: |
+          USER_ID=${{ env.USER_ID }}
+          GROUP_ID=${{ env.GROUP_ID }}
+        secrets: ${{ inputs.secrets }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        tags: ${{ steps.image-name.outputs.image-name }}
+        outputs: |
+          type=docker,dest=${{ env.TEMP_DIR }}/${{ env.TEMP_FILENAME_IMAGE }}
+
+    # load docker image
+    - shell: bash
+      run: docker load --input ${{ env.TEMP_DIR }}/${{ env.TEMP_FILENAME_IMAGE }}
