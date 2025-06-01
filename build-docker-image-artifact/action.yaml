@@ -1,6 +1,6 @@
 ---
-name: Build Maven in Docker Image Artifact
-description: Build Maven in Docker image artifact
+name: Build Docker Image Artifact
+description: Build Docker image artifact
 inputs:
   image-name:
     description: Docker image name
