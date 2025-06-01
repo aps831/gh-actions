@@ -52,8 +52,8 @@ runs:
         push: false
         sbom: false
         provenance: false
-        cache-from: type=gha,scope=build
-        cache-to: type=gha,scope=build,mode=max
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     # create temp dir
     - shell: bash
@@ -84,7 +84,7 @@ runs:
         provenance: false
         build-args: ${{ inputs.build-args }}
         secrets: ${{ inputs.secrets }}
-        cache-from: type=gha,scope=build
+        cache-from: type=gha
         tags: ${{ steps.image-name.outputs.image-name }}
         outputs: |
           type=docker,dest=${{ env.TEMP_DIR }}/${{ env.TEMP_FILENAME_IMAGE }}
