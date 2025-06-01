@@ -81,10 +81,7 @@ runs:
     # load docker image
     - shell: bash
       working-directory: ${{ env.TEMP_DIR }}
-      run: |
-        for file in *.tar; do
-          docker load --input $file
-        done
+      run: docker load --input ${{ env.TEMP_DIR }}/${{ env.TEMP_FILENAME_IMAGE }}
 
     # generate-image-sbom
     - uses: aps831/gh-actions/action-generate-image-sbom@master
