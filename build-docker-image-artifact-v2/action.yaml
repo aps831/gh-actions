@@ -55,6 +55,7 @@ runs:
 
     # docker-build-runner-image
     - uses: aps831/gh-actions/docker-build-runner-image@master
+      if: ${{ inputs.build-command != '' && inputs.build-command != 'None' }}
       id: builder
       with:
         docker-context: ${{ inputs.working-directory }}
@@ -62,6 +63,7 @@ runs:
 
     # docker-run-container
     - uses: aps831/gh-actions/docker-run-container@master
+      if: ${{ inputs.build-command != '' && inputs.build-command != 'None' }}
       with:
         image-name: ${{ steps.builder.outputs.image-name }}
         working-directory: ${{ inputs.working-directory }}
@@ -80,6 +82,7 @@ runs:
 
     # docker-build-runner-image
     - uses: aps831/gh-actions/docker-build-runner-image@master
+      if: ${{ inputs.test-command != '' && inputs.test-command != 'None' }}
       id: tester
       with:
         docker-context: ${{ inputs.working-directory }}
@@ -87,6 +90,7 @@ runs:
 
     # docker-run-container
     - uses: aps831/gh-actions/docker-run-container@master
+      if: ${{ inputs.test-command != '' && inputs.test-command != 'None' }}
       with:
         image-name: ${{ steps.tester.outputs.image-name }}
         working-directory: ${{ inputs.working-directory }}
