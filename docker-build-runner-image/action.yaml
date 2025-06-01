@@ -27,4 +27,4 @@ runs:
       run: |
         USER_ID=$(id -u)
         GROUP_ID=$(getent group docker | cut -d: -f3)
-        docker build --build-arg USER_ID=$USER_ID --build-arg GROUP_ID=$GROUP_ID -f ${{ inputs.dockerfile }} ${{ inputs.docker-context }} --build-arg DOCKER_GROUP_ID=$DOCKER_GROUP_ID --progress=plain --sbom=false --provenance=false --tag ${{ steps.image-name.outputs.image-name }}
+        docker build --build-arg USER_ID=$USER_ID --build-arg GROUP_ID=$GROUP_ID -f ${{ inputs.dockerfile }} ${{ inputs.docker-context }} --progress=plain --sbom=false --provenance=false --tag ${{ steps.image-name.outputs.image-name }}
