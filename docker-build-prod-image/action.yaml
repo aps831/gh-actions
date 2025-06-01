@@ -1,4 +1,6 @@
 ---
+#  TODO #1 Update provenance flag on docker/build-push-action
+#  TODO #2 Update sbom flag on docker/build-push-action
 name: Docker Build Production Image
 description: Docker build production image
 inputs:
