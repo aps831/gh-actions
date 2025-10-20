@@ -17,14 +17,14 @@ runs:
   steps:
     - uses: aps831/gh-actions/install-prettier@master
 
-    - uses: orhun/git-cliff-action@b7913b664658dd091d9971658cb02a19047baa79 # pin@v2
+    - uses: orhun/git-cliff-action@d77b37db2e3f7398432d34b72a12aa3e2ba87e51 # pin@v4
       if: ${{ inputs.start-tag != '' }}
       with:
         args: ${{ inputs.start-tag }}..${{ inputs.current-tag }}
       env:
         OUTPUT: CHANGELOG.md
 
-    - uses: orhun/git-cliff-action@b7913b664658dd091d9971658cb02a19047baa79 # pin@v2
+    - uses: orhun/git-cliff-action@d77b37db2e3f7398432d34b72a12aa3e2ba87e51 # pin@v4
       if: ${{ inputs.start-tag == '' }}
       with:
         args: --tag ${{ inputs.current-tag }}
