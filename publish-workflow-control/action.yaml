@@ -703,6 +703,19 @@ runs:
         echo "| finalize                  | ${{ steps.constants.outputs.DESC_CONTROL_FINALIZE }}  | ${{ steps.finalize.outputs.finalize }}   |" >> $GITHUB_STEP_SUMMARY
         echo "| unpublish                 | ${{ steps.constants.outputs.DESC_CONTROL_UNPUBLISH }} | ${{ steps.unpublish.outputs.unpublish }} |" >> $GITHUB_STEP_SUMMARY
 
+    # environment variables
+    - name: set environment variables
+      shell: bash
+      run: |
+        echo "WORKFLOW_CONTROL_RELEASE=${{ steps.release.outputs.release }}" >> "$GITHUB_ENV"
+        echo "WORKFLOW_CONTROL_PRERELEASE=${{ steps.prerelease.outputs.prerelease }}" >> "$GITHUB_ENV"
+        echo "WORKFLOW_CONTROL_UPDATE=${{ steps.update.outputs.update }}" >> "$GITHUB_ENV"
+        echo "WORKFLOW_CONTROL_BUILD=${{ steps.build.outputs.build }}" >> "$GITHUB_ENV"
+        echo "WORKFLOW_CONTROL_PUBLISH=${{ steps.publish.outputs.publish }}" >> "$GITHUB_ENV"
+        echo "WORKFLOW_CONTROL_DRAFT=${{ steps.draft.outputs.draft }}" >> "$GITHUB_ENV"
+        echo "WORKFLOW_CONTROL_FINALIZE=${{ steps.finalize.outputs.finalize }}" >> "$GITHUB_ENV"
+        echo "WORKFLOW_CONTROL_UNPUBLISH=${{ steps.unpublish.outputs.unpublish }}" >> "$GITHUB_ENV"
+
     # issue
     - id: issue
       uses: aps831/gh-actions/github-issue-for-commit@master
