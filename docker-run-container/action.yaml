@@ -25,5 +25,5 @@ runs:
         sudo chmod o+rw /var/run/docker.sock
         volumes=$(node ${{ github.action_path }}/volumes.js ${{ github.workspace }} ${{ inputs.working-directory }} $'${{ inputs.volumes }}')
         env=$(node ${{ github.action_path }}/env.js $'${{ inputs.env }}')
-        docker run --user $(id -u):$(id -g) $volumes -v /var/run/docker.sock:/var/run/docker.sock $env ${{ inputs.image-name }} ${{ inputs.command }}
+        docker run --user $(id -u):$(id -g) $volumes -v /var/run/docker.sock:/var/run/docker.sock -v $PWD:$PWD -w $PWD $env ${{ inputs.image-name }} ${{ inputs.command }}
         exit $?
