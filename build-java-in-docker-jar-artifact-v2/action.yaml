@@ -17,8 +17,8 @@ inputs:
   env:
     description: Newline separated list of environment variables to inject into build container
     required: false
-  build-command:
-    description: Command to run inside build container
+  build-commands:
+    description: Newline separated list of commands to run inside build container
     required: false
   ACCESS_TOKEN:
     description: Access token
@@ -52,7 +52,8 @@ runs:
         working-directory: ${{ inputs.working-directory }}
         volumes: ${{ inputs.volumes }}
         env: ${{ inputs.env }}
-        command: ${{ inputs.build-command }}
+        commands: |
+          ${{ inputs.build-commands }}
 
     # release-artifacts-upload
     - uses: aps831/gh-actions/action-release-artifacts-upload@master

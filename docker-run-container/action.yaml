@@ -14,8 +14,8 @@ inputs:
   env:
     description: Newline separated list of environment variables to inject into build container
     required: true
-  command:
-    description: Command to run inside build container
+  commands:
+    description: Newline separated list of commands to run inside build container
     required: true
 runs:
   using: "composite"
@@ -25,5 +25,11 @@ runs:
         sudo chmod o+rw /var/run/docker.sock
         volumes=$(node ${{ github.action_path }}/volumes.js ${{ github.workspace }} ${{ inputs.working-directory }} $'${{ inputs.volumes }}')
         env=$(node ${{ github.action_path }}/env.js $'${{ inputs.env }}')
-        docker run --user $(id -u):$(id -g) $volumes -v /var/run/docker.sock:/var/run/docker.sock -v $PWD:$PWD -w $PWD $env ${{ inputs.image-name }} ${{ inputs.command }}
+        commands="${{ inputs.commands }}"
+        while IFS= read -r command || [ -n "$command" ]; do
+          if [[ "$command" != "" ]]; then
+            echo "Running command $command"
+            docker run --user $(id -u):$(id -g) $volumes -v /var/run/docker.sock:/var/run/docker.sock -v $PWD:$PWD -w $PWD $env ${{ inputs.image-name }} $command
+          fi
+        done <<< "$commands"
         exit $?

@@ -29,11 +29,11 @@ inputs:
   env:
     description: Newline separated list of environment variables to inject into build container
     required: false
-  build-command:
-    description: Command to run inside build container
+  build-commands:
+    description: Newline separated list of commands to run inside build container
     required: false
-  test-command:
-    description: Command to run inside test container
+  test-commands:
+    description: Newline separated list of commands to run inside test container
     required: false
   ACCESS_TOKEN:
     description: Access token
@@ -55,7 +55,7 @@ runs:
 
     # docker-build-runner-image
     - uses: aps831/gh-actions/docker-build-runner-image@master
-      if: ${{ inputs.build-command != '' && !startsWith(inputs.build-command, 'None') }}
+      if: ${{ inputs.build-commands != '' && !startsWith(inputs.build-commands, 'None') }}
       id: builder
       with:
         docker-context: ${{ inputs.working-directory }}
@@ -63,13 +63,14 @@ runs:
 
     # docker-run-container
     - uses: aps831/gh-actions/docker-run-container@master
-      if: ${{ inputs.build-command != '' && !startsWith(inputs.build-command, 'None') }}
+      if: ${{ inputs.build-commands != '' && !startsWith(inputs.build-commands, 'None') }}
       with:
         image-name: ${{ steps.builder.outputs.image-name }}
         working-directory: ${{ inputs.working-directory }}
         volumes: ${{ inputs.volumes }}
         env: ${{ inputs.env }}
-        command: ${{ inputs.build-command }}
+        commands: |
+          ${{ inputs.build-commands }}
 
     # docker-build-prod-image
     - uses: aps831/gh-actions/docker-build-prod-image@master
@@ -82,7 +83,7 @@ runs:
 
     # docker-build-runner-image
     - uses: aps831/gh-actions/docker-build-runner-image@master
-      if: ${{ inputs.test-command != '' && !startsWith(inputs.test-command, 'None') }}
+      if: ${{ inputs.test-commands != '' && !startsWith(inputs.test-commands, 'None') }}
       id: tester
       with:
         docker-context: ${{ inputs.working-directory }}
@@ -90,7 +91,7 @@ runs:
 
     # docker-run-container
     - uses: aps831/gh-actions/docker-run-container@master
-      if: ${{ inputs.test-command != '' && !startsWith(inputs.test-command, 'None') }}
+      if: ${{ inputs.test-commands != '' && !startsWith(inputs.test-commands, 'None') }}
       with:
         image-name: ${{ steps.tester.outputs.image-name }}
         working-directory: ${{ inputs.working-directory }}
@@ -98,4 +99,5 @@ runs:
         env: |
           ${{ inputs.env }}
           IMAGE_UNDER_TEST_NAME=${{ steps.image.outputs.image-name }}
-        command: ${{ inputs.test-command }}
+        commands: |
+          ${{ inputs.test-commands }}

@@ -17,8 +17,8 @@ inputs:
   env:
     description: Newline separated list of environment variables to inject into build container
     required: false
-  build-command:
-    description: Command to run inside build container
+  build-commands:
+    description: Newline separated list of commands to run inside build container
     required: false
   output-artifact-directory:
     description: Output directory of artifact
@@ -55,7 +55,8 @@ runs:
         working-directory: ${{ inputs.working-directory }}
         volumes: ${{ inputs.volumes }}
         env: ${{ inputs.env }}
-        command: ${{ inputs.build-command }}
+        commands: |
+          ${{ inputs.build-commands }}
 
     # zip artifact folder
     - name: zip artifact folder
