@@ -15,7 +15,7 @@ runs:
     - uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # pin@v7
       id: scan
       with:
-        image: "${{ inputs.name }}"
+        image: "${{ inputs.image }}"
         output-format: "sarif"
         fail-build: true
 
